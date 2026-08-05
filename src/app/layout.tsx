@@ -15,8 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NexusStore — Next-Gen Electronics & Tech",
-  description: "Premium consumer tech, wireless audio, smart wearables, and gaming setup gear.",
+  title: "Gift & Print Hub — Custom Gifts, Photo Prints & Corporate Merch",
+  description:
+    "Design personalized gifts, custom photo ceramic mugs, custom T-shirts, engraved wooden photo frames, corporate gift sets, and custom printed keepsakes.",
 };
 
 export default function RootLayout({

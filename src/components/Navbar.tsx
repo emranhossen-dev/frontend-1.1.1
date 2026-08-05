@@ -16,34 +16,41 @@ export const Navbar: React.FC = () => {
         
         {/* Brand Logo */}
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform">
-              N
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-violet-600 flex items-center justify-center font-black text-white shadow-lg shadow-rose-500/20 group-hover:scale-105 transition-transform">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V6a2 2 0 10-2 2h2zm0 13-4-4m4 4 4-4M4 6h16v13H4V6z" />
+              </svg>
             </div>
-            <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
-              NEXUS<span className="text-indigo-400">STORE</span>
-            </span>
+            <div className="flex flex-col">
+              <span className="font-black text-lg tracking-tight bg-gradient-to-r from-white via-zinc-100 to-amber-200 bg-clip-text text-transparent leading-none">
+                GIFT <span className="text-rose-400">&</span> PRINT
+              </span>
+              <span className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase leading-tight">
+                Custom Hub
+              </span>
+            </div>
           </Link>
         </div>
 
         {/* Navigation Links (Desktop) */}
-        <nav className="hidden md:flex items-center gap-8 font-medium text-sm text-zinc-400">
+        <nav className="hidden md:flex items-center gap-7 font-medium text-sm text-zinc-400">
           <Link href="/" className="hover:text-white transition-colors">
             Home
           </Link>
           <Link href="/#categories" className="hover:text-white transition-colors">
-            Categories
+            Gift Categories
+          </Link>
+          <Link href="/#products" className="hover:text-white transition-colors">
+            Custom Catalog
           </Link>
           <Link href="/cart" className="hover:text-white transition-colors">
-            Cart Page
-          </Link>
-          <Link href="/checkout" className="hover:text-white transition-colors">
-            Checkout
+            Cart ({totalItems})
           </Link>
           {user && (
             <Link href="/account" className="hover:text-white transition-colors flex items-center gap-1.5">
               Dashboard
-              <span className="bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/20">
+              <span className="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-500/20">
                 ACTIVE
               </span>
             </Link>
@@ -60,7 +67,7 @@ export const Navbar: React.FC = () => {
                 href="/account"
                 className="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-200 hover:text-white transition-colors flex items-center gap-2 text-xs font-semibold"
               >
-                <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-[10px]">
+                <div className="w-6 h-6 rounded-lg bg-rose-500 text-white flex items-center justify-center font-bold text-[10px]">
                   {user.displayName?.[0] || user.email?.[0] || "U"}
                 </div>
                 <span className="hidden lg:inline max-w-[100px] truncate">{user.displayName || user.email}</span>
@@ -76,7 +83,7 @@ export const Navbar: React.FC = () => {
           ) : (
             <Link
               href="/login"
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white font-bold text-xs shadow-md shadow-rose-500/20 transition-all"
             >
               Sign In
             </Link>
@@ -92,7 +99,7 @@ export const Navbar: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
             {totalItems > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-indigo-600 text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-md shadow-indigo-600/40 animate-pulse">
+              <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-md shadow-rose-500/40 animate-pulse">
                 {totalItems}
               </span>
             )}

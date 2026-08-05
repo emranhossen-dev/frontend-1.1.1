@@ -13,17 +13,26 @@ export interface Product {
   reviewCount: number;
   badge?: string;
   isNew?: boolean;
+  supportsCustomText?: boolean;
+  supportsPhotoUpload?: boolean;
 }
 
 export interface CartItem extends Product {
+  cartItemId?: string;
   quantity: number;
+  customText?: string;
+  customFont?: string;
+  customColor?: string;
+  customNotes?: string;
+  variantColor?: string;
+  variantSize?: string;
 }
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (product: Product) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, delta: number) => void;
+  addToCart: (product: Product, options?: Partial<CartItem>) => void;
+  removeFromCart: (cartItemId: string) => void;
+  updateQuantity: (cartItemId: string, delta: number) => void;
   clearCart: () => void;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
@@ -58,29 +67,51 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [cart]);
 
-  const addToCart = (product: Product) => {
+  const addToCart = (product: Product, options?: Partial<CartItem>) => {
+    const customText = options?.customText?.trim() || "";
+    const customFont = options?.customFont || "";
+    const customColor = options?.customColor || "";
+    const customNotes = options?.customNotes || "";
+    const variantColor = options?.variantColor || "";
+    const variantSize = options?.variantSize || "";
+
+    const key = `${product.id}-${variantColor}-${variantSize}-${customText}-${customFont}`;
+
     setCart((prev) => {
-      const existingIndex = prev.findIndex((item) => item.id === product.id);
+      const existingIndex = prev.findIndex(
+        (item) => (item.cartItemId || item.id) === key
+      );
       if (existingIndex > -1) {
         const updated = [...prev];
-        updated[existingIndex].quantity += 1;
+        updated[existingIndex].quantity += options?.quantity || 1;
         return updated;
       } else {
-        return [...prev, { ...product, quantity: 1 }];
+        const newItem: CartItem = {
+          ...product,
+          cartItemId: key,
+          quantity: options?.quantity || 1,
+          customText,
+          customFont,
+          customColor,
+          customNotes,
+          variantColor,
+          variantSize,
+        };
+        return [...prev, newItem];
       }
     });
     setIsCartOpen(true);
   };
 
-  const removeFromCart = (productId: string) => {
-    setCart((prev) => prev.filter((item) => item.id !== productId));
+  const removeFromCart = (cartItemId: string) => {
+    setCart((prev) => prev.filter((item) => (item.cartItemId || item.id) !== cartItemId));
   };
 
-  const updateQuantity = (productId: string, delta: number) => {
+  const updateQuantity = (cartItemId: string, delta: number) => {
     setCart((prev) =>
       prev
         .map((item) => {
-          if (item.id === productId) {
+          if ((item.cartItemId || item.id) === cartItemId) {
             const newQty = item.quantity + delta;
             return newQty > 0 ? { ...item, quantity: newQty } : null;
           }

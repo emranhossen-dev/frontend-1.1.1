@@ -17,7 +17,7 @@ export const CartDrawer: React.FC = () => {
 
   if (!isCartOpen) return null;
 
-  const freeShippingThreshold = 200;
+  const freeShippingThreshold = 100;
   const amountLeftForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
   const progressPercentage = Math.min(100, (subtotal / freeShippingThreshold) * 100);
 
@@ -25,7 +25,7 @@ export const CartDrawer: React.FC = () => {
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop Overlay */}
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
         onClick={() => setIsCartOpen(false)}
       />
 
@@ -35,10 +35,10 @@ export const CartDrawer: React.FC = () => {
           {/* Header */}
           <div className="p-6 border-b border-zinc-800 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
-              <h2 className="text-lg font-bold text-white">Your Shopping Cart ({cart.length})</h2>
+              <h2 className="text-lg font-bold text-white">Your Customized Gifts ({cart.length})</h2>
             </div>
             <button
               onClick={() => setIsCartOpen(false)}
@@ -52,16 +52,16 @@ export const CartDrawer: React.FC = () => {
           <div className="bg-zinc-900/80 px-6 py-3 border-b border-zinc-800 text-xs">
             {amountLeftForFreeShipping > 0 ? (
               <p className="text-zinc-400 font-medium">
-                Add <span className="text-emerald-400 font-bold">${amountLeftForFreeShipping.toFixed(2)}</span> more to qualify for <span className="text-white font-bold">FREE Express Shipping</span>!
+                Add <span className="text-rose-400 font-bold">${amountLeftForFreeShipping.toFixed(2)}</span> more to qualify for <span className="text-white font-bold">FREE Gift Shipping</span>!
               </p>
             ) : (
               <p className="text-emerald-400 font-bold flex items-center gap-1.5">
-                🎉 You've unlocked FREE Express Shipping!
+                🎉 You've unlocked FREE Gift Shipping!
               </p>
             )}
             <div className="w-full h-1.5 bg-zinc-800 rounded-full mt-2 overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-300 rounded-full"
+                className="h-full bg-gradient-to-r from-rose-500 via-amber-500 to-emerald-400 transition-all duration-300 rounded-full"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
@@ -78,35 +78,53 @@ export const CartDrawer: React.FC = () => {
                 </div>
                 <h3 className="text-zinc-300 font-semibold text-base">Your cart is empty</h3>
                 <p className="text-zinc-500 text-xs max-w-xs mx-auto">
-                  Looks like you haven't added any products to your shopping cart yet.
+                  Start customizing mugs, hoodies, photo frames, and executive gift sets!
                 </p>
               </div>
             ) : (
-              cart.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex gap-4 p-3 rounded-xl bg-zinc-900/50 border border-zinc-800/80 items-center justify-between"
-                >
-                  <div className="relative w-16 h-16 bg-zinc-900 rounded-lg overflow-hidden flex-shrink-0">
-                    <Image src={item.image} alt={item.name} fill className="object-cover" />
-                  </div>
+              cart.map((item) => {
+                const itemId = item.cartItemId || item.id;
+                return (
+                  <div
+                    key={itemId}
+                    className="flex flex-col gap-2 p-3.5 rounded-2xl bg-zinc-900/60 border border-zinc-800"
+                  >
+                    <div className="flex gap-4 items-center justify-between">
+                      <div className="relative w-16 h-16 bg-zinc-900 rounded-xl overflow-hidden flex-shrink-0 border border-zinc-800">
+                        <Image src={item.image} alt={item.name} fill className="object-cover" />
+                      </div>
 
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-semibold text-white truncate">{item.name}</h4>
-                    <span className="text-xs text-zinc-400">${item.price} each</span>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-bold text-white truncate">{item.name}</h4>
+                        <span className="text-xs text-zinc-400">${item.price} each</span>
+                        
+                        {/* Customization Badges */}
+                        {item.customText && (
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            <span className="px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-bold">
+                              Text: "{item.customText}"
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="text-right font-black text-sm text-white">
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </div>
+                    </div>
 
                     {/* Quantity controls */}
-                    <div className="flex items-center gap-3 mt-2">
+                    <div className="flex items-center justify-between pt-2 border-t border-zinc-800/60">
                       <div className="flex items-center border border-zinc-800 rounded-lg bg-zinc-950">
                         <button
-                          onClick={() => updateQuantity(item.id, -1)}
+                          onClick={() => updateQuantity(itemId, -1)}
                           className="px-2 py-0.5 text-zinc-400 hover:text-white"
                         >
                           -
                         </button>
                         <span className="px-2.5 text-xs font-semibold text-white">{item.quantity}</span>
                         <button
-                          onClick={() => updateQuantity(item.id, 1)}
+                          onClick={() => updateQuantity(itemId, 1)}
                           className="px-2 py-0.5 text-zinc-400 hover:text-white"
                         >
                           +
@@ -114,19 +132,15 @@ export const CartDrawer: React.FC = () => {
                       </div>
 
                       <button
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => removeFromCart(itemId)}
                         className="text-xs text-rose-400 hover:text-rose-300 font-medium"
                       >
                         Remove
                       </button>
                     </div>
                   </div>
-
-                  <div className="text-right font-bold text-sm text-white">
-                    ${(item.price * item.quantity).toFixed(2)}
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
 
@@ -141,26 +155,26 @@ export const CartDrawer: React.FC = () => {
                 <div className="flex justify-between">
                   <span>Shipping</span>
                   <span className="text-emerald-400 font-semibold">
-                    {subtotal >= freeShippingThreshold ? "FREE" : "$15.00"}
+                    {subtotal >= freeShippingThreshold ? "FREE" : "$9.99"}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm text-white font-bold pt-2 border-t border-zinc-800">
                   <span>Total</span>
-                  <span className="text-indigo-400">
-                    ${(subtotal + (subtotal >= freeShippingThreshold ? 0 : 15)).toFixed(2)}
+                  <span className="text-rose-400">
+                    ${(subtotal + (subtotal >= freeShippingThreshold ? 0 : 9.99)).toFixed(2)}
                   </span>
                 </div>
               </div>
 
               <button
                 onClick={() => {
-                  alert("Proceeding to Checkout!");
+                  alert("Order Placed! Thank you for shopping with Gift & Print Hub.");
                   clearCart();
                   setIsCartOpen(false);
                 }}
-                className="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-lg shadow-indigo-600/30 transition-all text-sm text-center"
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white font-bold shadow-lg shadow-rose-500/20 transition-all text-sm text-center"
               >
-                Proceed to Checkout
+                Checkout Custom Order
               </button>
             </div>
           )}
