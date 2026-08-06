@@ -46,10 +46,8 @@ export const CustomizerPreviewModal: React.FC<CustomizerPreviewModalProps> = ({
 
   const handleAddToCart = () => {
     addToCart(product, {
-      customText,
-      customFont: selectedFont,
-      customColor: selectedColor,
-      customNotes,
+      variantColor: selectedColor,
+      variantSize: selectedFont,
       quantity: 1,
     });
     onClose();

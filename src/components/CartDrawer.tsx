@@ -1,142 +1,173 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
+import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
+import {
+  HiXMark,
+  HiOutlineTrash,
+  HiPlus,
+  HiMinus,
+  HiOutlineShoppingBag,
+  HiOutlineArrowRight,
+  HiCheck,
+  HiTag,
+  HiSparkles,
+} from "react-icons/hi2";
+import Link from "next/link";
 
 export const CartDrawer: React.FC = () => {
-  const {
-    cart,
-    isCartOpen,
-    setIsCartOpen,
-    removeFromCart,
-    updateQuantity,
-    subtotal,
-    clearCart,
-  } = useCart();
+  const { cart, removeFromCart, updateQuantity, isCartOpen, setIsCartOpen, subtotal, totalItems } =
+    useCart();
+
+  const [promoCode, setPromoCode] = useState("");
+  const [discount, setDiscount] = useState(0);
+  const [promoError, setPromoError] = useState("");
+  const [promoApplied, setPromoApplied] = useState("");
 
   if (!isCartOpen) return null;
 
-  const freeShippingThreshold = 100;
-  const amountLeftForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
-  const progressPercentage = Math.min(100, (subtotal / freeShippingThreshold) * 100);
+  const handleApplyPromo = () => {
+    if (promoCode.trim().toUpperCase() === "WEBSITES10" || promoCode.trim().toUpperCase() === "SAVE10") {
+      setDiscount(0.1);
+      setPromoApplied("WEBSITES10 (১০% ছাড়)");
+      setPromoError("");
+    } else {
+      setPromoError("সঠিক কুপন কোড লিখুন (যেমন: WEBSITES10)");
+    }
+  };
+
+  const discountAmount = subtotal * discount;
+  const freeShippingThreshold = 3000;
+  const freeShippingProgress = Math.min(100, (subtotal / freeShippingThreshold) * 100);
+  const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
+  const finalTotal = Math.max(0, subtotal - discountAmount);
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
-      {/* Backdrop Overlay */}
+    <div className="fixed inset-0 z-50 overflow-hidden bg-zinc-950/80 backdrop-blur-md transition-opacity">
       <div
-        className="absolute inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0"
         onClick={() => setIsCartOpen(false)}
+        aria-label="Close background backdrop"
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-zinc-950 border-l border-zinc-800 text-zinc-100 flex flex-col justify-between shadow-2xl">
-          
+        <div className="w-screen max-w-md bg-zinc-900 border-l border-zinc-800 shadow-2xl flex flex-col justify-between">
           {/* Header */}
-          <div className="p-6 border-b border-zinc-800 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-              </svg>
-              <h2 className="text-lg font-bold text-white">Your Customized Gifts ({cart.length})</h2>
+          <div className="p-5 border-b border-zinc-800 flex items-center justify-between bg-zinc-950">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold shadow-md shadow-blue-500/30">
+                <HiOutlineShoppingBag className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-base font-black text-white">শপিং কার্ট (Shopping Cart)</h2>
+                <p className="text-xs text-zinc-400">{totalItems} টি পণ্য সিলেক্ট করেছেন</p>
+              </div>
             </div>
             <button
               onClick={() => setIsCartOpen(false)}
-              className="p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-900 transition-colors"
+              className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+              aria-label="Close cart"
             >
-              ✕
+              <HiXMark className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Free Shipping Progress Indicator */}
-          <div className="bg-zinc-900/80 px-6 py-3 border-b border-zinc-800 text-xs">
-            {amountLeftForFreeShipping > 0 ? (
-              <p className="text-zinc-400 font-medium">
-                Add <span className="text-rose-400 font-bold">${amountLeftForFreeShipping.toFixed(2)}</span> more to qualify for <span className="text-white font-bold">FREE Gift Shipping</span>!
-              </p>
-            ) : (
-              <p className="text-emerald-400 font-bold flex items-center gap-1.5">
-                🎉 You've unlocked FREE Gift Shipping!
-              </p>
-            )}
-            <div className="w-full h-1.5 bg-zinc-800 rounded-full mt-2 overflow-hidden">
+          {/* Free Shipping Meter */}
+          <div className="px-5 py-3 bg-zinc-950/60 border-b border-zinc-800/80">
+            <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
+              <div className="flex items-center gap-1.5 text-zinc-300">
+                {remainingForFreeShipping <= 0 && <HiSparkles className="w-4 h-4 text-amber-400 shrink-0" />}
+                <span>
+                  {remainingForFreeShipping > 0
+                    ? `ফ্রি ডেলিভারির জন্য আরও ৳${remainingForFreeShipping.toLocaleString()} টাকার কেনাকাটা করুন`
+                    : "অভিনন্দন! আপনি পাচ্ছেন ফ্রি এক্সপ্রেস ডেলিভারি!"}
+                </span>
+              </div>
+              <span className="text-blue-400 font-bold">{Math.round(freeShippingProgress)}%</span>
+            </div>
+            <div className="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-rose-500 via-amber-500 to-emerald-400 transition-all duration-300 rounded-full"
-                style={{ width: `${progressPercentage}%` }}
+                className="bg-gradient-to-r from-blue-600 to-emerald-400 h-full rounded-full transition-all duration-500"
+                style={{ width: `${freeShippingProgress}%` }}
               />
             </div>
           </div>
 
-          {/* Cart Item List */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {/* Cart Items List */}
+          <div className="flex-1 overflow-y-auto p-5 space-y-4">
             {cart.length === 0 ? (
-              <div className="text-center py-16 space-y-4">
-                <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto text-zinc-600">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                  </svg>
+              <div className="h-full flex flex-col items-center justify-center text-center py-12">
+                <div className="w-16 h-16 rounded-2xl bg-zinc-800/80 border border-zinc-700 flex items-center justify-center text-zinc-500 mb-4">
+                  <HiOutlineShoppingBag className="w-8 h-8 text-zinc-500" />
                 </div>
-                <h3 className="text-zinc-300 font-semibold text-base">Your cart is empty</h3>
-                <p className="text-zinc-500 text-xs max-w-xs mx-auto">
-                  Start customizing mugs, hoodies, photo frames, and executive gift sets!
+                <h3 className="text-base font-bold text-white mb-1">আপনার কার্ট খালি রয়েছে</h3>
+                <p className="text-xs text-zinc-400 max-w-xs mb-6">
+                  আমাদের নতুন গেজেট ও অফারসমূহ এক্সপ্লোর করে পণ্য যুক্ত করুন।
                 </p>
+                <button
+                  onClick={() => setIsCartOpen(false)}
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-500/20 cursor-pointer"
+                >
+                  কেনাকাটা শুরু করুন
+                </button>
               </div>
             ) : (
               cart.map((item) => {
-                const itemId = item.cartItemId || item.id;
+                const key = item.cartItemId || item.id;
                 return (
                   <div
-                    key={itemId}
-                    className="flex flex-col gap-2 p-3.5 rounded-2xl bg-zinc-900/60 border border-zinc-800"
+                    key={key}
+                    className="p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800/80 flex gap-3 items-center relative group"
                   >
-                    <div className="flex gap-4 items-center justify-between">
-                      <div className="relative w-16 h-16 bg-zinc-900 rounded-xl overflow-hidden flex-shrink-0 border border-zinc-800">
-                        <Image src={item.image} alt={item.name} fill className="object-cover" />
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-bold text-white truncate">{item.name}</h4>
-                        <span className="text-xs text-zinc-400">${item.price} each</span>
-                        
-                        {/* Customization Badges */}
-                        {item.customText && (
-                          <div className="mt-1 flex flex-wrap gap-1">
-                            <span className="px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-bold">
-                              Text: "{item.customText}"
-                            </span>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="text-right font-black text-sm text-white">
-                        ${(item.price * item.quantity).toFixed(2)}
-                      </div>
+                    <div className="w-20 h-20 rounded-xl bg-zinc-900 overflow-hidden shrink-0 border border-zinc-800">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
 
-                    {/* Quantity controls */}
-                    <div className="flex items-center justify-between pt-2 border-t border-zinc-800/60">
-                      <div className="flex items-center border border-zinc-800 rounded-lg bg-zinc-950">
-                        <button
-                          onClick={() => updateQuantity(itemId, -1)}
-                          className="px-2 py-0.5 text-zinc-400 hover:text-white"
-                        >
-                          -
-                        </button>
-                        <span className="px-2.5 text-xs font-semibold text-white">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(itemId, 1)}
-                          className="px-2 py-0.5 text-zinc-400 hover:text-white"
-                        >
-                          +
-                        </button>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-xs font-bold text-white truncate leading-snug">
+                        {item.name}
+                      </h4>
+                      {(item.variantColor || item.variantSize) && (
+                        <p className="text-[11px] text-zinc-400 mt-0.5">
+                          {item.variantColor} {item.variantSize && `• ${item.variantSize}`}
+                        </p>
+                      )}
+                      <div className="text-xs font-black text-blue-400 mt-1">
+                        ৳{(item.price * item.quantity).toLocaleString()}
                       </div>
 
-                      <button
-                        onClick={() => removeFromCart(itemId)}
-                        className="text-xs text-rose-400 hover:text-rose-300 font-medium"
-                      >
-                        Remove
-                      </button>
+                      {/* Quantity Controls */}
+                      <div className="flex items-center justify-between mt-2 pt-1 border-t border-zinc-800/60">
+                        <div className="flex items-center border border-zinc-800 rounded-lg bg-zinc-900 p-0.5">
+                          <button
+                            onClick={() => updateQuantity(key, -1)}
+                            className="p-1 text-zinc-400 hover:text-white cursor-pointer"
+                          >
+                            <HiMinus className="w-3 h-3" />
+                          </button>
+                          <span className="px-2 text-xs font-bold text-white">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => updateQuantity(key, 1)}
+                            className="p-1 text-zinc-400 hover:text-white cursor-pointer"
+                          >
+                            <HiPlus className="w-3 h-3" />
+                          </button>
+                        </div>
+
+                        <button
+                          onClick={() => removeFromCart(key)}
+                          className="p-1 text-zinc-500 hover:text-rose-400 transition-colors cursor-pointer"
+                          title="Remove item"
+                        >
+                          <HiOutlineTrash className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -144,41 +175,75 @@ export const CartDrawer: React.FC = () => {
             )}
           </div>
 
-          {/* Footer Checkout Summary */}
+          {/* Footer Summary & Checkout */}
           {cart.length > 0 && (
-            <div className="p-6 border-t border-zinc-800 bg-zinc-900/40 space-y-4">
-              <div className="space-y-2 text-xs text-zinc-400">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span className="text-white font-semibold">${subtotal.toFixed(2)}</span>
+            <div className="p-5 border-t border-zinc-800 bg-zinc-950 space-y-4">
+              {/* Promo Code Input */}
+              <div>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <HiTag className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+                    <input
+                      type="text"
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value)}
+                      placeholder="কুপন কোড (e.g. WEBSITES10)"
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white uppercase placeholder:normal-case focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <button
+                    onClick={handleApplyPromo}
+                    className="px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs cursor-pointer"
+                  >
+                    অ্যাপ্লাই
+                  </button>
                 </div>
+                {promoApplied && (
+                  <p className="text-[11px] text-emerald-400 font-semibold mt-1 flex items-center gap-1">
+                    <HiCheck className="w-3 h-3" />
+                    <span>প্রযোজ্য {promoApplied}</span>
+                  </p>
+                )}
+                {promoError && (
+                  <p className="text-[11px] text-rose-400 font-semibold mt-1">{promoError}</p>
+                )}
+              </div>
+
+              {/* Price Calculation */}
+              <div className="space-y-1.5 text-xs text-zinc-400">
                 <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span className="text-emerald-400 font-semibold">
-                    {subtotal >= freeShippingThreshold ? "FREE" : "$9.99"}
+                  <span>সাবটোটাল</span>
+                  <span className="font-semibold text-white">৳{subtotal.toLocaleString()}</span>
+                </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-emerald-400">
+                    <span>ডিসকাউন্ট (১০%)</span>
+                    <span>-৳{discountAmount.toLocaleString()}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span>ডেলিভারি চার্জ</span>
+                  <span className="font-semibold text-emerald-400">
+                    {subtotal >= freeShippingThreshold ? "ফ্রি" : "৳১২০"}
                   </span>
                 </div>
-                <div className="flex justify-between text-sm text-white font-bold pt-2 border-t border-zinc-800">
-                  <span>Total</span>
-                  <span className="text-rose-400">
-                    ${(subtotal + (subtotal >= freeShippingThreshold ? 0 : 9.99)).toFixed(2)}
-                  </span>
+                <div className="flex justify-between text-sm font-black text-white pt-2 border-t border-zinc-800">
+                  <span>সর্বমোট (Total)</span>
+                  <span className="text-blue-400">৳{finalTotal.toLocaleString()}</span>
                 </div>
               </div>
 
-              <button
-                onClick={() => {
-                  alert("Order Placed! Thank you for shopping with Gift & Print Hub.");
-                  clearCart();
-                  setIsCartOpen(false);
-                }}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white font-bold shadow-lg shadow-rose-500/20 transition-all text-sm text-center"
+              {/* Checkout CTA */}
+              <Link
+                href="/checkout"
+                onClick={() => setIsCartOpen(false)}
+                className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-xl shadow-blue-500/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
               >
-                Checkout Custom Order
-              </button>
+                <span>অর্ডার সম্পন্ন করুন</span>
+                <HiOutlineArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           )}
-
         </div>
       </div>
     </div>
