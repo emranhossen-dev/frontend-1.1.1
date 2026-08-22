@@ -34,23 +34,31 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
 }) => {
   const router = useRouter();
 
-  if (!isOpen) return null;
-
   const handleNav = (path: string) => {
     onClose();
     router.push(path);
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div
+      className={`fixed inset-0 z-50 overflow-hidden transition-all duration-300 ${
+        isOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+      }`}
+    >
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-fade-in"
+        className={`absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-300 ${
+          isOpen ? 'opacity-100' : 'opacity-0'
+        }`}
       />
 
-      {/* Drawer Panel Sliding from Left */}
-      <div className="fixed inset-y-0 left-0 max-w-full flex pr-10">
+      {/* Drawer Panel Sliding Smoothly from Left */}
+      <div
+        className={`fixed inset-y-0 left-0 max-w-full flex pr-10 transform transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
         <div className="w-screen max-w-xs sm:max-w-sm bg-white dark:bg-slate-900 shadow-2xl flex flex-col justify-between">
           {/* Header */}
           <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between">
@@ -64,7 +72,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
             <button
               onClick={onClose}
               aria-label="Close navigation"
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full transition-colors"
+              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -78,7 +86,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                 onClose();
                 onOpenSearch();
               }}
-              className="w-full h-11 bg-gray-100 dark:bg-slate-800 rounded-xl px-4 flex items-center gap-3 text-gray-500 text-xs font-semibold hover:bg-gray-200 transition-colors"
+              className="w-full h-11 bg-gray-100 dark:bg-slate-800 rounded-xl px-4 flex items-center gap-3 text-gray-500 text-xs font-semibold hover:bg-gray-200 transition-colors cursor-pointer"
             >
               <Search className="w-4 h-4 text-gray-400" />
               <span>Search products, brands...</span>
@@ -92,7 +100,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
 
               <button
                 onClick={() => handleNav('/')}
-                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-sm font-bold text-gray-900 dark:text-white transition-colors text-left"
+                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-sm font-bold text-gray-900 dark:text-white transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
                   <Home className="w-4 h-4 text-gray-500" />
@@ -103,7 +111,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
 
               <button
                 onClick={() => handleNav('/products')}
-                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-sm font-bold text-gray-900 dark:text-white transition-colors text-left"
+                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-sm font-bold text-gray-900 dark:text-white transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
                   <Grid className="w-4 h-4 text-gray-500" />
@@ -116,7 +124,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
 
               <button
                 onClick={() => handleNav('/cart')}
-                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-sm font-bold text-gray-900 dark:text-white transition-colors text-left"
+                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-sm font-bold text-gray-900 dark:text-white transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
                   <ShoppingBag className="w-4 h-4 text-gray-500" />
@@ -127,7 +135,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
 
               <button
                 onClick={() => handleNav('/account')}
-                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-sm font-bold text-gray-900 dark:text-white transition-colors text-left"
+                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-sm font-bold text-gray-900 dark:text-white transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
                   <User className="w-4 h-4 text-gray-500" />
@@ -138,7 +146,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
 
               <button
                 onClick={() => handleNav('/account/orders/8849201A/track')}
-                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-sm font-bold text-gray-900 dark:text-white transition-colors text-left"
+                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-sm font-bold text-gray-900 dark:text-white transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
                   <Truck className="w-4 h-4 text-gray-500" />
@@ -157,7 +165,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                 <button
                   key={cat.id}
                   onClick={() => handleNav('/products')}
-                  className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-xs font-semibold text-gray-700 dark:text-gray-300 transition-colors text-left"
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-xs font-semibold text-gray-700 dark:text-gray-300 transition-colors text-left cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
                     <Sparkles className="w-3.5 h-3.5 text-gray-400" />

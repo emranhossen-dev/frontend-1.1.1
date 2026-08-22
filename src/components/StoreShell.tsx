@@ -1,10 +1,11 @@
 'use client';
 
-import React, { ReactNode } from 'react';
+import React, { ReactNode, Suspense } from 'react';
 import { StoreProvider, useStore } from '@/context/StoreContext';
 import CartDrawer from '@/components/CartDrawer';
 import SearchModal from '@/components/SearchModal';
 import MobileNavDrawer from '@/components/MobileNavDrawer';
+import PageNavigationLoader from '@/components/PageNavigationLoader';
 import { useRouter } from 'next/navigation';
 
 const StoreShellInner: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -26,6 +27,10 @@ const StoreShellInner: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   return (
     <>
+      <Suspense fallback={null}>
+        <PageNavigationLoader />
+      </Suspense>
+
       {children}
 
       {/* Global Slide-over Mobile Menu Navigation */}

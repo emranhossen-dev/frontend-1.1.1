@@ -32,12 +32,27 @@ export const Header: React.FC<HeaderProps> = ({
   const cartCount = customCartCount !== undefined ? customCartCount : computedCartCount;
   const brandName = siteName || storeConfig.name;
 
+  const handleMenuClick = () => {
+    setIsMenuOpen(true);
+    if (customOpenMenu) customOpenMenu();
+  };
+
+  const handleSearchClick = () => {
+    setIsSearchOpen(true);
+    if (customOpenSearch) customOpenSearch();
+  };
+
+  const handleCartClick = () => {
+    setIsCartOpen(true);
+    if (customOpenCart) customOpenCart();
+  };
+
   return (
     <header className="sticky top-0 z-40 w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-gray-200/80 dark:border-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Left: Mobile Hamburger Menu Trigger */}
         <button
-          onClick={customOpenMenu || (() => setIsMenuOpen(true))}
+          onClick={handleMenuClick}
           aria-label="Open Mobile Menu"
           className="p-2 -ml-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-all active:scale-95 cursor-pointer"
         >
@@ -55,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Right Actions: Search & Cart */}
         <div className="flex items-center gap-1">
           <button
-            onClick={customOpenSearch || (() => setIsSearchOpen(true))}
+            onClick={handleSearchClick}
             aria-label="Search"
             className="p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-all active:scale-95 cursor-pointer"
           >
@@ -63,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <button
-            onClick={customOpenCart || (() => setIsCartOpen(true))}
+            onClick={handleCartClick}
             aria-label="Open Cart"
             className="p-2 -mr-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-all active:scale-95 relative cursor-pointer"
           >
