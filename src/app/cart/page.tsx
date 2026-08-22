@@ -4,55 +4,32 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import BottomNavBar from '@/components/BottomNavBar';
-import SearchModal from '@/components/SearchModal';
-import { defaultStoreConfig, defaultProducts } from '@/config/storeConfig';
-import { CartItem } from '@/types/store';
+import { useStore } from '@/context/StoreContext';
+import { notifySuccess, notifyError } from '@/lib/sweetalert';
 import { ShoppingCart, Trash2, Plus, Minus, Lock, ArrowRight, Tag } from 'lucide-react';
 
 export default function CartPage() {
   const router = useRouter();
-  const [storeConfig] = useState(defaultStoreConfig);
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    { product: defaultProducts[0], quantity: 1 },
-    { product: defaultProducts[2], quantity: 2 },
-  ]);
+  const { cartItems, storeConfig, updateQuantity, removeFromCart } = useStore();
+
   const [couponCode, setCouponCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
-
-  const [activeTab, setActiveTab] = useState('cart');
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.product.price * item.quantity,
     0
   );
 
-  const handleUpdateQuantity = (productId: string, delta: number) => {
-    setCartItems((prev) =>
-      prev
-        .map((item) => {
-          if (item.product.id === productId) {
-            const newQty = item.quantity + delta;
-            return newQty > 0 ? { ...item, quantity: newQty } : null;
-          }
-          return item;
-        })
-        .filter(Boolean) as CartItem[]
-    );
-  };
-
-  const handleRemoveItem = (productId: string) => {
-    setCartItems((prev) => prev.filter((item) => item.product.id !== productId));
-  };
-
   const handleApplyCoupon = () => {
     if (couponCode.trim().toUpperCase() === 'FIRST50') {
       setDiscountAmount(500);
       setAppliedCoupon('FIRST50');
+      notifySuccess('Promo Coupon Applied!', '৳500 flat discount applied to your order total.');
     } else if (couponCode.trim().length > 0) {
-      alert('Invalid promo code. Try using "FIRST50" for ৳500 OFF!');
+      notifyError('Invalid Promo Code', 'Try using code "FIRST50" for ৳500 OFF!');
     }
   };
 
@@ -61,13 +38,7 @@ export default function CartPage() {
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col font-sans">
       {/* Header */}
-      <Header
-        siteName={storeConfig.name}
-        cartCount={cartItems.length}
-        onOpenMenu={() => console.log('Open Menu')}
-        onOpenCart={() => router.push('/cart')}
-        onOpenSearch={() => setIsSearchOpen(true)}
-      />
+      <Header />
 
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-6 pb-28">
         {/* Page Title */}
@@ -76,7 +47,7 @@ export default function CartPage() {
             Your Cart
           </h1>
           <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-            {cartItems.length} Items
+            {cartItems.reduce((s, i) => s + i.quantity, 0)} Items
           </span>
         </div>
 
@@ -133,8 +104,8 @@ export default function CartPage() {
                     <div className="flex items-center justify-between mt-3">
                       <div className="flex items-center border border-gray-300 dark:border-slate-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-slate-800 h-8">
                         <button
-                          onClick={() => handleUpdateQuantity(product.id, -1)}
-                          className="w-8 h-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700"
+                          onClick={() => updateQuantity(product.id, -1)}
+                          className="w-8 h-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700 cursor-pointer"
                         >
                           <Minus className="w-3.5 h-3.5" />
                         </button>
@@ -142,8 +113,8 @@ export default function CartPage() {
                           {quantity}
                         </span>
                         <button
-                          onClick={() => handleUpdateQuantity(product.id, 1)}
-                          className="w-8 h-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700"
+                          onClick={() => updateQuantity(product.id, 1)}
+                          className="w-8 h-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700 cursor-pointer"
                         >
                           <Plus className="w-3.5 h-3.5" />
                         </button>
@@ -152,9 +123,9 @@ export default function CartPage() {
                   </div>
 
                   <button
-                    onClick={() => handleRemoveItem(product.id)}
+                    onClick={() => removeFromCart(product.id)}
                     aria-label="Remove item"
-                    className="absolute top-3 right-0 text-gray-400 hover:text-red-500 transition-colors p-1"
+                    className="absolute top-3 right-0 text-gray-400 hover:text-red-500 transition-colors p-1 cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -177,7 +148,7 @@ export default function CartPage() {
                 />
                 <button
                   onClick={handleApplyCoupon}
-                  className="h-12 px-6 bg-black dark:bg-white text-white dark:text-black font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors whitespace-nowrap"
+                  className="h-12 px-6 bg-black dark:bg-white text-white dark:text-black font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors whitespace-nowrap cursor-pointer"
                 >
                   Apply
                 </button>
@@ -228,7 +199,7 @@ export default function CartPage() {
               {/* Checkout CTA */}
               <button
                 onClick={() => router.push('/checkout')}
-                className="w-full h-14 bg-black dark:bg-white text-white dark:text-black font-bold text-sm rounded-xl flex items-center justify-center gap-2 hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-lg active:scale-95 mt-4"
+                className="w-full h-14 bg-black dark:bg-white text-white dark:text-black font-bold text-sm rounded-xl flex items-center justify-center gap-2 hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-lg active:scale-95 mt-4 cursor-pointer"
               >
                 Proceed to Checkout
                 <ArrowRight className="w-4 h-4" />
@@ -242,23 +213,8 @@ export default function CartPage() {
         )}
       </main>
 
-      {/* Bottom Nav */}
-      <BottomNavBar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        wishlistCount={1}
-        onOpenSearch={() => setIsSearchOpen(true)}
-        onOpenCategories={() => router.push('/products')}
-      />
-
-      {/* Search Modal */}
-      <SearchModal
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        products={defaultProducts}
-        currency={storeConfig.currency}
-        onSelectProduct={() => router.push('/cart')}
-      />
+      <Footer />
+      <BottomNavBar />
     </div>
   );
 }
