@@ -10,7 +10,6 @@ import FeaturedProducts from '@/components/FeaturedProducts';
 import { Product } from '@/types/store';
 import { useStore } from '@/context/StoreContext';
 import {
-  ArrowLeft,
   Heart,
   Share2,
   Star,
@@ -23,7 +22,6 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  ZoomIn,
 } from 'lucide-react';
 
 interface ProductDetailsPageProps {
@@ -101,7 +99,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col font-sans pb-24">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col font-sans">
       {/* Header */}
       <Header />
 

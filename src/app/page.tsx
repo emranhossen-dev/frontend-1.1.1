@@ -24,7 +24,7 @@ export default function Home() {
       {/* Top Navigation Header */}
       <Header siteName={storeConfig.name} />
 
-      <main className="flex-1 w-full pb-12 sm:pb-16">
+      <main className="flex-1 w-full pb-6">
         {/* Editorial Hero Banner */}
         <HeroSection banner={heroBanner} />
 

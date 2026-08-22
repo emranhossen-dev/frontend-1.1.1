@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BottomNavBar from '@/components/BottomNavBar';
-import { Product } from '@/types/store';
 import { useStore } from '@/context/StoreContext';
 import {
   ChevronRight,
@@ -54,7 +53,7 @@ export default function AllProductsPage() {
       {/* Top Header */}
       <Header />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-4 pb-24">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-4 pb-12">
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-3">
           <Link href="/" className="hover:text-black dark:hover:text-white transition-colors">

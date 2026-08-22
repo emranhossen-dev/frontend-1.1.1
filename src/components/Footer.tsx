@@ -9,9 +9,6 @@ import {
   PhoneCall,
   Mail,
   MapPin,
-  ShieldCheck,
-  CreditCard,
-  Truck,
   Heart,
 } from 'lucide-react';
 
@@ -28,7 +25,7 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-slate-900 text-white pt-12 pb-24 sm:pb-12 border-t border-slate-800">
+    <footer className="bg-slate-900 text-white pt-12 pb-20 sm:pb-8 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 space-y-12">
         {/* Newsletter Banner */}
         <div className="bg-gradient-to-r from-slate-800 to-slate-900 border border-slate-700/80 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
