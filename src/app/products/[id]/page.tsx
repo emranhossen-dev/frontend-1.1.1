@@ -3,9 +3,12 @@
 import React, { useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { defaultStoreConfig, defaultProducts } from '@/config/storeConfig';
-import { Product, CartItem } from '@/types/store';
-import CartDrawer from '@/components/CartDrawer';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import BottomNavBar from '@/components/BottomNavBar';
+import FeaturedProducts from '@/components/FeaturedProducts';
+import { Product } from '@/types/store';
+import { useStore } from '@/context/StoreContext';
 import {
   ArrowLeft,
   Heart,
@@ -16,7 +19,11 @@ import {
   Truck,
   ShieldCheck,
   RotateCcw,
-  Check,
+  Maximize2,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  ZoomIn,
 } from 'lucide-react';
 
 interface ProductDetailsPageProps {
@@ -28,10 +35,18 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
   const resolvedParams = use(params);
   const productId = resolvedParams.id;
 
-  const [storeConfig] = useState(defaultStoreConfig);
+  const {
+    products,
+    storeConfig,
+    wishlistIds,
+    toggleWishlist,
+    addToCart,
+    setIsCartOpen,
+  } = useStore();
+
   // Find product by id or fallback to default product 1
   const product: Product =
-    defaultProducts.find((p) => p.id === productId) || defaultProducts[0];
+    products.find((p) => p.id === productId) || products[0];
 
   const galleryImages = [
     product.image,
@@ -46,9 +61,10 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
   const [activeTab, setActiveTab] = useState<'description' | 'specifications' | 'reviews'>(
     'description'
   );
-  const [isWishlisted, setIsWishlisted] = useState(false);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Full-Screen Image Lightbox Modal State
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   const colors = [
     { name: 'Matte White', bg: 'bg-[#fdf8f8] border-gray-300' },
@@ -58,68 +74,61 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
   const sizes = ['Small', 'Medium', 'Large'];
 
+  const isWishlisted = wishlistIds.includes(product.id);
+
   const discountPercent = product.comparePrice
     ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
     : 20;
 
+  // Filter Related Products (Same category, excluding current product)
+  const relatedProducts = products
+    .filter((p) => p.id !== product.id)
+    .slice(0, 4);
+
   const handleAddToCart = () => {
-    setCartItems((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      }
-      return [...prev, { product, quantity }];
-    });
-    setIsCartOpen(true);
+    addToCart(product, quantity);
   };
 
   const handleBuyNow = () => {
-    handleAddToCart();
-    alert('Redirecting to Checkout Flow!');
+    addToCart(product, quantity);
+    setIsCartOpen(false);
+    router.push('/checkout');
+  };
+
+  const openLightbox = (index: number) => {
+    setLightboxIndex(index);
+    setIsLightboxOpen(true);
   };
 
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col font-sans pb-24">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-gray-200/80 dark:border-slate-800 h-16 flex items-center justify-between px-4">
-        <button
-          onClick={() => router.back()}
-          aria-label="Back"
-          className="p-2 -ml-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors active:scale-95"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-
-        <span className="font-extrabold text-sm uppercase tracking-wider text-gray-900 dark:text-white">
-          DETAILS
-        </span>
-
-        <button
-          onClick={() => setIsWishlisted(!isWishlisted)}
-          aria-label="Wishlist"
-          className="p-2 -mr-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors active:scale-95"
-        >
-          <Heart
-            className={`w-5 h-5 ${
-              isWishlisted ? 'fill-red-500 text-red-500' : ''
-            }`}
-          />
-        </button>
-      </header>
+      <Header />
 
       <main className="flex-1 w-full max-w-4xl mx-auto">
+        {/* Breadcrumb Navigation */}
+        <div className="px-4 py-3 border-b border-gray-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
+          <nav className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+            <Link href="/" className="hover:text-black dark:hover:text-white transition-colors">
+              Home
+            </Link>
+            <span>/</span>
+            <Link href="/products" className="hover:text-black dark:hover:text-white transition-colors">
+              {product.category || 'Products'}
+            </Link>
+            <span>/</span>
+            <span className="text-gray-900 dark:text-white font-semibold truncate">{product.title}</span>
+          </nav>
+        </div>
+
         {/* Image Gallery Carousel */}
-        <section className="relative w-full aspect-[4/5] sm:aspect-square bg-gray-100 dark:bg-slate-900 overflow-hidden">
+        <section className="relative w-full aspect-[4/5] sm:aspect-square bg-gray-100 dark:bg-slate-900 overflow-hidden group">
           <div className="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar">
             {galleryImages.map((img, idx) => (
               <div
                 key={idx}
-                className="min-w-full h-full snap-center relative"
-                onClick={() => setActiveImageIndex(idx)}
+                className="min-w-full h-full snap-center relative cursor-zoom-in"
+                onClick={() => openLightbox(idx)}
               >
                 <img
                   src={img}
@@ -130,15 +139,26 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             ))}
           </div>
 
+          {/* Full Screen View Button Overlay */}
+          <button
+            onClick={() => openLightbox(activeImageIndex)}
+            className="absolute top-4 right-4 p-2.5 bg-black/60 dark:bg-white/70 backdrop-blur-md text-white dark:text-black rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all opacity-80 hover:opacity-100 cursor-pointer"
+            aria-label="View Fullscreen Image"
+          >
+            <Maximize2 className="w-4 h-4" />
+          </button>
+
           {/* Pagination Dots */}
           <div className="absolute bottom-4 left-0 w-full flex justify-center gap-2">
             {galleryImages.map((_, idx) => (
-              <div
+              <button
                 key={idx}
-                className={`w-2 h-2 rounded-full transition-all ${
+                onClick={() => setActiveImageIndex(idx)}
+                aria-label={`Go to slide ${idx + 1}`}
+                className={`h-2 rounded-full transition-all cursor-pointer ${
                   activeImageIndex === idx
                     ? 'bg-black dark:bg-white w-6'
-                    : 'bg-black/30 dark:bg-white/30'
+                    : 'bg-black/30 dark:bg-white/30 w-2'
                 }`}
               />
             ))}
@@ -146,28 +166,44 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
         </section>
 
         {/* Product Info Section */}
-        <section className="px-4 py-6 space-y-4">
+        <section className="px-4 py-6 space-y-4 bg-white dark:bg-slate-900">
           <div className="flex justify-between items-start gap-4">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-              {product.title}
-            </h1>
-            <button
-              onClick={() => {
-                if (navigator.share) {
-                  navigator.share({
-                    title: product.title,
-                    url: window.location.href,
-                  });
-                } else {
-                  navigator.clipboard.writeText(window.location.href);
-                  alert('Product link copied to clipboard!');
-                }
-              }}
-              aria-label="Share"
-              className="p-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors"
-            >
-              <Share2 className="w-5 h-5" />
-            </button>
+            <div>
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">
+                {product.brand || product.category}
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                {product.title}
+              </h1>
+            </div>
+
+            <div className="flex gap-1">
+              <button
+                onClick={() => toggleWishlist(product.id)}
+                aria-label="Wishlist"
+                className="p-2 text-gray-500 hover:text-red-500 transition-colors cursor-pointer"
+              >
+                <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
+              </button>
+
+              <button
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: product.title,
+                      url: window.location.href,
+                    });
+                  } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    alert('Product link copied to clipboard!');
+                  }
+                }}
+                aria-label="Share"
+                className="p-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+              >
+                <Share2 className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Ratings & Reviews */}
@@ -178,7 +214,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               ))}
             </div>
             <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">
-              {product.rating.toFixed(1)} (124 reviews)
+              {product.rating.toFixed(1)} ({product.reviewsCount || 124} reviews)
             </span>
           </div>
 
@@ -201,7 +237,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
         </section>
 
         {/* Selectors Section */}
-        <section className="px-4 py-6 border-t border-gray-200 dark:border-slate-800 space-y-6">
+        <section className="px-4 py-6 border-t border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-6">
           {/* Color Variant Selector */}
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white mb-3">
@@ -215,7 +251,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                 <button
                   key={c.name}
                   onClick={() => setSelectedColor(c.name)}
-                  className={`w-10 h-10 rounded-full border-2 p-0.5 flex items-center justify-center transition-all ${
+                  className={`w-10 h-10 rounded-full border-2 p-0.5 flex items-center justify-center transition-all cursor-pointer ${
                     selectedColor === c.name
                       ? 'border-black dark:border-white scale-110 shadow-sm'
                       : 'border-transparent opacity-80 hover:opacity-100'
@@ -235,7 +271,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               </h3>
               <button
                 onClick={() => alert('Size Guide: Standard International Fit')}
-                className="text-xs text-gray-500 hover:text-black dark:hover:text-white underline"
+                className="text-xs text-gray-500 hover:text-black dark:hover:text-white underline cursor-pointer"
               >
                 Size Guide
               </button>
@@ -245,7 +281,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                 <button
                   key={s}
                   onClick={() => setSelectedSize(s)}
-                  className={`flex-1 py-3 rounded-xl border text-xs font-bold transition-all ${
+                  className={`flex-1 py-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                     selectedSize === s
                       ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black shadow-sm'
                       : 'border-gray-200 dark:border-slate-800 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800'
@@ -265,7 +301,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             <div className="flex items-center border border-gray-300 dark:border-slate-700 rounded-xl w-36 h-12 bg-white dark:bg-slate-900">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="flex-1 h-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-l-xl"
+                className="flex-1 h-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-l-xl cursor-pointer"
               >
                 <Minus className="w-4 h-4" />
               </button>
@@ -274,7 +310,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               </span>
               <button
                 onClick={() => setQuantity(quantity + 1)}
-                className="flex-1 h-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-r-xl"
+                className="flex-1 h-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-r-xl cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -283,11 +319,11 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
         </section>
 
         {/* Dynamic Multi-Tab Section */}
-        <section className="border-t border-gray-200 dark:border-slate-800">
+        <section className="border-t border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
           <div className="flex border-b border-gray-200 dark:border-slate-800 px-4">
             <button
               onClick={() => setActiveTab('description')}
-              className={`py-4 mr-6 text-xs font-bold tracking-wider uppercase border-b-2 transition-all ${
+              className={`py-4 mr-6 text-xs font-bold tracking-wider uppercase border-b-2 transition-all cursor-pointer ${
                 activeTab === 'description'
                   ? 'border-black dark:border-white text-black dark:text-white'
                   : 'border-transparent text-gray-400 hover:text-gray-600'
@@ -298,7 +334,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
             <button
               onClick={() => setActiveTab('specifications')}
-              className={`py-4 mr-6 text-xs font-bold tracking-wider uppercase border-b-2 transition-all ${
+              className={`py-4 mr-6 text-xs font-bold tracking-wider uppercase border-b-2 transition-all cursor-pointer ${
                 activeTab === 'specifications'
                   ? 'border-black dark:border-white text-black dark:text-white'
                   : 'border-transparent text-gray-400 hover:text-gray-600'
@@ -309,13 +345,13 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
             <button
               onClick={() => setActiveTab('reviews')}
-              className={`py-4 text-xs font-bold tracking-wider uppercase border-b-2 transition-all ${
+              className={`py-4 text-xs font-bold tracking-wider uppercase border-b-2 transition-all cursor-pointer ${
                 activeTab === 'reviews'
                   ? 'border-black dark:border-white text-black dark:text-white'
                   : 'border-transparent text-gray-400 hover:text-gray-600'
               }`}
             >
-              Reviews (124)
+              Reviews ({product.reviewsCount || 124})
             </button>
           </div>
 
@@ -371,7 +407,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
           </div>
         </section>
 
-        {/* Trust Badges */}
+        {/* Trust Badges Bar */}
         <section className="px-4 py-6 bg-gray-50 dark:bg-slate-900/60 border-t border-gray-200 dark:border-slate-800 space-y-3">
           <div className="flex items-center gap-3">
             <Truck className="w-5 h-5 text-gray-500" />
@@ -394,45 +430,100 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             </span>
           </div>
         </section>
+
+        {/* Related Products Showcase */}
+        <div className="mt-6 border-t border-gray-200 dark:border-slate-800">
+          <FeaturedProducts title="You May Also Like" products={relatedProducts} />
+        </div>
       </main>
 
       {/* Sticky Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-gray-200/80 dark:border-slate-800 px-4 py-3 flex gap-3 z-50 shadow-2xl">
+      <div className="fixed bottom-0 left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-gray-200/80 dark:border-slate-800 px-4 py-3 flex gap-3 z-40 shadow-2xl">
         <button
           onClick={handleAddToCart}
-          className="flex-1 border border-gray-300 dark:border-slate-700 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors bg-white dark:bg-slate-900 active:scale-95"
+          className="flex-1 border border-gray-300 dark:border-slate-700 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors bg-white dark:bg-slate-900 active:scale-95 cursor-pointer"
         >
           Add to Cart
         </button>
 
         <button
           onClick={handleBuyNow}
-          className="flex-[1.5] bg-black dark:bg-white text-white dark:text-black py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-lg active:scale-95"
+          className="flex-[1.5] bg-black dark:bg-white text-white dark:text-black py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-lg active:scale-95 cursor-pointer"
         >
           Buy Now
         </button>
       </div>
 
-      {/* Cart Drawer */}
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        items={cartItems}
-        currency={storeConfig.currency}
-        onUpdateQuantity={(id, delta) => {
-          setCartItems((prev) =>
-            prev
-              .map((item) =>
-                item.product.id === id
-                  ? { ...item, quantity: Math.max(0, item.quantity + delta) }
-                  : item
-              )
-              .filter((item) => item.quantity > 0)
-          );
-        }}
-        onRemoveItem={(id) => setCartItems((prev) => prev.filter((i) => i.product.id !== id))}
-        onCheckout={() => alert('Proceeding to Checkout!')}
-      />
+      {/* Full-Screen Image Lightbox Modal */}
+      {isLightboxOpen && (
+        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 animate-fade-in">
+          {/* Top Bar */}
+          <div className="flex justify-between items-center text-white">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-gray-400">
+              Image {lightboxIndex + 1} of {galleryImages.length}
+            </span>
+            <button
+              onClick={() => setIsLightboxOpen(false)}
+              aria-label="Close Lightbox"
+              className="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer"
+            >
+              <X className="w-6 h-6 text-white" />
+            </button>
+          </div>
+
+          {/* Full Screen Image View */}
+          <div className="relative flex-1 flex items-center justify-center py-4">
+            <img
+              src={galleryImages[lightboxIndex]}
+              alt={`${product.title} full view`}
+              className="max-h-[80vh] max-w-full object-contain rounded-2xl shadow-2xl transition-all"
+            />
+
+            {/* Prev/Next Controls */}
+            {galleryImages.length > 1 && (
+              <>
+                <button
+                  onClick={() =>
+                    setLightboxIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1))
+                  }
+                  className="absolute left-2 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={() =>
+                    setLightboxIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0))
+                  }
+                  className="absolute right-2 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors cursor-pointer"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Bottom Thumbnails Strip */}
+          <div className="flex justify-center gap-3 py-2 overflow-x-auto">
+            {galleryImages.map((img, idx) => (
+              <button
+                key={idx}
+                onClick={() => setLightboxIndex(idx)}
+                className={`w-14 h-14 rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
+                  lightboxIndex === idx ? 'border-white scale-105' : 'border-transparent opacity-50'
+                }`}
+              >
+                <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Comprehensive Footer */}
+      <Footer />
+
+      {/* Bottom Nav */}
+      <BottomNavBar />
     </div>
   );
 }
