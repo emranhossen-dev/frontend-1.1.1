@@ -7,9 +7,7 @@ import {
   ArrowLeft,
   Truck,
   Check,
-  MapPin,
   HelpCircle,
-  PackageCheck,
 } from 'lucide-react';
 
 interface OrderTrackingPageProps {
@@ -57,7 +55,7 @@ export default function OrderTrackingPage({ params }: OrderTrackingPageProps) {
         <button
           onClick={() => router.back()}
           aria-label="Back"
-          className="p-2 -ml-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors active:scale-95"
+          className="p-2 -ml-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors active:scale-95 cursor-pointer"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -191,7 +189,7 @@ export default function OrderTrackingPage({ params }: OrderTrackingPageProps) {
         <section className="px-4 pt-4 flex justify-center">
           <button
             onClick={() => alert('Customer Support Hotline: +8801700000000')}
-            className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-black dark:hover:text-white transition-colors"
+            className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
           >
             <HelpCircle className="w-4 h-4" /> Need Help with this order?
           </button>
