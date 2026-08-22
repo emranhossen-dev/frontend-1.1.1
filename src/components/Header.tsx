@@ -7,9 +7,19 @@ import { useStore } from '@/context/StoreContext';
 
 interface HeaderProps {
   siteName?: string;
+  cartCount?: number;
+  onOpenMenu?: () => void;
+  onOpenCart?: () => void;
+  onOpenSearch?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ siteName }) => {
+export const Header: React.FC<HeaderProps> = ({
+  siteName,
+  cartCount: customCartCount,
+  onOpenMenu: customOpenMenu,
+  onOpenCart: customOpenCart,
+  onOpenSearch: customOpenSearch,
+}) => {
   const {
     storeConfig,
     cartItems,
@@ -18,7 +28,8 @@ export const Header: React.FC<HeaderProps> = ({ siteName }) => {
     setIsMenuOpen,
   } = useStore();
 
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const computedCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const cartCount = customCartCount !== undefined ? customCartCount : computedCartCount;
   const brandName = siteName || storeConfig.name;
 
   return (
@@ -26,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({ siteName }) => {
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Left: Mobile Hamburger Menu Trigger */}
         <button
-          onClick={() => setIsMenuOpen(true)}
+          onClick={customOpenMenu || (() => setIsMenuOpen(true))}
           aria-label="Open Mobile Menu"
           className="p-2 -ml-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-all active:scale-95 cursor-pointer"
         >
@@ -44,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({ siteName }) => {
         {/* Right Actions: Search & Cart */}
         <div className="flex items-center gap-1">
           <button
-            onClick={() => setIsSearchOpen(true)}
+            onClick={customOpenSearch || (() => setIsSearchOpen(true))}
             aria-label="Search"
             className="p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-all active:scale-95 cursor-pointer"
           >
@@ -52,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({ siteName }) => {
           </button>
 
           <button
-            onClick={() => setIsCartOpen(true)}
+            onClick={customOpenCart || (() => setIsCartOpen(true))}
             aria-label="Open Cart"
             className="p-2 -mr-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-all active:scale-95 relative cursor-pointer"
           >

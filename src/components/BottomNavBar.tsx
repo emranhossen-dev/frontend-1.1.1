@@ -2,17 +2,42 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Home, LayoutGrid, Search, ShoppingBag, User } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Home, LayoutGrid, Search, ShoppingBag, User, LucideIcon } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 
-export const BottomNavBar: React.FC = () => {
+interface BottomNavBarProps {
+  activeTab?: string;
+  setActiveTab?: (tab: string) => void;
+  wishlistCount?: number;
+  onOpenSearch?: () => void;
+  onOpenCategories?: () => void;
+}
+
+interface NavTabItem {
+  id: string;
+  label: string;
+  icon: LucideIcon;
+  href?: string;
+  badge?: number;
+  isActive: boolean;
+  action?: () => void;
+}
+
+export const BottomNavBar: React.FC<BottomNavBarProps> = ({
+  activeTab,
+  wishlistCount,
+  onOpenSearch,
+  onOpenCategories,
+}) => {
   const pathname = usePathname();
-  const { cartItems, wishlistIds, setIsSearchOpen, setIsMenuOpen } = useStore();
+  const router = useRouter();
+  const { cartItems, wishlistIds, setIsSearchOpen } = useStore();
 
   const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const effectiveWishlistCount = wishlistCount !== undefined ? wishlistCount : wishlistIds.length;
 
-  const tabs = [
+  const tabs: NavTabItem[] = [
     {
       id: 'home',
       label: 'Home',
@@ -26,13 +51,15 @@ export const BottomNavBar: React.FC = () => {
       icon: LayoutGrid,
       href: '/products',
       isActive: pathname === '/products',
+      action: onOpenCategories,
     },
     {
       id: 'search',
       label: 'Search',
       icon: Search,
-      action: () => setIsSearchOpen(true),
-      isActive: false,
+      href: '#',
+      action: onOpenSearch || (() => setIsSearchOpen(true)),
+      isActive: activeTab === 'search',
     },
     {
       id: 'cart',
@@ -47,7 +74,7 @@ export const BottomNavBar: React.FC = () => {
       label: 'Account',
       icon: User,
       href: '/account',
-      badge: wishlistIds.length > 0 ? wishlistIds.length : undefined,
+      badge: effectiveWishlistCount > 0 ? effectiveWishlistCount : undefined,
       isActive: pathname.startsWith('/account'),
     },
   ];
@@ -62,7 +89,10 @@ export const BottomNavBar: React.FC = () => {
           return (
             <button
               key={tab.id}
-              onClick={tab.action}
+              onClick={() => {
+                if (tab.href && tab.href !== '#') router.push(tab.href);
+                if (tab.action) tab.action();
+              }}
               className={`flex flex-col items-center justify-center w-14 py-1 relative transition-all active:scale-90 ${
                 active
                   ? 'text-black dark:text-white font-bold'
@@ -71,6 +101,11 @@ export const BottomNavBar: React.FC = () => {
             >
               <div className="relative">
                 <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                {tab.badge !== undefined && (
+                  <span className="absolute -top-1.5 -right-2.5 bg-black dark:bg-white text-white dark:text-black font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                    {tab.badge}
+                  </span>
+                )}
               </div>
               <span className="text-[10px] uppercase tracking-wider mt-1 font-semibold">
                 {tab.label}
