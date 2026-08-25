@@ -1,5 +1,7 @@
 'use client';
 
+export const runtime = 'edge';
+
 import React, { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { defaultStoreConfig, defaultProducts } from '@/config/storeConfig';
