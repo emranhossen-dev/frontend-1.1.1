@@ -48,11 +48,11 @@ export const Navbar: React.FC = () => {
           {mobileMenuOpen ? <HiXMark className="w-5 h-5" /> : <HiOutlineBars3 className="w-5 h-5" />}
         </button>
 
-        {/* 2. Website Logo */}
+        {/* 2. Website Logo & Brand Name */}
         <Link
           href="/"
           onClick={() => setSelectedCategory("All")}
-          className="flex items-center group shrink-0"
+          className="flex items-center gap-2 group shrink-0"
           title="ArdhiMart"
         >
           <Image
@@ -63,6 +63,9 @@ export const Navbar: React.FC = () => {
             priority
             className="h-8 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105"
           />
+          <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white group-hover:text-blue-400 transition-colors">
+            ArdhiMart
+          </span>
         </Link>
 
         {/* 3. Search Bar (Search Icon on RIGHT) */}

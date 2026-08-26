@@ -1,7 +1,7 @@
 import { StoreConfig, HeroBanner, Category, Product } from '@/types/store';
 
 export const defaultStoreConfig: StoreConfig = {
-  name: "Frontend",
+  name: "ArdhiMart",
   tagline: "Premium E-commerce Experience",
   currency: "৳",
   logoUrl: "/logo.jpg",

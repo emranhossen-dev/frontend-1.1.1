@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Frontend — Premium E-Commerce Storefront",
-  description: "Curated minimalist essentials and modern luxury e-commerce experience.",
+  title: "ArdhiMart — Modern Luxury & Everyday Essentials",
+  description: "Curated minimalist essentials, premium gadgets & modern luxury e-commerce experience across Bangladesh.",
 };
 
 export default function RootLayout({
