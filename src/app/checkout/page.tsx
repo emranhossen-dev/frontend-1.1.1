@@ -53,7 +53,7 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
       const itemsPayload = cartItems.length > 0
         ? cartItems.map((i) => ({
             productId: i.product.id,

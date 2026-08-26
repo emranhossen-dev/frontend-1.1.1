@@ -42,7 +42,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   React.useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
         const res = await fetch(`${baseUrl}/products`);
         if (res.ok) {
           const data = await res.json();
