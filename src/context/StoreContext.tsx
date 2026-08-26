@@ -50,7 +50,19 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
-            setProducts(data);
+            const mapped = data.map((item: any) => ({
+              ...item,
+              id: String(item.id),
+              title: item.title || item.name || 'Untitled Product',
+              price: Number(item.price || 0),
+              comparePrice: item.comparePrice ? Number(item.comparePrice) : undefined,
+              rating: typeof item.rating === 'number' ? item.rating : 5.0,
+              reviewsCount: typeof item.reviewsCount === 'number' ? item.reviewsCount : 8,
+              badge: item.badge || 'New',
+              image: item.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500',
+              category: item.category || 'Electronics'
+            }));
+            setProducts(mapped);
           }
         }
       } catch (err) {
