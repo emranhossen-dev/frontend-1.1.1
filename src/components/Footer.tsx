@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useStore } from '@/context/StoreContext';
 import { notifySuccess } from '@/lib/sweetalert';
+import Image from 'next/image';
 import {
   Send,
   PhoneCall,
@@ -61,8 +62,14 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {/* Col 1: Brand Info */}
           <div className="space-y-4">
-            <Link href="/" className="font-extrabold text-2xl tracking-tight text-white uppercase block">
-              {storeConfig.name}
+            <Link href="/" className="inline-block">
+              <Image
+                src="/logo.png"
+                alt="ArdhiMart Logo"
+                width={180}
+                height={45}
+                className="h-10 w-auto object-contain"
+              />
             </Link>
             <p className="text-xs text-slate-400 leading-relaxed font-medium">
               Curated minimalist essentials and modern luxury e-commerce experience across Bangladesh.

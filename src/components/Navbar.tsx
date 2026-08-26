@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import Image from "next/image";
 import {
   HiOutlineBars3,
   HiOutlineMagnifyingGlass,
@@ -11,7 +12,6 @@ import {
   HiOutlineUser,
   HiXMark,
 } from "react-icons/hi2";
-import { FaBagShopping } from "react-icons/fa6";
 
 export const Navbar: React.FC = () => {
   const {
@@ -48,16 +48,21 @@ export const Navbar: React.FC = () => {
           {mobileMenuOpen ? <HiXMark className="w-5 h-5" /> : <HiOutlineBars3 className="w-5 h-5" />}
         </button>
 
-        {/* 2. Website Logo ICON ONLY */}
+        {/* 2. Website Logo */}
         <Link
           href="/"
           onClick={() => setSelectedCategory("All")}
           className="flex items-center group shrink-0"
-          title="websites"
+          title="ArdhiMart"
         >
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black text-white shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform">
-            <FaBagShopping className="w-5 h-5 text-white" />
-          </div>
+          <Image
+            src="/logo.png"
+            alt="ArdhiMart Logo"
+            width={160}
+            height={40}
+            priority
+            className="h-8 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105"
+          />
         </Link>
 
         {/* 3. Search Bar (Search Icon on RIGHT) */}
