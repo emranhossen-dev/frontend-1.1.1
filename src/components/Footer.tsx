@@ -64,7 +64,7 @@ export const Footer: React.FC = () => {
           <div className="space-y-4">
             <Link href="/" className="inline-block">
               <Image
-                src="/logo.jpg"
+                src="/logo.png"
                 alt="ArdhiMart Logo"
                 width={180}
                 height={45}
@@ -195,13 +195,13 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        {/* Bottom Copyright Bar */}
+        {/* Bottom Copyright & Agency Credit Bar */}
         <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>© {new Date().getFullYear()} {storeConfig.name}. All Rights Reserved.</p>
-          <div className="flex items-center gap-1">
-            <span>Crafted with</span>
+          <div className="flex items-center gap-1.5 font-medium">
+            <span>Developed with</span>
             <Heart className="w-3.5 h-3.5 fill-red-500 text-red-500" />
-            <span>for high performance e-commerce.</span>
+            <span>by <strong className="text-white font-bold tracking-wide">Next Station 26</strong></span>
           </div>
         </div>
       </div>
