@@ -4,7 +4,7 @@ export const defaultStoreConfig: StoreConfig = {
   name: "ArdhiMart",
   tagline: "Premium E-commerce Experience",
   currency: "৳",
-  logoUrl: "/logo.jpg",
+  logoUrl: "/logo.png",
   announcementText: "⚡ Free Delivery on orders over ৳5000 | Use Code: FIRST50",
 };
 
