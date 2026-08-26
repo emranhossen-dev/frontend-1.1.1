@@ -201,7 +201,16 @@ export const Footer: React.FC = () => {
           <div className="flex items-center gap-1.5 font-medium">
             <span>Developed with</span>
             <Heart className="w-3.5 h-3.5 fill-red-500 text-red-500" />
-            <span>by <strong className="text-white font-bold tracking-wide">Next Station 26</strong></span>
+            <span>by{' '}
+              <a
+                href="https://nextstation26.asia/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-blue-400 font-bold tracking-wide transition-colors underline decoration-slate-600 hover:decoration-blue-400"
+              >
+                Next Station 26
+              </a>
+            </span>
           </div>
         </div>
       </div>
