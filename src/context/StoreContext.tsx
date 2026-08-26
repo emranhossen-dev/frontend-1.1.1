@@ -35,8 +35,27 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [storeConfig] = useState<StoreConfig>(defaultStoreConfig);
   const [categories] = useState<Category[]>(defaultCategories);
-  const [products] = useState<Product[]>(defaultProducts);
+  const [products, setProducts] = useState<Product[]>(defaultProducts);
   const [heroBanner] = useState(defaultHeroBanner);
+
+  // Fetch real products from NestJS REST API
+  React.useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+        const res = await fetch(`${baseUrl}/products`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setProducts(data);
+          }
+        }
+      } catch (err) {
+        console.warn('Backend API offline, using fallback default products:', err);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const [cartItems, setCartItems] = useState<CartItem[]>([
     { product: defaultProducts[0], quantity: 1 },

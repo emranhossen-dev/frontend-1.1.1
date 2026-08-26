@@ -14,9 +14,13 @@ import {
   CheckCircle,
 } from 'lucide-react';
 
+import { useStore } from '@/context/StoreContext';
+
 export default function CheckoutPage() {
   const router = useRouter();
   const [storeConfig] = useState(defaultStoreConfig);
+  const { cartItems, clearCart } = useStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Accordion Expand States
   const [isSummaryExpanded, setIsSummaryExpanded] = useState(true);
@@ -34,16 +38,64 @@ export default function CheckoutPage() {
   const [deliveryMethod, setDeliveryMethod] = useState<'inside' | 'outside'>('inside');
   const [paymentMethod, setPaymentMethod] = useState<'COD' | 'bKash' | 'Card'>('COD');
 
-  const cartSubtotal = 4250;
+  const cartSubtotal = cartItems.length > 0
+    ? cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0)
+    : 4250;
   const shippingFee = deliveryMethod === 'inside' ? 60 : 120;
   const grandTotal = cartSubtotal + shippingFee;
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!firstName || !phone || !address) {
       alert('Please fill in your Name, Phone Number, and Delivery Address.');
       return;
     }
-    router.push('/checkout/success');
+
+    setIsSubmitting(true);
+
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+      const itemsPayload = cartItems.length > 0
+        ? cartItems.map((i) => ({
+            productId: i.product.id,
+            productName: i.product.title,
+            quantity: i.quantity,
+            price: i.product.price,
+            image: i.product.image,
+          }))
+        : [{
+            productId: defaultProducts[0].id,
+            productName: defaultProducts[0].title,
+            quantity: 1,
+            price: defaultProducts[0].price,
+            image: defaultProducts[0].image,
+          }];
+
+      const res = await fetch(`${baseUrl}/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName: `${firstName} ${lastName}`.trim(),
+          customerEmail: email || undefined,
+          customerPhone: phone,
+          shippingAddress: address,
+          city: city,
+          items: itemsPayload,
+          subtotal: cartSubtotal,
+          shippingFee: shippingFee,
+          totalAmount: grandTotal,
+          paymentMethod: paymentMethod,
+        }),
+      });
+
+      if (res.ok) {
+        clearCart();
+      }
+    } catch (err) {
+      console.warn('Backend API order submit error fallback:', err);
+    } finally {
+      setIsSubmitting(false);
+      router.push('/checkout/success');
+    }
   };
 
   return (
