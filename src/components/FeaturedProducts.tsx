@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Product } from '@/types/store';
 import { useStore } from '@/context/StoreContext';
-import { Heart, Star, ShoppingCart } from 'lucide-react';
+import { Heart, Star, ShoppingCart, Loader2 } from 'lucide-react';
 
 interface FeaturedProductsProps {
   products?: Product[];
@@ -17,6 +17,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
 }) => {
   const {
     products: defaultProds,
+    isLoading,
     storeConfig,
     wishlistIds,
     toggleWishlist,
@@ -33,7 +34,20 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
         </h3>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+      {isLoading ? (
+        <div className="py-16 flex flex-col items-center justify-center space-y-3">
+          <div className="relative flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full border-4 border-gray-200 dark:border-slate-800 animate-spin border-t-black dark:border-t-white" />
+            <Loader2 className="w-5 h-5 animate-spin text-black dark:text-white absolute" />
+          </div>
+          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">Loading collection...</p>
+        </div>
+      ) : productsList.length === 0 ? (
+        <div className="py-12 text-center text-gray-500 text-xs font-semibold">
+          No products available in database catalog yet.
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
         {productsList.map((prod) => {
           const isWishlisted = wishlistIds.includes(prod.id);
 
@@ -117,7 +131,8 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
             </div>
           );
         })}
-      </div>
+        </div>
+      )}
     </section>
   );
 };

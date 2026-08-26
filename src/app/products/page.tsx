@@ -15,11 +15,13 @@ import {
   Star,
   X,
   Check,
+  Loader2,
 } from 'lucide-react';
 
 export default function AllProductsPage() {
   const {
     products,
+    isLoading,
     storeConfig,
     categories,
     wishlistIds,
@@ -119,8 +121,18 @@ export default function AllProductsPage() {
           </button>
         </div>
 
-        {/* Products 2-Column Mobile Grid */}
-        {filteredProducts.length === 0 ? (
+        {/* Products Grid or Loading Spinner */}
+        {isLoading ? (
+          <div className="py-24 flex flex-col items-center justify-center space-y-4">
+            <div className="relative flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full border-4 border-gray-200 dark:border-slate-800 animate-spin border-t-black dark:border-t-white" />
+              <Loader2 className="w-6 h-6 animate-spin text-black dark:text-white absolute" />
+            </div>
+            <p className="text-xs font-bold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+              Loading Products Catalog...
+            </p>
+          </div>
+        ) : filteredProducts.length === 0 ? (
           <div className="py-16 text-center space-y-3">
             <p className="text-gray-500 text-sm font-semibold">No products found matching filter criteria.</p>
             <button

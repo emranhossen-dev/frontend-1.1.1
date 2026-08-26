@@ -14,6 +14,7 @@ interface StoreContextType {
   storeConfig: StoreConfig;
   categories: Category[];
   products: Product[];
+  isLoading: boolean;
   heroBanner: typeof defaultHeroBanner;
   cartItems: CartItem[];
   wishlistIds: string[];
@@ -36,12 +37,14 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [storeConfig] = useState<StoreConfig>(defaultStoreConfig);
   const [categories] = useState<Category[]>(defaultCategories);
   const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [heroBanner] = useState(defaultHeroBanner);
 
   // Fetch real products from NestJS REST API
   React.useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setIsLoading(true);
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
         const res = await fetch(`${baseUrl}/products`);
         if (res.ok) {
@@ -52,6 +55,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
       } catch (err) {
         console.warn('Backend API connection warning:', err);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchProducts();
@@ -122,6 +127,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         storeConfig,
         categories,
         products,
+        isLoading,
         heroBanner,
         cartItems,
         wishlistIds,
