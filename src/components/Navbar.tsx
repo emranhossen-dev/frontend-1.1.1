@@ -56,7 +56,7 @@ export const Navbar: React.FC = () => {
           title="ArdhiMart"
         >
           <Image
-            src="/logo.png"
+            src="/logo.jpg"
             alt="ArdhiMart Logo"
             width={160}
             height={40}
