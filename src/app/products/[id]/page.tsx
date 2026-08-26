@@ -187,15 +187,19 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               </button>
 
               <button
-                onClick={() => {
-                  if (navigator.share) {
-                    navigator.share({
-                      title: product.title,
-                      url: window.location.href,
-                    });
-                  } else {
-                    navigator.clipboard.writeText(window.location.href);
-                    alert('Product link copied to clipboard!');
+                onClick={async () => {
+                  try {
+                    if (typeof window !== 'undefined' && navigator.share) {
+                      await navigator.share({
+                        title: product.title,
+                        url: window.location.href,
+                      });
+                    } else if (typeof window !== 'undefined' && navigator.clipboard) {
+                      await navigator.clipboard.writeText(window.location.href);
+                      alert('Product link copied to clipboard!');
+                    }
+                  } catch {
+                    // User dismissed share dialog
                   }
                 }}
                 aria-label="Share"
