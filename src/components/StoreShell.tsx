@@ -68,11 +68,18 @@ const StoreShellInner: React.FC<{ children: ReactNode }> = ({ children }) => {
   );
 };
 
+import { AuthProvider } from '@/context/AuthContext';
+import { CartProvider } from '@/context/CartContext';
+
 export const StoreShell: React.FC<{ children: ReactNode }> = ({ children }) => {
   return (
-    <StoreProvider>
-      <StoreShellInner>{children}</StoreShellInner>
-    </StoreProvider>
+    <AuthProvider>
+      <CartProvider>
+        <StoreProvider>
+          <StoreShellInner>{children}</StoreShellInner>
+        </StoreProvider>
+      </CartProvider>
+    </AuthProvider>
   );
 };
 

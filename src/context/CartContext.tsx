@@ -126,7 +126,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     // Modern Toast Notification for Add to Cart
-    toast.custom((t) => (
+    toast.custom((t: any) => (
       <div
         className={`${
           t.visible ? "animate-in fade-in slide-in-from-top-2" : "animate-out fade-out slide-out-to-top-2"
