@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu, ShoppingBag, Search } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 
@@ -30,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const computedCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const cartCount = customCartCount !== undefined ? customCartCount : computedCartCount;
-  const brandName = siteName || storeConfig.name;
+  const brandName = siteName || storeConfig.name || 'ArdhiMart';
 
   const handleMenuClick = () => {
     setIsMenuOpen(true);
@@ -48,31 +49,44 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-gray-200/80 dark:border-slate-800 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Left: Mobile Hamburger Menu Trigger */}
-        <button
-          onClick={handleMenuClick}
-          aria-label="Open Mobile Menu"
-          className="p-2 -ml-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-all active:scale-95 cursor-pointer"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
+    <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 text-gray-900 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+        
+        {/* Left Group: Hamburger Icon -> Logo Image -> Brand Name */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <button
+            onClick={handleMenuClick}
+            aria-label="Open Mobile Menu"
+            className="p-2 rounded-xl bg-gray-100 border border-gray-200 text-gray-700 hover:text-black hover:bg-gray-200 transition-all active:scale-95 cursor-pointer"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
 
-        {/* Center: Dynamic Brand Name (Links to Home) */}
-        <Link
-          href="/"
-          className="font-extrabold text-xl sm:text-2xl tracking-tight text-gray-900 dark:text-white uppercase hover:opacity-80 transition-opacity"
-        >
-          {brandName}
-        </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-2.5 group shrink-0"
+            title="ArdhiMart"
+          >
+            <Image
+              src="/logo.jpg"
+              alt="ArdhiMart Logo"
+              width={140}
+              height={36}
+              priority
+              className="h-8 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105"
+            />
+            <span className="font-extrabold text-lg sm:text-xl tracking-tight text-gray-900 group-hover:text-blue-600 transition-colors">
+              {brandName}
+            </span>
+          </Link>
+        </div>
 
         {/* Right Actions: Search & Cart */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={handleSearchClick}
             aria-label="Search"
-            className="p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-all active:scale-95 cursor-pointer"
+            className="p-2.5 bg-gray-100 border border-gray-200 text-gray-700 hover:text-black hover:border-gray-300 rounded-xl transition-all active:scale-95 cursor-pointer"
           >
             <Search className="w-5 h-5" />
           </button>
@@ -80,14 +94,17 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={handleCartClick}
             aria-label="Open Cart"
-            className="p-2 -mr-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-all active:scale-95 relative cursor-pointer"
+            className="p-2.5 bg-gray-100 border border-gray-200 text-gray-700 hover:text-black hover:border-gray-300 rounded-xl transition-all active:scale-95 relative cursor-pointer flex items-center gap-1.5"
           >
-            <ShoppingBag className="w-6 h-6" />
-            {cartCount > 0 && (
-              <span className="absolute top-1 right-1 w-5 h-5 bg-black dark:bg-white text-white dark:text-black font-extrabold text-xs rounded-full flex items-center justify-center animate-scale-in shadow-xs">
-                {cartCount}
-              </span>
-            )}
+            <div className="relative">
+              <ShoppingBag className="w-5 h-5 text-blue-600" />
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-blue-600 text-white font-black text-[10px] w-4 h-4 rounded-full flex items-center justify-center shadow-md animate-pulse">
+                  {cartCount}
+                </span>
+              )}
+            </div>
+            <span className="hidden sm:inline text-xs font-bold text-gray-900">Cart</span>
           </button>
         </div>
       </div>
