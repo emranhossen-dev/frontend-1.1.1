@@ -57,16 +57,18 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [heroBanner] = useState(defaultHeroBanner);
 
-  // Fetch real database products from NestJS REST API
+  // Fetch real database products from NestJS REST API with resilient retry logic
   React.useEffect(() => {
+    let isMounted = true;
+    let retries = 0;
+
     const fetchProducts = async () => {
       try {
-        setIsLoading(true);
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
         const res = await fetch(`${baseUrl}/products`);
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data)) {
+          if (Array.isArray(data) && isMounted) {
             const mapped = data.map((item: any) => ({
               ...item,
               id: String(item.id),
@@ -80,20 +82,32 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               category: item.category || 'Electronics'
             }));
             setProducts(mapped);
+            setIsLoading(false);
             if (typeof window !== 'undefined') {
               try {
                 localStorage.setItem('ardhimart_cached_products', JSON.stringify(mapped));
               } catch (e) {}
             }
+            return;
           }
         }
       } catch (err) {
-        console.warn('Backend API fetch warning:', err);
-      } finally {
+        console.warn('Backend API fetch attempt warning:', err);
+      }
+
+      if (retries < 3 && isMounted) {
+        retries++;
+        setTimeout(fetchProducts, 1200);
+      } else if (isMounted) {
         setIsLoading(false);
       }
     };
+
     fetchProducts();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
