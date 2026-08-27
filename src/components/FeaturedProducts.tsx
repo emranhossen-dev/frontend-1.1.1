@@ -35,16 +35,31 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
       </div>
 
       {isLoading ? (
-        <div className="py-16 flex flex-col items-center justify-center space-y-3">
-          <div className="relative flex items-center justify-center">
-            <div className="w-10 h-10 rounded-full border-4 border-gray-200 dark:border-slate-800 animate-spin border-t-black dark:border-t-white" />
-            <Loader2 className="w-5 h-5 animate-spin text-black dark:text-white absolute" />
-          </div>
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">Loading collection...</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+          {[1, 2, 3, 4].map((n) => (
+            <div
+              key={n}
+              className="animate-pulse bg-white dark:bg-slate-900 rounded-2xl p-3 border border-gray-200/80 dark:border-slate-800"
+            >
+              <div className="w-full aspect-[3/4] bg-gray-200 dark:bg-slate-800 rounded-xl mb-3" />
+              <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-3/4 mb-2" />
+              <div className="h-3 bg-gray-200 dark:bg-slate-800 rounded w-1/2 mb-3" />
+              <div className="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-slate-800">
+                <div className="h-5 bg-gray-200 dark:bg-slate-800 rounded w-1/3" />
+                <div className="w-8 h-8 bg-gray-200 dark:bg-slate-800 rounded-xl" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : productsList.length === 0 ? (
-        <div className="py-12 text-center text-gray-500 text-xs font-semibold">
-          No products available in database catalog yet.
+        <div className="py-16 text-center space-y-2">
+          <div className="w-12 h-12 mx-auto rounded-2xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-400">
+            <ShoppingCart className="w-6 h-6" />
+          </div>
+          <h4 className="text-sm font-bold text-gray-900 dark:text-white">No products found in database yet</h4>
+          <p className="text-xs text-gray-500 max-w-sm mx-auto">
+            Use the Admin Panel to publish your first product to Neon PostgreSQL database.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">

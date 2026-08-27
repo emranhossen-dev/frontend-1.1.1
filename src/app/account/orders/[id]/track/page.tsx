@@ -4,7 +4,8 @@ export const runtime = 'edge';
 
 import React, { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { defaultStoreConfig, defaultProducts } from '@/config/storeConfig';
+import { defaultStoreConfig } from '@/config/storeConfig';
+import { useStore } from '@/context/StoreContext';
 import {
   ArrowLeft,
   Truck,
@@ -21,6 +22,7 @@ export default function OrderTrackingPage({ params }: OrderTrackingPageProps) {
   const resolvedParams = use(params);
   const orderId = resolvedParams.id || '8849201A';
 
+  const { products } = useStore();
   const [storeConfig] = useState(defaultStoreConfig);
 
   const timelineSteps = [
@@ -90,13 +92,13 @@ export default function OrderTrackingPage({ params }: OrderTrackingPageProps) {
 
           <div className="flex gap-4 p-3 bg-gray-50 dark:bg-slate-800/60 rounded-2xl border border-gray-100 dark:border-slate-800">
             <img
-              src={defaultProducts[0].image}
-              alt={defaultProducts[0].title}
+              src={products[0]?.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600'}
+              alt={products[0]?.title || 'Minimalist Tech Product'}
               className="w-16 h-20 object-cover rounded-xl bg-gray-200 dark:bg-slate-700 shrink-0"
             />
             <div className="flex flex-col justify-center">
               <h3 className="font-bold text-sm text-gray-900 dark:text-white">
-                {defaultProducts[0].title}
+                {products[0]?.title || 'Minimalist Tech Product'}
               </h3>
               <p className="text-xs text-gray-500 mt-1 font-medium">Qty: 1</p>
             </div>

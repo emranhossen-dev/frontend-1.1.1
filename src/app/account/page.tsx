@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import BottomNavBar from '@/components/BottomNavBar';
 import SearchModal from '@/components/SearchModal';
-import { defaultStoreConfig, defaultProducts } from '@/config/storeConfig';
+import { defaultStoreConfig } from '@/config/storeConfig';
+import { useStore } from '@/context/StoreContext';
 import {
   User,
   Edit,
@@ -24,6 +25,7 @@ import {
 
 export default function AccountPage() {
   const router = useRouter();
+  const { products } = useStore();
   const [storeConfig] = useState(defaultStoreConfig);
   const [activeTab, setActiveTab] = useState('account');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -43,17 +45,17 @@ export default function AccountPage() {
   const recentOrders = [
     {
       id: '8892',
-      productName: 'Minimalist Tote',
+      productName: 'Minimalist Product',
       status: 'In Transit',
       price: 2450,
-      image: defaultProducts[0].image,
+      image: products[0]?.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600',
     },
     {
       id: '8874',
-      productName: 'Acetate Sunglasses',
+      productName: 'Tech Lifestyle Accessory',
       status: 'Delivered',
       price: 1800,
-      image: defaultProducts[2].image,
+      image: products[1]?.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600',
     },
   ];
 
@@ -278,7 +280,7 @@ export default function AccountPage() {
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
-        products={defaultProducts}
+        products={products}
         currency={storeConfig.currency}
         onSelectProduct={(p) => router.push(`/products/${p.id}`)}
       />

@@ -42,26 +42,31 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         const cached = localStorage.getItem('ardhimart_cached_products');
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            // Filter out old legacy dummy items if present
+            const clean = parsed.filter((p: any) => p.id && !p.id.startsWith('prod-') && p.title !== 'Ceramic Minimalist Vase');
+            if (clean.length > 0) return clean;
+          }
         }
       } catch (e) {
         console.warn('Cache read error:', e);
       }
     }
-    return defaultProducts;
+    return [];
   });
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [heroBanner] = useState(defaultHeroBanner);
 
-  // Quiet Background Sync: Fetch real products from NestJS REST API without blocking initial render
+  // Fetch real database products from NestJS REST API
   React.useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setIsLoading(true);
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
         const res = await fetch(`${baseUrl}/products`);
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
+          if (Array.isArray(data)) {
             const mapped = data.map((item: any) => ({
               ...item,
               id: String(item.id),
@@ -83,7 +88,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           }
         }
       } catch (err) {
-        console.warn('Backend API background sync warning:', err);
+        console.warn('Backend API fetch warning:', err);
       } finally {
         setIsLoading(false);
       }

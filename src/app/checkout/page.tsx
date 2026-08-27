@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { defaultStoreConfig, defaultProducts } from '@/config/storeConfig';
+import { defaultStoreConfig } from '@/config/storeConfig';
 import {
   ArrowLeft,
   Lock,
@@ -40,7 +40,7 @@ export default function CheckoutPage() {
 
   const cartSubtotal = cartItems.length > 0
     ? cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0)
-    : 4250;
+    : 0;
   const shippingFee = deliveryMethod === 'inside' ? 60 : 120;
   const grandTotal = cartSubtotal + shippingFee;
 
@@ -54,21 +54,13 @@ export default function CheckoutPage() {
 
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
-      const itemsPayload = cartItems.length > 0
-        ? cartItems.map((i) => ({
-            productId: i.product.id,
-            productName: i.product.title,
-            quantity: i.quantity,
-            price: i.product.price,
-            image: i.product.image,
-          }))
-        : [{
-            productId: defaultProducts[0].id,
-            productName: defaultProducts[0].title,
-            quantity: 1,
-            price: defaultProducts[0].price,
-            image: defaultProducts[0].image,
-          }];
+      const itemsPayload = cartItems.map((i) => ({
+        productId: i.product.id,
+        productName: i.product.title,
+        quantity: i.quantity,
+        price: i.product.price,
+        image: i.product.image,
+      }));
 
       const res = await fetch(`${baseUrl}/orders`, {
         method: 'POST',
@@ -129,7 +121,7 @@ export default function CheckoutPage() {
             <div className="flex items-center gap-2">
               <ShoppingBag className="w-5 h-5 text-gray-900 dark:text-white" />
               <h2 className="font-bold text-sm text-gray-900 dark:text-white">
-                Order Summary (2 items)
+                Order Summary ({cartItems.length} items)
               </h2>
             </div>
             <div className="flex items-center gap-2">
@@ -148,41 +140,25 @@ export default function CheckoutPage() {
           {/* Expanded Summary Items */}
           {isSummaryExpanded && (
             <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-800 space-y-3">
-              <div className="flex items-center gap-3">
-                <img
-                  src={defaultProducts[0].image}
-                  alt={defaultProducts[0].title}
-                  className="w-12 h-14 object-cover rounded-lg bg-gray-100"
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-xs text-gray-900 dark:text-white truncate">
-                    {defaultProducts[0].title}
+              {cartItems.map((item) => (
+                <div key={item.product.id} className="flex items-center gap-3">
+                  <img
+                    src={item.product.image}
+                    alt={item.product.title}
+                    className="w-12 h-14 object-cover rounded-lg bg-gray-100 dark:bg-slate-800 shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-xs text-gray-900 dark:text-white truncate">
+                      {item.product.title}
+                    </p>
+                    <p className="text-[10px] text-gray-400">QTY: {item.quantity}</p>
+                  </div>
+                  <p className="font-extrabold text-xs text-gray-900 dark:text-white">
+                    {storeConfig.currency}
+                    {(item.product.price * item.quantity).toLocaleString()}
                   </p>
-                  <p className="text-[10px] text-gray-400">QTY: 1</p>
                 </div>
-                <p className="font-extrabold text-xs text-gray-900 dark:text-white">
-                  {storeConfig.currency}
-                  {defaultProducts[0].price.toLocaleString()}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <img
-                  src={defaultProducts[1].image}
-                  alt={defaultProducts[1].title}
-                  className="w-12 h-14 object-cover rounded-lg bg-gray-100"
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-xs text-gray-900 dark:text-white truncate">
-                    {defaultProducts[1].title}
-                  </p>
-                  <p className="text-[10px] text-gray-400">QTY: 1</p>
-                </div>
-                <p className="font-extrabold text-xs text-gray-900 dark:text-white">
-                  {storeConfig.currency}
-                  {defaultProducts[1].price.toLocaleString()}
-                </p>
-              </div>
+              ))}
             </div>
           )}
         </section>
