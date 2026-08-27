@@ -36,20 +36,32 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [storeConfig] = useState<StoreConfig>(defaultStoreConfig);
   const [categories] = useState<Category[]>(defaultCategories);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [products, setProducts] = useState<Product[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('ardhimart_cached_products');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {
+        console.warn('Cache read error:', e);
+      }
+    }
+    return defaultProducts;
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [heroBanner] = useState(defaultHeroBanner);
 
-  // Fetch real products from NestJS REST API
+  // Quiet Background Sync: Fetch real products from NestJS REST API without blocking initial render
   React.useEffect(() => {
     const fetchProducts = async () => {
       try {
-        setIsLoading(true);
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
         const res = await fetch(`${baseUrl}/products`);
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data)) {
+          if (Array.isArray(data) && data.length > 0) {
             const mapped = data.map((item: any) => ({
               ...item,
               id: String(item.id),
@@ -63,10 +75,15 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               category: item.category || 'Electronics'
             }));
             setProducts(mapped);
+            if (typeof window !== 'undefined') {
+              try {
+                localStorage.setItem('ardhimart_cached_products', JSON.stringify(mapped));
+              } catch (e) {}
+            }
           }
         }
       } catch (err) {
-        console.warn('Backend API connection warning:', err);
+        console.warn('Backend API background sync warning:', err);
       } finally {
         setIsLoading(false);
       }
