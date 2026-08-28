@@ -38,7 +38,7 @@ export const StorefrontAiChatbot: React.FC = () => {
     {
       id: 'welcome-1',
       sender: 'bot',
-      text: 'আসসালামু আলাইকুম! 👋 আমি ArdhiMart এর AI সাপোর্ট এসিস্ট্যান্ট। আপনি চাইলে চ্যাটেই যেকোনো পণ্য সরাসরি অর্ডার করতে পারেন।\nHello! Ask about products or place an order directly in chat.',
+      text: 'আসসালামু আলাইকুম! 👋 আমি ArdhiMart এর Live Chat AI এসিস্ট্যান্ট। পণ্য, দাম, ডেলিভারি বা অর্ডারের বিষয়ে প্রশ্ন করুন অথবা চ্যাটের ভেতরেই সহজে অর্ডার কনফার্ম করুন।\nHello! Ask about products or place an order directly here.',
       timestamp: 'Just now',
     },
   ]);
@@ -55,7 +55,7 @@ export const StorefrontAiChatbot: React.FC = () => {
 
   // Quick Prompts Chips
   const quickPrompts = [
-    '🛒 এখনই চ্যাটে অর্ডার করুন',
+    '💬 চ্যাটে অর্ডার করতে চাই',
     '⚡ পাওয়ার ব্যাংক বা গ্যাজেটের দাম কত?',
     '🚚 Delivery fee and shipping time?',
     '📦 আমার অর্ডার ৯৮০ এর স্ট্যাটাস কি?'
@@ -112,7 +112,7 @@ export const StorefrontAiChatbot: React.FC = () => {
         if (res.ok) {
           const ord = await res.json();
           const orderNum = ord.orderNumber || ord.id || '981';
-          return `🎉 অভিনন্দন! আপনার অর্ডার সফলভাবে প্লেস করা হয়েছে।\n📦 অর্ডার নম্বর: #${orderNum}\n👤 কাস্টমার: ${name} (${phone})\n📍 ঠিকানা: ${address}\n💵 পেমেন্ট: ক্যাশ অন ডেলিভারি (৳${selectedProduct.price + 80})\n\nআমাদের প্রতিনিধি দ্রুত আপনার সাথে যোগাযোগ করবেন। ❤️`;
+          return `🎉 অভিনন্দন! আপনার অর্ডারটি সফলভাবে কনফার্ম করা হয়েছে।\n📦 অর্ডার নম্বর: #${orderNum}\n👤 কাস্টমার: ${name} (${phone})\n📍 ঠিকানা: ${address}\n💵 পেমেন্ট: ক্যাশ অন ডেলিভারি (৳${selectedProduct.price + 80})\n\nআমাদের কুরিয়ার প্রতিনিধি দ্রুত আপনার সাথে যোগাযোগ করবেন। ❤️`;
         }
       } catch (e) {}
     }
@@ -120,7 +120,7 @@ export const StorefrontAiChatbot: React.FC = () => {
     return null;
   };
 
-  // Ultra-Short Smart Local Keyword Fallback
+  // Smart Local Keyword Fallback
   const getLocalFallbackResponse = async (userPrompt: string): Promise<string> => {
     const q = userPrompt.toLowerCase();
     const isEnglish = /[a-z]/i.test(q) && !/[\u0980-\u09FF]/.test(q);
@@ -129,9 +129,9 @@ export const StorefrontAiChatbot: React.FC = () => {
     // Order Intent without full details
     if (q.includes('অর্ডার') || q.includes('order') || q.includes('buy')) {
       if (isEnglish) {
-        return 'To place an order directly in chat, please provide: 1. Product Name 2. Your Name 3. Phone Number 4. Full Address.';
+        return 'To place your order directly in chat, please provide: 1. Product Name 2. Full Name 3. Mobile Number 4. Delivery Address.';
       } else {
-        return 'চ্যাটে সরাসরি অর্ডার করতে প্রদান করুন: ১. পণ্যের নাম ২. আপনার নাম ৩. মোবাইল নম্বর ৪. পূর্ণাঙ্গ ঠিকানা।';
+        return 'চ্যাটে সরাসরি অর্ডার কনফার্ম করতে প্রদান করুন: ১. পণ্যের নাম ২. আপনার নাম ৩. মোবাইল নম্বর ৪. ফুল ডেলিভারি ঠিকানা।';
       }
     }
 
@@ -144,17 +144,17 @@ export const StorefrontAiChatbot: React.FC = () => {
         if (orderRes.ok) {
           const ord = await orderRes.json();
           if (isEnglish) {
-            return `Order #${orderId}: ${ord.status?.toUpperCase()} (${ord.customerName}, Total ৳${ord.totalAmount}).`;
+            return `Order #${orderId} Status: ${ord.status?.toUpperCase()} (${ord.customerName}, Total Payable ৳${ord.totalAmount}).`;
           } else {
-            return `অর্ডার #${orderId}: ${ord.status?.toUpperCase()} (গ্রাহক: ${ord.customerName}, মোট ৳${ord.totalAmount})।`;
+            return `অর্ডার #${orderId} এর বর্তমান অবস্থা: ${ord.status?.toUpperCase()} (গ্রাহক: ${ord.customerName}, মোট দেয় ৳${ord.totalAmount})।`;
           }
         }
       } catch (e) {}
 
       if (isEnglish) {
-        return `Order #${orderId} is currently being processed. Check details on Track Order page.`;
+        return `Order #${orderId} is currently being processed. You can check live tracking on Track Order page.`;
       } else {
-        return `অর্ডার #${orderMatch[0]} বর্তমানে প্রসেসিং এ আছে। বিস্তারিত ট্র্যাকিং পেজে দেখুন।`;
+        return `অর্ডার #${orderMatch[0]} লজিস্টিক টিমের মাধ্যমে প্রসেসিং এ আছে। বিস্তারিত জানতে ট্র্যাকিং পেজে অনুসন্ধান করুন।`;
       }
     }
 
@@ -166,30 +166,30 @@ export const StorefrontAiChatbot: React.FC = () => {
     if (matchedProducts.length > 0) {
       const p = matchedProducts[0];
       if (isEnglish) {
-        return `"${p.title}" is available for ৳${p.price}. Reply with your Name, Phone, and Address to order!`;
+        return `"${p.title}" is available for ৳${p.price}. In stock with Cash on Delivery across Bangladesh!`;
       } else {
-        return `"${p.title}" এর অফার দাম ৳${p.price}। সরাসরি অর্ডার করতে আপনার নাম, মোবাইল নম্বর ও ঠিকানা লিখুন!`;
+        return `"${p.title}" এর বর্তমান অফার প্রাইজ ৳${p.price}। সম্পূর্ণ বাংলাদেশে ক্যাশ অন ডেলিভারিতে পাওয়া যাচ্ছে!`;
       }
     }
 
     // Delivery / Shipping Query
     if (q.includes('delivery') || q.includes('shipping') || q.includes('ডেলিভারি') || q.includes('চার্জ')) {
       if (isEnglish) {
-        return 'Delivery Fee: Inside Dhaka ৳80 (24-48h), Outside Dhaka ৳120 (2-3 days). COD available.';
+        return 'Delivery Fee: Inside Dhaka ৳80 (24-48h), Outside Dhaka ৳120 (2-3 days). Cash on Delivery available!';
       } else {
-        return 'ডেলিভারি চার্জ: ঢাকার ভেতরে ৳৮০ (২৪-৪৮ ঘণ্টা), বাইরে ৳১২০ (২-৩ দিন)। ক্যাশ অন ডেলিভারি প্রযোজ্য।';
+        return 'ডেলিভারি চার্জ: ঢাকার ভেতরে ৳৮০ (২৪-৪৮ ঘণ্টা), ঢাকার বাইরে ৳১২০ (২-৩ দিন)। ক্যাশ অন ডেলিভারি প্রযোজ্য!';
       }
     }
 
     // General Response
     if (isEnglish) {
-      return 'I am ArdhiMart Shopping Assistant. Ask about products or place an order directly here!';
+      return 'Welcome to ArdhiMart! Feel free to ask about any product or send your address & phone to place an order instantly.';
     } else {
-      return 'আমি ArdhiMart এর শপিং এসিস্ট্যান্ট। আমাদের পণ্য সম্পর্কে জানতে বা সরাসরি অর্ডার করতে লিখুন!';
+      return 'ArdhiMart এ আপনাকে স্বাগতম! যেকোনো পণ্য সম্পর্কে জানতে অথবা সরাসরি অর্ডার করতে আপনার ঠিকানা ও মোবাইল নম্বর লিখুন।';
     }
   };
 
-  // Gemini AI Service Handler with In-Chat Order Creation
+  // Gemini AI Handler with Complete, Un-truncated Responses
   const getAiResponse = async (userPrompt: string): Promise<string> => {
     // 1. Try In-Chat Direct Order Placement
     const orderPlacementResult = await attemptPlaceOrderInChat(userPrompt);
@@ -218,25 +218,25 @@ export const StorefrontAiChatbot: React.FC = () => {
       .map((p) => `• ${p.title}: ৳${p.price}`)
       .join('\n');
 
-    const systemPrompt = `You are the AI Customer Support & Sales Agent for "ArdhiMart" e-commerce store in Bangladesh.
+    const systemPrompt = `You are the expert AI Live Support Agent for "ArdhiMart" e-commerce store in Bangladesh.
 
-CRITICAL RULES:
-1. KEEP YOUR RESPONSE EXTREMELY SHORT AND ULTRA-CONCISE (MAX 1 OR 2 SHORT SENTENCES, UNDER 25 WORDS). DO NOT WRITE LONG EXPLANATIONS.
-2. DO NOT GREET OR SALUTE. Answer the question directly without "Assalamu Alaikum" or "Hello".
+CRITICAL RESPONSE RULES:
+1. Provide a clear, complete, helpful, and polished response (1-3 sentences max). ALWAYS COMPLETE YOUR SENTENCES FULLY. Do not stop mid-sentence.
+2. DO NOT greet or salute. Answer the question directly without "Assalamu Alaikum" or "Hello".
 3. DETECT LANGUAGE AUTOMATICALLY:
-   - If user asks in English -> reply in short English.
-   - If user asks in Bengali/Banglish -> reply in short Bengali.
-4. ORDER PLACEMENT GUIDELINE:
-   - If the customer expresses desire to order, ask them politely to provide: 1. Product Name, 2. Full Name, 3. Mobile Number, and 4. Address so you can confirm their order instantly in chat!
+   - If user asks in English -> reply in clean English.
+   - If user asks in Bengali/Banglish -> reply in natural Bengali.
+4. IN-CHAT ORDER GUIDELINE:
+   - If user asks to order, politely ask for: 1. Product Name, 2. Full Name, 3. Mobile Number, 4. Full Delivery Address to confirm instantly in chat!
 
-Store Knowledge:
-- Delivery: Inside Dhaka ৳80, Outside Dhaka ৳120. COD available.
+Store Knowledge Base:
+- Delivery: Inside Dhaka ৳80 (24-48h), Outside Dhaka ৳120 (2-3 days). COD available.
 - Return: 7-day replacement warranty.
 Products:
 ${productCatalogSnippet || 'Featured Tech Accessories, Power Banks, Smartwatches'}
 ${orderContext ? `\nFound Info: ${orderContext}` : ''}
 
-Customer Question: "${userPrompt}"`;
+Customer Query: "${userPrompt}"`;
 
     const apiKey = DEFAULT_GEMINI_KEY;
     const models = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-2.0-flash'];
@@ -250,7 +250,7 @@ Customer Question: "${userPrompt}"`;
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [{ parts: [{ text: systemPrompt }] }],
-              generationConfig: { temperature: 0.3, maxOutputTokens: 120 },
+              generationConfig: { temperature: 0.5, maxOutputTokens: 350 },
             }),
           }
         );
@@ -312,22 +312,22 @@ Customer Question: "${userPrompt}"`;
   };
 
   return (
-    <div className="fixed bottom-5 right-4 z-50 select-none">
-      {/* FLOATING TRIGGER BUTTON */}
+    <div className="fixed bottom-24 right-4 sm:bottom-20 sm:right-6 z-50 select-none">
+      {/* FLOATING TRIGGER BUTTON (ROUNDED SHAPE & LIVE CHAT BADGE, RAISED HIGHER) */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="group relative flex items-center gap-2 px-4 py-3 bg-[#0F396F] hover:bg-[#164685] text-white rounded-full shadow-2xl transition-all duration-300 active:scale-95 cursor-pointer border border-indigo-400/30"
-          aria-label="Open AI Assistant"
+          className="group relative flex items-center gap-2.5 px-4 py-3.5 bg-[#0F396F] hover:bg-[#164685] text-white rounded-full shadow-2xl transition-all duration-300 active:scale-95 cursor-pointer border border-cyan-400/40 glow-indigo"
+          aria-label="Open Live Chat"
         >
           <div className="relative flex items-center justify-center">
-            <Bot className="w-6 h-6 text-cyan-300" />
+            <MessageSquare className="w-5 h-5 text-cyan-300 fill-cyan-400/20" />
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full ring-2 ring-slate-900 animate-ping" />
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full ring-2 ring-slate-900" />
           </div>
 
-          <span className="font-extrabold text-xs tracking-wider text-white hidden sm:inline">
-            ArdhiMart AI Support
+          <span className="font-extrabold text-xs tracking-wider text-white">
+            Live Chat
           </span>
 
           <span className="px-1.5 py-0.5 text-[9px] font-black bg-cyan-400 text-slate-950 rounded-full uppercase">
@@ -347,12 +347,12 @@ Customer Question: "${userPrompt}"`;
               </div>
               <div>
                 <h3 className="text-xs font-black text-white flex items-center gap-1.5">
-                  ArdhiMart AI Assistant
+                  ArdhiMart Live Chat AI
                   <Sparkles className="w-3 h-3 text-cyan-400" />
                 </h3>
                 <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  In-Chat Direct Order Placement Active
+                  In-Chat Direct Order Active
                 </span>
               </div>
             </div>
@@ -400,7 +400,7 @@ Customer Question: "${userPrompt}"`;
             {isTyping && (
               <div className="flex gap-2 items-center text-slate-400 text-xs p-2">
                 <Bot className="w-4 h-4 animate-bounce text-cyan-400" />
-                <span>AI Assistant typing...</span>
+                <span>AI Live Chat typing...</span>
               </div>
             )}
 
@@ -433,7 +433,7 @@ Customer Question: "${userPrompt}"`;
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="অর্ডার করতে নাম, মোবাইল নম্বর ও ঠিকানা লিখুন..."
+                placeholder="Ask or send name, phone & address to order..."
                 className="flex-1 px-3.5 py-2 text-xs bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-sans"
               />
               <button
