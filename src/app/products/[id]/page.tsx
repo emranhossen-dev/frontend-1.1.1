@@ -337,7 +337,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               </div>
             </div>
 
-            {/* SIDE-BY-SIDE ADD TO CART & BUY NOW BUTTONS IN A SINGLE ROW WITH SHIMMER LIGHT SLIDE & NEON GLOW ANIMATIONS */}
+            {/* SIDE-BY-SIDE ADD TO CART & BUY NOW BUTTONS WITH CLEAN SHIMMER LIGHT SLIDE ONLY */}
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
                 onClick={handleAddToCart}
@@ -349,7 +349,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
               <button
                 onClick={handleBuyNow}
-                className="btn-shimmer btn-glow-orange w-full py-3.5 px-3 bg-[#FF6B00] hover:bg-[#e05e00] text-white font-black text-xs uppercase tracking-wider rounded-2xl transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                className="btn-shimmer w-full py-3.5 px-3 bg-[#FF6B00] hover:bg-[#e05e00] text-white font-black text-xs uppercase tracking-wider rounded-2xl transition-all duration-300 shadow-md hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Zap className="w-4 h-4 shrink-0" />
                 <span className="truncate whitespace-nowrap">Buy Now</span>
@@ -501,7 +501,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
         <button
           onClick={handleBuyNow}
-          className="btn-shimmer btn-glow-orange flex-[1.5] bg-[#FF6B00] text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-[#e05e00] transition-colors active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+          className="btn-shimmer flex-[1.5] bg-[#FF6B00] text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-[#e05e00] transition-colors active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shadow-md"
         >
           <Zap className="w-4 h-4 shrink-0" />
           <span className="truncate whitespace-nowrap">Buy Now</span>
