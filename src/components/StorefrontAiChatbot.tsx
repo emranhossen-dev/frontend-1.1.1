@@ -38,7 +38,7 @@ export const StorefrontAiChatbot: React.FC = () => {
     {
       id: 'welcome-1',
       sender: 'bot',
-      text: 'আসসালামু আলাইকুম! 👋 আমি ArdhiMart এর AI সাপোর্ট এসিস্ট্যান্ট। পণ্য, দাম, ডেলিভারি চার্জ বা অর্ডার নিয়ে প্রশ্ন করুন।\nHello! How can I assist you today?',
+      text: 'আসসালামু আলাইকুম! 👋 আমি ArdhiMart এর AI সাপোর্ট এসিস্ট্যান্ট। আপনি চাইলে চ্যাটেই যেকোনো পণ্য সরাসরি অর্ডার করতে পারেন।\nHello! Ask about products or place an order directly in chat.',
       timestamp: 'Just now',
     },
   ]);
@@ -55,17 +55,85 @@ export const StorefrontAiChatbot: React.FC = () => {
 
   // Quick Prompts Chips
   const quickPrompts = [
+    '🛒 এখনই চ্যাটে অর্ডার করুন',
     '⚡ পাওয়ার ব্যাংক বা গ্যাজেটের দাম কত?',
     '🚚 Delivery fee and shipping time?',
-    '📦 আমার অর্ডার ৯৮০ এর স্ট্যাটাস কি?',
-    '🔄 Return & replacement policy'
+    '📦 আমার অর্ডার ৯৮০ এর স্ট্যাটাস কি?'
   ];
+
+  // Automatic Backend Order Creator
+  const attemptPlaceOrderInChat = async (userPrompt: string): Promise<string | null> => {
+    const phoneMatch = userPrompt.match(/(?:01|8801|\+8801)\d{8,9}/);
+    const orderKeywords = ['order', 'buy', 'অর্ডার', 'কিনব', 'বুক', 'নিতে চাই'];
+    const hasOrderIntent = orderKeywords.some((k) => userPrompt.toLowerCase().includes(k));
+
+    if (phoneMatch && hasOrderIntent) {
+      const phone = phoneMatch[0];
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
+
+      // Parse name and address roughly from text
+      const cleanText = userPrompt.replace(phone, '').trim();
+      const parts = cleanText.split(/[,|\n-]/).map((s) => s.trim()).filter(Boolean);
+      const name = parts[0] || 'Customer';
+      const address = parts.slice(1).join(', ') || 'Dhaka, Bangladesh';
+
+      const selectedProduct = products[0] || {
+        id: 'prod-1',
+        title: 'Wireless Power Bank 10000mAh',
+        price: 1200,
+        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500',
+      };
+
+      try {
+        const res = await fetch(`${baseUrl}/orders`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customerName: name,
+            customerPhone: phone,
+            shippingAddress: address,
+            city: 'Dhaka',
+            items: [
+              {
+                productId: selectedProduct.id,
+                productName: selectedProduct.title,
+                quantity: 1,
+                price: selectedProduct.price,
+                image: selectedProduct.image,
+              },
+            ],
+            subtotal: selectedProduct.price,
+            shippingFee: 80,
+            totalAmount: selectedProduct.price + 80,
+            paymentMethod: 'COD',
+          }),
+        });
+
+        if (res.ok) {
+          const ord = await res.json();
+          const orderNum = ord.orderNumber || ord.id || '981';
+          return `🎉 অভিনন্দন! আপনার অর্ডার সফলভাবে প্লেস করা হয়েছে।\n📦 অর্ডার নম্বর: #${orderNum}\n👤 কাস্টমার: ${name} (${phone})\n📍 ঠিকানা: ${address}\n💵 পেমেন্ট: ক্যাশ অন ডেলিভারি (৳${selectedProduct.price + 80})\n\nআমাদের প্রতিনিধি দ্রুত আপনার সাথে যোগাযোগ করবেন। ❤️`;
+        }
+      } catch (e) {}
+    }
+
+    return null;
+  };
 
   // Ultra-Short Smart Local Keyword Fallback
   const getLocalFallbackResponse = async (userPrompt: string): Promise<string> => {
     const q = userPrompt.toLowerCase();
     const isEnglish = /[a-z]/i.test(q) && !/[\u0980-\u09FF]/.test(q);
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
+
+    // Order Intent without full details
+    if (q.includes('অর্ডার') || q.includes('order') || q.includes('buy')) {
+      if (isEnglish) {
+        return 'To place an order directly in chat, please provide: 1. Product Name 2. Your Name 3. Phone Number 4. Full Address.';
+      } else {
+        return 'চ্যাটে সরাসরি অর্ডার করতে প্রদান করুন: ১. পণ্যের নাম ২. আপনার নাম ৩. মোবাইল নম্বর ৪. পূর্ণাঙ্গ ঠিকানা।';
+      }
+    }
 
     // Order Tracking Query (e.g. 980)
     const orderMatch = userPrompt.match(/\b\d{3,4}\b/);
@@ -98,9 +166,9 @@ export const StorefrontAiChatbot: React.FC = () => {
     if (matchedProducts.length > 0) {
       const p = matchedProducts[0];
       if (isEnglish) {
-        return `"${p.title}" is available for ৳${p.price}. In stock with Cash on Delivery!`;
+        return `"${p.title}" is available for ৳${p.price}. Reply with your Name, Phone, and Address to order!`;
       } else {
-        return `"${p.title}" এর বর্তমান অফার দাম ৳${p.price}। ক্যাশ অন ডেলিভারিতে পাওয়া যাচ্ছে!`;
+        return `"${p.title}" এর অফার দাম ৳${p.price}। সরাসরি অর্ডার করতে আপনার নাম, মোবাইল নম্বর ও ঠিকানা লিখুন!`;
       }
     }
 
@@ -113,25 +181,22 @@ export const StorefrontAiChatbot: React.FC = () => {
       }
     }
 
-    // Return & Warranty Query
-    if (q.includes('return') || q.includes('warranty') || q.includes('রিটার্ন') || q.includes('ওয়ারেন্টি')) {
-      if (isEnglish) {
-        return 'We offer a 7-day free replacement warranty for damaged or wrong products.';
-      } else {
-        return 'ArdhiMart এ ত্রুটিপূর্ণ পণ্যে ৭ দিনের ফ্রি রিপ্লেসমেন্ট সুবিধা রয়েছে।';
-      }
-    }
-
     // General Response
     if (isEnglish) {
-      return 'I am ArdhiMart Shopping Assistant. Please ask about our products, prices, or orders!';
+      return 'I am ArdhiMart Shopping Assistant. Ask about products or place an order directly here!';
     } else {
-      return 'আমি ArdhiMart এর শপিং এসিস্ট্যান্ট। আমাদের স্টোরের পণ্য, দাম বা অর্ডার নিয়ে প্রশ্ন করুন!';
+      return 'আমি ArdhiMart এর শপিং এসিস্ট্যান্ট। আমাদের পণ্য সম্পর্কে জানতে বা সরাসরি অর্ডার করতে লিখুন!';
     }
   };
 
-  // Gemini AI Service Handler with Concise Token & Out-of-Scope Guardrails
+  // Gemini AI Service Handler with In-Chat Order Creation
   const getAiResponse = async (userPrompt: string): Promise<string> => {
+    // 1. Try In-Chat Direct Order Placement
+    const orderPlacementResult = await attemptPlaceOrderInChat(userPrompt);
+    if (orderPlacementResult) {
+      return orderPlacementResult;
+    }
+
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
 
     // Order Lookup
@@ -153,16 +218,16 @@ export const StorefrontAiChatbot: React.FC = () => {
       .map((p) => `• ${p.title}: ৳${p.price}`)
       .join('\n');
 
-    const systemPrompt = `You are the AI Customer Support Agent for "ArdhiMart" e-commerce store in Bangladesh.
+    const systemPrompt = `You are the AI Customer Support & Sales Agent for "ArdhiMart" e-commerce store in Bangladesh.
 
 CRITICAL RULES:
-1. KEEP YOUR RESPONSE EXTREMELY SHORT AND ULTRA-CONCISE (MAX 1 OR 2 SHORT SENTENCES, UNDER 25 WORDS). DO NOT WRITE LONG EXPLANATIONS OR PARAGRAPHS.
+1. KEEP YOUR RESPONSE EXTREMELY SHORT AND ULTRA-CONCISE (MAX 1 OR 2 SHORT SENTENCES, UNDER 25 WORDS). DO NOT WRITE LONG EXPLANATIONS.
 2. DO NOT GREET OR SALUTE. Answer the question directly without "Assalamu Alaikum" or "Hello".
 3. DETECT LANGUAGE AUTOMATICALLY:
    - If user asks in English -> reply in short English.
    - If user asks in Bengali/Banglish -> reply in short Bengali.
-4. OUT-OF-SCOPE & IRRELEVANT QUESTIONS GUARDRAIL:
-   - If the user asks about third-party stores, competitors, non-store items, or irrelevant topics (e.g. weather, politics, external links), politely state that you are ArdhiMart's Shopping Assistant and invite them to ask about ArdhiMart products, prices, or orders.
+4. ORDER PLACEMENT GUIDELINE:
+   - If the customer expresses desire to order, ask them politely to provide: 1. Product Name, 2. Full Name, 3. Mobile Number, and 4. Address so you can confirm their order instantly in chat!
 
 Store Knowledge:
 - Delivery: Inside Dhaka ৳80, Outside Dhaka ৳120. COD available.
@@ -287,7 +352,7 @@ Customer Question: "${userPrompt}"`;
                 </h3>
                 <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Fast & Concise AI Assistant
+                  In-Chat Direct Order Placement Active
                 </span>
               </div>
             </div>
@@ -368,7 +433,7 @@ Customer Question: "${userPrompt}"`;
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Ask a question (e.g. delivery charge?)..."
+                placeholder="অর্ডার করতে নাম, মোবাইল নম্বর ও ঠিকানা লিখুন..."
                 className="flex-1 px-3.5 py-2 text-xs bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-sans"
               />
               <button
