@@ -11,7 +11,6 @@ import {
   Check,
   HelpCircle,
   Search,
-  Package,
   Clock,
   AlertCircle
 } from 'lucide-react';
@@ -23,7 +22,8 @@ interface OrderTrackingPageProps {
 export default function OrderTrackingPage({ params }: OrderTrackingPageProps) {
   const router = useRouter();
   const resolvedParams = use(params);
-  const initialSearchId = resolvedParams.id || '';
+  const rawIdParam = resolvedParams?.id || '';
+  const initialSearchId = (rawIdParam && rawIdParam !== 'track') ? rawIdParam : '';
 
   const { products } = useStore();
   const [searchQuery, setSearchQuery] = useState(initialSearchId);
@@ -32,45 +32,70 @@ export default function OrderTrackingPage({ params }: OrderTrackingPageProps) {
   const [errorMsg, setErrorMsg] = useState('');
 
   const fetchOrderDetails = async (idOrPhone: string) => {
-    if (!idOrPhone.trim()) return;
+    if (!idOrPhone || !idOrPhone.trim()) {
+      setErrorMsg('Please enter an Order ID (e.g. 980) or Mobile Number.');
+      return;
+    }
 
+    const cleanQuery = idOrPhone.trim();
     setIsLoading(true);
     setErrorMsg('');
     setOrderData(null);
 
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
-      const res = await fetch(`${baseUrl}/orders/${encodeURIComponent(idOrPhone.trim())}`);
       
+      // Try Direct ID lookup first
+      const res = await fetch(`${baseUrl}/orders/${encodeURIComponent(cleanQuery)}`);
       if (res.ok) {
         const data = await res.json();
-        setOrderData(data);
-      } else {
-        // Try searching orders list by query
-        const listRes = await fetch(`${baseUrl}/orders?search=${encodeURIComponent(idOrPhone.trim())}`);
-        if (listRes.ok) {
-          const listData = await listRes.json();
-          if (Array.isArray(listData) && listData.length > 0) {
-            setOrderData(listData[0]);
-          } else {
-            setErrorMsg(`No order found matching ID or Phone #${idOrPhone}`);
-          }
-        } else {
-          setErrorMsg(`No order found matching ID or Phone #${idOrPhone}`);
+        if (data && (data.id || data.orderNumber)) {
+          setOrderData(data);
+          setIsLoading(false);
+          return;
         }
       }
+
+      // Fallback: Search orders list by query
+      const listRes = await fetch(`${baseUrl}/orders?search=${encodeURIComponent(cleanQuery)}`);
+      if (listRes.ok) {
+        const listData = await listRes.json();
+        if (Array.isArray(listData) && listData.length > 0) {
+          setOrderData(listData[0]);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Fallback 2: Check all orders list if small dataset
+      const allRes = await fetch(`${baseUrl}/orders`);
+      if (allRes.ok) {
+        const allData = await allRes.json();
+        if (Array.isArray(allData)) {
+          const match = allData.find((o: any) => 
+            String(o.id) === cleanQuery || 
+            String(o.orderNumber) === cleanQuery || 
+            String(o.customerPhone).includes(cleanQuery)
+          );
+          if (match) {
+            setOrderData(match);
+            setIsLoading(false);
+            return;
+          }
+        }
+      }
+
+      setErrorMsg(`No active order found for ID or Phone #${cleanQuery}`);
     } catch (err: any) {
-      setErrorMsg('Failed to connect to order tracking server. Please check your order ID.');
+      setErrorMsg('Could not connect to tracking server. Please verify your order number.');
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (initialSearchId && initialSearchId !== 'track') {
+    if (initialSearchId) {
       fetchOrderDetails(initialSearchId);
-    } else {
-      fetchOrderDetails('980'); // Default query fallback for instant preview
     }
   }, [initialSearchId]);
 
@@ -104,13 +129,13 @@ export default function OrderTrackingPage({ params }: OrderTrackingPageProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col font-sans pb-12">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col font-sans pb-12 select-none">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-gray-200/80 dark:border-slate-800 h-16 flex items-center justify-between px-4">
         <button
           onClick={() => router.back()}
           aria-label="Back"
-          className="p-2 -ml-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors active:scale-95 cursor-pointer"
+          className="p-2 -ml-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -126,7 +151,7 @@ export default function OrderTrackingPage({ params }: OrderTrackingPageProps) {
         {/* Search Input Box */}
         <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm space-y-2">
           <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block">
-            Enter Order ID (e.g. 980) or Phone Number
+            Enter Order ID (e.g. 980) or Mobile Number
           </label>
           <div className="flex gap-2">
             <input
@@ -209,7 +234,7 @@ export default function OrderTrackingPage({ params }: OrderTrackingPageProps) {
             {/* Tracking Timeline */}
             <section className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-4 shadow-sm">
               <h2 className="text-xs font-extrabold uppercase tracking-wider text-gray-900 dark:text-white">
-                Live Status Progress
+                Live Order Progress
               </h2>
 
               <div className="relative pl-3 space-y-6">
