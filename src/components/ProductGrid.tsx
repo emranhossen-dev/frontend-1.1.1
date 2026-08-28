@@ -86,8 +86,19 @@ export const ProductGrid: React.FC = () => {
       {/* Grid of Product Cards - Identical 2-col (mobile) / 3-col (sm) / 4-col (md+) layout */}
       {filteredProducts.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-          {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {filteredProducts.map((product: any) => (
+            <ProductCard
+              key={product.id}
+              product={{
+                ...product,
+                title: product.title || product.name || 'Untitled Product',
+                price: product.price || 0,
+                rating: product.rating || 5.0,
+                badge: product.badge || 'New',
+                image: product.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500',
+                category: product.category || 'General',
+              }}
+            />
           ))}
         </div>
       ) : (

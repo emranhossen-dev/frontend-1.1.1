@@ -67,15 +67,18 @@ export const Header: React.FC<HeaderProps> = ({
             className="flex items-center gap-2.5 group shrink-0"
             title="ArdhiMart"
           >
-            <Image
-              src="/logo.png"
-              alt="ArdhiMart Logo"
-              width={140}
-              height={36}
-              priority
-              className="h-8 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105"
-            />
-            <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white group-hover:text-blue-400 transition-colors">
+            {/* Crisp Light Background Pill for 100% Sharp Logo Contrast */}
+            <div className="bg-white px-2.5 py-1 rounded-xl shadow-xs border border-gray-100 flex items-center justify-center transition-transform group-hover:scale-105">
+              <Image
+                src="/logo.png"
+                alt="ArdhiMart Logo"
+                width={140}
+                height={36}
+                priority
+                className="h-7 sm:h-9 w-auto object-contain"
+              />
+            </div>
+            <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white group-hover:text-[#FF6B00] transition-colors">
               {brandName}
             </span>
           </Link>
@@ -97,9 +100,9 @@ export const Header: React.FC<HeaderProps> = ({
             className="p-2.5 bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700 rounded-xl transition-all active:scale-95 relative cursor-pointer flex items-center gap-1.5"
           >
             <div className="relative">
-              <ShoppingBag className="w-5 h-5 text-blue-400" />
+              <ShoppingBag className="w-5 h-5 text-[#FF6B00]" />
               {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-blue-600 text-white font-black text-[10px] w-4 h-4 rounded-full flex items-center justify-center shadow-md animate-pulse">
+                <span className="absolute -top-2 -right-2 bg-[#FF6B00] text-white font-black text-[10px] w-4 h-4 rounded-full flex items-center justify-center shadow-md animate-pulse">
                   {cartCount}
                 </span>
               )}

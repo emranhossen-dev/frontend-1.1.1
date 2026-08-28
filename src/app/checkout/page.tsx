@@ -237,7 +237,7 @@ export default function CheckoutPage() {
 
               <button
                 onClick={() => setActiveStep('delivery')}
-                className="w-full h-11 bg-black dark:bg-white text-white dark:text-black font-bold text-xs uppercase tracking-wider rounded-xl mt-2 hover:bg-gray-800 transition-colors"
+                className="w-full h-11 bg-[#0F396F] hover:bg-[#164685] text-white font-bold text-xs uppercase tracking-wider rounded-xl mt-2 transition-colors cursor-pointer"
               >
                 Continue to Delivery
               </button>
@@ -271,7 +271,7 @@ export default function CheckoutPage() {
                 }}
                 className={`flex items-center justify-between p-3.5 border rounded-xl cursor-pointer transition-all ${
                   deliveryMethod === 'inside'
-                    ? 'border-black dark:border-white bg-gray-50 dark:bg-slate-800'
+                    ? 'border-[#FF6B00] bg-orange-50/20 dark:bg-slate-800'
                     : 'border-gray-200 dark:border-slate-800'
                 }`}
               >
@@ -298,7 +298,7 @@ export default function CheckoutPage() {
                 }}
                 className={`flex items-center justify-between p-3.5 border rounded-xl cursor-pointer transition-all ${
                   deliveryMethod === 'outside'
-                    ? 'border-black dark:border-white bg-gray-50 dark:bg-slate-800'
+                    ? 'border-[#FF6B00] bg-orange-50/20 dark:bg-slate-800'
                     : 'border-gray-200 dark:border-slate-800'
                 }`}
               >
@@ -320,7 +320,7 @@ export default function CheckoutPage() {
 
               <button
                 onClick={() => setActiveStep('payment')}
-                className="w-full h-11 bg-black dark:bg-white text-white dark:text-black font-bold text-xs uppercase tracking-wider rounded-xl mt-2 hover:bg-gray-800 transition-colors"
+                className="w-full h-11 bg-[#0F396F] hover:bg-[#164685] text-white font-bold text-xs uppercase tracking-wider rounded-xl mt-2 transition-colors cursor-pointer"
               >
                 Continue to Payment
               </button>
@@ -352,7 +352,7 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod('COD')}
                   className={`py-3 px-2 border rounded-xl font-bold text-xs flex flex-col items-center gap-1 transition-all ${
                     paymentMethod === 'COD'
-                      ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black shadow-sm'
+                      ? 'border-[#FF6B00] bg-[#FF6B00] text-white shadow-sm'
                       : 'border-gray-200 dark:border-slate-800 text-gray-700 dark:text-gray-300'
                   }`}
                 >
@@ -364,7 +364,7 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod('bKash')}
                   className={`py-3 px-2 border rounded-xl font-bold text-xs flex flex-col items-center gap-1 transition-all ${
                     paymentMethod === 'bKash'
-                      ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black shadow-sm'
+                      ? 'border-[#FF6B00] bg-[#FF6B00] text-white shadow-sm'
                       : 'border-gray-200 dark:border-slate-800 text-gray-700 dark:text-gray-300'
                   }`}
                 >
@@ -376,7 +376,7 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod('Card')}
                   className={`py-3 px-2 border rounded-xl font-bold text-xs flex flex-col items-center gap-1 transition-all ${
                     paymentMethod === 'Card'
-                      ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black shadow-sm'
+                      ? 'border-[#FF6B00] bg-[#FF6B00] text-white shadow-sm'
                       : 'border-gray-200 dark:border-slate-800 text-gray-700 dark:text-gray-300'
                   }`}
                 >
@@ -414,7 +414,7 @@ export default function CheckoutPage() {
 
           <button
             onClick={handlePlaceOrder}
-            className="w-full h-13 bg-black dark:bg-white text-white dark:text-black font-extrabold text-sm rounded-xl flex items-center justify-center gap-2 hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-lg active:scale-95"
+            className="btn-shimmer w-full h-13 bg-[#FF6B00] hover:bg-[#E56000] text-white font-extrabold text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 cursor-pointer"
           >
             <Lock className="w-4 h-4" />
             Place Order

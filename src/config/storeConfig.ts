@@ -5,7 +5,7 @@ export const defaultStoreConfig: StoreConfig = {
   tagline: "Premium E-commerce Experience",
   currency: "৳",
   logoUrl: "/logo.png",
-  announcementText: "⚡ Free Delivery on orders over ৳5000 | Use Code: FIRST50",
+  announcementText: "Free Delivery on orders over ৳5000 | Use Code: FIRST50",
 };
 
 export const defaultHeroBanner: HeroBanner = {

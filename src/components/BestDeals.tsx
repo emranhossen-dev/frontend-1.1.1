@@ -5,7 +5,6 @@ import { PRODUCTS_DATA } from "../data/products";
 import { ProductCard } from "./ProductCard";
 import { useCart } from "../context/CartContext";
 import { HiOutlineChevronRight } from "react-icons/hi2";
-import { FaBolt } from "react-icons/fa6";
 
 export const BestDeals: React.FC = () => {
   const { setSelectedCategory } = useCart();
@@ -17,9 +16,6 @@ export const BestDeals: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-3.5 sm:mb-5">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-            <FaBolt className="w-4 h-4 text-amber-400" />
-          </div>
           <h2 className="text-lg sm:text-2xl font-black text-white tracking-tight">
             সেরা ডিলসমূহ (Best Deals)
           </h2>
@@ -45,8 +41,19 @@ export const BestDeals: React.FC = () => {
 
       {/* Best Deals Grid - Render identical 2-col (mobile) / 3-col (sm) / 4-col (md+) ProductCard layout */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-        {deals.slice(0, 4).map((product) => (
-          <ProductCard key={product.id} product={product} />
+        {deals.slice(0, 4).map((product: any) => (
+          <ProductCard
+            key={product.id}
+            product={{
+              ...product,
+              title: product.title || product.name || 'Untitled Product',
+              price: product.price || 0,
+              rating: product.rating || 5.0,
+              badge: product.badge || 'Deal',
+              image: product.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500',
+              category: product.category || 'General',
+            }}
+          />
         ))}
       </div>
     </section>

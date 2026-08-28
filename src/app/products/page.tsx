@@ -18,6 +18,8 @@ import {
   Loader2,
 } from 'lucide-react';
 
+import { ProductCard, ProductSkeletonCard } from '@/components/ProductCard';
+
 export default function AllProductsPage() {
   const {
     products,
@@ -123,20 +125,9 @@ export default function AllProductsPage() {
 
         {/* Products Grid or Skeleton Loading Cards */}
         {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
-            {[1, 2, 3, 4].map((n) => (
-              <div
-                key={n}
-                className="animate-pulse bg-white dark:bg-slate-900 rounded-2xl p-3 border border-gray-200/80 dark:border-slate-800"
-              >
-                <div className="w-full aspect-[3/4] bg-gray-200 dark:bg-slate-800 rounded-xl mb-3" />
-                <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-3/4 mb-2" />
-                <div className="h-3 bg-gray-200 dark:bg-slate-800 rounded w-1/2 mb-3" />
-                <div className="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-slate-800">
-                  <div className="h-5 bg-gray-200 dark:bg-slate-800 rounded w-1/3" />
-                  <div className="w-8 h-8 bg-gray-200 dark:bg-slate-800 rounded-xl" />
-                </div>
-              </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <ProductSkeletonCard key={n} />
             ))}
           </div>
         ) : filteredProducts.length === 0 ? (
@@ -154,75 +145,10 @@ export default function AllProductsPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
-            {filteredProducts.map((prod) => {
-              const isWishlisted = wishlistIds.includes(prod.id);
-
-              return (
-                <article key={prod.id} className="group flex flex-col">
-                  <div className="relative aspect-[3/4] bg-white dark:bg-slate-900 border border-gray-200/80 dark:border-slate-800 rounded-xl overflow-hidden mb-2.5 transition-all group-hover:shadow-md">
-                    <Link href={`/products/${prod.id}`}>
-                      <img
-                        src={prod.image}
-                        alt={prod.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    </Link>
-
-                    {/* Badge */}
-                    {prod.badge && (
-                      <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/80 dark:bg-white/90 text-white dark:text-black font-bold text-[10px] uppercase rounded">
-                        {prod.badge}
-                      </div>
-                    )}
-
-                    {/* Wishlist Button */}
-                    <button
-                      onClick={() => toggleWishlist(prod.id)}
-                      aria-label="Wishlist"
-                      className="absolute top-2 right-2 p-1.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-full text-gray-600 dark:text-gray-300 hover:text-red-500 transition-colors cursor-pointer"
-                    >
-                      <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
-                    </button>
-
-                    {/* Quick Add Button */}
-                    <button
-                      onClick={() => addToCart(prod)}
-                      aria-label="Add to Cart"
-                      className="absolute bottom-2 right-2 p-2 bg-black dark:bg-white text-white dark:text-black rounded-full shadow-md hover:scale-110 active:scale-95 transition-all cursor-pointer"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <Link href={`/products/${prod.id}`}>
-                      <h3 className="font-semibold text-xs sm:text-sm text-gray-900 dark:text-white truncate hover:underline">
-                        {prod.title}
-                      </h3>
-                    </Link>
-
-                    <div className="flex items-center gap-1 text-xs text-amber-500 font-semibold">
-                      <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                      <span>{prod.rating.toFixed(1)}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="font-extrabold text-sm text-gray-900 dark:text-white">
-                        {storeConfig.currency}
-                        {prod.price.toLocaleString()}
-                      </span>
-                      {prod.comparePrice && (
-                        <span className="text-xs text-gray-400 line-through">
-                          {storeConfig.currency}
-                          {prod.comparePrice.toLocaleString()}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+            {filteredProducts.map((prod) => (
+              <ProductCard key={prod.id} product={prod} />
+            ))}
           </div>
         )}
       </main>

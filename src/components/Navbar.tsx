@@ -55,15 +55,18 @@ export const Navbar: React.FC = () => {
             className="flex items-center gap-2 group shrink-0"
             title="ArdhiMart"
           >
-            <Image
-              src="/logo.png"
-              alt="ArdhiMart Logo"
-              width={140}
-              height={36}
-              priority
-              className="h-8 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105"
-            />
-            <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white group-hover:text-blue-400 transition-colors">
+            {/* Crisp Light Background Pill for 100% Sharp Logo Contrast */}
+            <div className="bg-white px-2.5 py-1 rounded-xl shadow-xs border border-gray-100 flex items-center justify-center transition-transform group-hover:scale-105">
+              <Image
+                src="/logo.png"
+                alt="ArdhiMart Logo"
+                width={140}
+                height={36}
+                priority
+                className="h-7 sm:h-9 w-auto object-contain"
+              />
+            </div>
+            <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white group-hover:text-[#FF6B00] transition-colors">
               ArdhiMart
             </span>
           </Link>
@@ -77,7 +80,7 @@ export const Navbar: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="পণ্য খুঁজুন (Search products)..."
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-4 pr-10 py-1.5 sm:py-2 text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500 transition-colors"
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-4 pr-10 py-1.5 sm:py-2 text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF6B00] transition-colors"
             />
             
             {/* Search Icon on the Right */}
@@ -107,9 +110,9 @@ export const Navbar: React.FC = () => {
             aria-label="Shopping Cart Page"
           >
             <div className="relative">
-              <HiOutlineShoppingBag className="w-5 h-5 text-blue-400" />
+              <HiOutlineShoppingBag className="w-5 h-5 text-[#FF6B00]" />
               {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-md shadow-blue-500/40 animate-pulse">
+                <span className="absolute -top-2 -right-2 bg-[#FF6B00] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-md shadow-orange-500/40 animate-pulse">
                   {totalItems}
                 </span>
               )}
@@ -143,7 +146,7 @@ export const Navbar: React.FC = () => {
               setSelectedCategory("All");
               setMobileMenuOpen(false);
             }}
-            className="block text-white py-1 hover:text-blue-400"
+            className="block text-white py-1 hover:text-[#FF6B00]"
           >
             হোম পেজ (Home)
           </Link>
@@ -163,7 +166,7 @@ export const Navbar: React.FC = () => {
                   }}
                   className={`text-left py-1.5 px-3 rounded-lg border text-xs ${
                     selectedCategory === cat
-                      ? "bg-blue-600 border-blue-500 text-white font-bold"
+                      ? "bg-[#0F396F] border-[#164685] text-white font-bold"
                       : "bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white"
                   }`}
                 >
@@ -190,7 +193,7 @@ export const Navbar: React.FC = () => {
                 }}
                 className={`px-3 py-1 rounded-full border transition-all cursor-pointer ${
                   isSelected
-                    ? "bg-blue-600 border-blue-500 text-white shadow-sm font-bold"
+                    ? "bg-[#0F396F] border-[#164685] text-white shadow-sm font-bold"
                     : "bg-zinc-900/80 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700"
                 }`}
               >

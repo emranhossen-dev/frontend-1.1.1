@@ -56,7 +56,7 @@ export const HeroBanner: React.FC = () => {
 
               <button
                 onClick={() => addToCart(heroProduct)}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-lg shadow-indigo-600/30 hover:shadow-indigo-500/50 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                className="btn-shimmer w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#FF6B00] hover:bg-[#E56000] text-white font-extrabold shadow-lg shadow-orange-600/30 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
