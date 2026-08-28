@@ -38,6 +38,7 @@ export interface Product {
   deliveryInsideDhaka?: number;
   deliveryOutsideDhaka?: number;
   sku?: string;
+  urlSlug?: string;
 }
 
 export interface HeroBanner {
