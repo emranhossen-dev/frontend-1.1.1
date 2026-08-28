@@ -77,12 +77,12 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               price: Number(item.price || 0),
               comparePrice: item.comparePrice ? Number(item.comparePrice) : undefined,
               rating: typeof item.rating === 'number' ? item.rating : 5.0,
-              reviewsCount: typeof item.reviewsCount === 'number' ? item.reviewsCount : 12,
+              reviewsCount: typeof item.reviewsCount === 'number' ? item.reviewsCount : 0,
               badge: item.badge || 'New',
               image: item.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500',
               galleryImages: item.galleryImages && Array.isArray(item.galleryImages) ? item.galleryImages : [],
               category: item.category || 'Electronics',
-              color: item.color || item.variantOptions || 'Black, White, Blue',
+              color: item.color || item.variantOptions || '',
               shortDescription: item.shortDescription || '',
               description: item.description || '',
               usability: item.usability || '',
@@ -91,6 +91,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               deliveryInsideDhaka: item.deliveryInsideDhaka ? Number(item.deliveryInsideDhaka) : 80,
               deliveryOutsideDhaka: item.deliveryOutsideDhaka ? Number(item.deliveryOutsideDhaka) : 120,
               sku: item.sku || '',
+              urlSlug: item.urlSlug || '',
             }));
             setProducts(mapped);
             setIsLoading(false);

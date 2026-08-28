@@ -26,6 +26,7 @@ import {
   ChevronRight,
   ShoppingBag,
   Zap,
+  MessageSquare,
 } from 'lucide-react';
 
 interface ProductDetailsPageProps {
@@ -47,8 +48,10 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     setIsCartOpen,
   } = useStore();
 
-  // Find product by id
-  const product: Product | undefined = products.find((p) => p.id === productId);
+  // Find product by id or urlSlug
+  const product: Product | undefined = products.find(
+    (p) => p.id === productId || p.urlSlug === productId
+  );
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState('');
@@ -262,11 +265,11 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             <div className="flex items-center gap-3">
               <div className="flex text-amber-400">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  <Star key={i} className={`w-4 h-4 ${product.reviewsCount ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-slate-700'}`} />
                 ))}
               </div>
               <span className="text-xs font-bold text-gray-700 dark:text-gray-300 truncate whitespace-nowrap">
-                {product.rating.toFixed(1)} ({product.reviewsCount || 12} reviews)
+                {product.reviewsCount ? `${product.rating.toFixed(1)} (${product.reviewsCount} reviews)` : 'No reviews yet'}
               </span>
               <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 truncate whitespace-nowrap">
                 In Stock
@@ -292,7 +295,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               )}
             </div>
 
-            {/* Single Dynamic Variant Selector (Only renders if variantOptions exist in database) */}
+            {/* Single Dynamic Variant Selector (ONLY RENDERS IF VARIANT OPTIONS ACTUALLY EXIST IN DATABASE) */}
             {variantOptions.length > 0 && (
               <div className="space-y-2">
                 <h3 className="text-xs font-extrabold uppercase tracking-wider text-gray-900 dark:text-white">
@@ -399,7 +402,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                   : 'border-transparent text-gray-400 hover:text-gray-600'
               }`}
             >
-              Reviews ({product.reviewsCount || 12})
+              Reviews ({product.reviewsCount || 0})
             </button>
           </div>
 
@@ -412,12 +415,16 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                   </p>
                 )}
                 <p className="whitespace-pre-line">
-                  {product.description || 'Hand-crafted from premium stoneware clay, this minimalist piece embodies quiet luxury and modern elegance.'}
+                  {product.description || 'পণ্যটির বিস্তারিত তথ্য শীঘ্রই সংযুক্ত করা হবে।'}
                 </p>
                 {product.usability && (
-                  <div className="p-3 bg-orange-50/50 dark:bg-slate-950 rounded-xl border border-orange-200/40 dark:border-slate-800 text-xs">
-                    <strong className="text-gray-900 dark:text-white block mb-1">Usability & Care:</strong>
-                    <p className="whitespace-pre-line">{product.usability}</p>
+                  <div className="p-3.5 bg-orange-50/60 dark:bg-slate-950 rounded-2xl border border-orange-200/50 dark:border-slate-800 text-xs space-y-1">
+                    <strong className="text-gray-900 dark:text-white block font-bold text-sm">
+                      ব্যবহারবিধি ও যত্ন (Usability & Care Instructions):
+                    </strong>
+                    <p className="whitespace-pre-line text-gray-700 dark:text-gray-300 leading-relaxed">
+                      {product.usability}
+                    </p>
                   </div>
                 )}
               </div>
@@ -426,42 +433,34 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             {activeTab === 'specifications' && (
               <ul className="space-y-2">
                 {product.material && (
-                  <li className="flex justify-between py-1 border-b border-gray-100 dark:border-slate-800">
+                  <li className="flex justify-between py-1.5 border-b border-gray-100 dark:border-slate-800">
                     <span className="font-semibold text-gray-900 dark:text-white">Material</span>
                     <span>{product.material}</span>
                   </li>
                 )}
                 {product.warranty && (
-                  <li className="flex justify-between py-1 border-b border-gray-100 dark:border-slate-800">
+                  <li className="flex justify-between py-1.5 border-b border-gray-100 dark:border-slate-800">
                     <span className="font-semibold text-gray-900 dark:text-white">Warranty</span>
                     <span>{product.warranty}</span>
                   </li>
                 )}
-                <li className="flex justify-between py-1 border-b border-gray-100 dark:border-slate-800">
-                  <span className="font-semibold text-gray-900 dark:text-white">Shipping Inside Dhaka</span>
+                <li className="flex justify-between py-1.5 border-b border-gray-100 dark:border-slate-800">
+                  <span className="font-semibold text-gray-900 dark:text-white">Inside Dhaka Delivery Fee</span>
                   <span>৳{product.deliveryInsideDhaka || 80}</span>
                 </li>
-                <li className="flex justify-between py-1 border-b border-gray-100 dark:border-slate-800">
-                  <span className="font-semibold text-gray-900 dark:text-white">Shipping Outside Dhaka</span>
+                <li className="flex justify-between py-1.5 border-b border-gray-100 dark:border-slate-800">
+                  <span className="font-semibold text-gray-900 dark:text-white">Outside Dhaka Delivery Fee</span>
                   <span>৳{product.deliveryOutsideDhaka || 120}</span>
                 </li>
               </ul>
             )}
 
             {activeTab === 'reviews' && (
-              <div className="space-y-4">
-                <div className="p-3 bg-gray-50 dark:bg-slate-900 rounded-xl">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold text-xs text-gray-900 dark:text-white">Rafiqul Islam</span>
-                    <span className="text-xs text-gray-400">2 days ago</span>
-                  </div>
-                  <div className="flex text-amber-400 mb-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-xs">Amazing build quality! Looks even better in person.</p>
-                </div>
+              <div className="py-8 text-center space-y-2">
+                <MessageSquare className="w-8 h-8 text-gray-300 dark:text-slate-700 mx-auto" />
+                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                  এখনও কোনো কাস্টমার রিভিউ পোস্ট করা হয়নি (No reviews yet).
+                </p>
               </div>
             )}
           </div>

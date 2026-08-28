@@ -63,6 +63,21 @@ h1, h2, h3, h4, h5, h6 {
   animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 .animate-on-scroll {
   opacity: 0;
   transform: translateY(20px);
@@ -106,18 +121,4 @@ h1, h2, h3, h4, h5, h6 {
   animation: btnShimmer 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   pointer-events: none;
   z-index: 10;
-}
-
-/* PULSING NEON AURA GLOW ANIMATION */
-@keyframes btnPulseGlow {
-  0%, 100% {
-    box-shadow: 0 0 15px rgba(255, 107, 0, 0.45), 0 0 30px rgba(255, 107, 0, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 25px rgba(255, 107, 0, 0.75), 0 0 45px rgba(255, 107, 0, 0.45);
-  }
-}
-
-.btn-glow-orange {
-  animation: btnPulseGlow 2s ease-in-out infinite;
 }
