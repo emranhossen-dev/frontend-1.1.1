@@ -38,7 +38,7 @@ export const StorefrontAiChatbot: React.FC = () => {
     {
       id: 'welcome-1',
       sender: 'bot',
-      text: 'আসসালামু আলাইকুম! 👋 আমি ArdhiMart এর AI কাস্টমার সাপোর্ট এসিস্ট্যান্ট। আমাদের গ্যাজেট, দাম, স্টক, ডেলিভারি চার্জ বা আপনার অর্ডারের বর্তমান অবস্থা নিয়ে যেকোনো প্রশ্ন করতে পারেন। কীভাবে সাহায্য করতে পারি?',
+      text: 'আসসালামু আলাইকুম! 👋 আমি ArdhiMart এর AI সাপোর্ট এসিস্ট্যান্ট। আমাদের যেকোনো পণ্য, স্টক, ডেলিভারি চার্জ বা অর্ডার নিয়ে প্রশ্ন করুন।\nHello! I am ArdhiMart AI Assistant. Ask me anything about products, prices, delivery, or orders.',
       timestamp: 'Just now',
     },
   ]);
@@ -53,19 +53,88 @@ export const StorefrontAiChatbot: React.FC = () => {
     }
   }, [messages, isOpen]);
 
-  // Quick Prompt Chips
+  // Quick Prompts Chips
   const quickPrompts = [
-    '⚡ পাওয়া ব্যাংক বা গ্যাজেটের দাম কত?',
-    '🚚 ডেলিভারি চার্জ এবং সময় কতদিন?',
-    '📦 আমার অর্ডার ৯৮০ এর বর্তমান স্ট্যাটাস কি?',
-    '🔄 প্রোডাক্ট রিটার্ন বা রিপ্লেসমেন্ট পলিসি কি?'
+    '⚡ পাওয়ার ব্যাংক বা গ্যাজেটের দাম কত?',
+    '🚚 Delivery fee and shipping time?',
+    '📦 আমার অর্ডার ৯৮০ এর স্ট্যাটাস কি?',
+    '🔄 Return & replacement policy'
   ];
 
-  // Gemini AI Service Handler with Catalog & Order Context
+  // Smart Local Keyword Fallback Generator (Guarantees zero downtime if AI quota hits limit)
+  const getLocalFallbackResponse = async (userPrompt: string): Promise<string> => {
+    const q = userPrompt.toLowerCase();
+    const isEnglish = /[a-z]/i.test(q) && !/[\u0980-\u09FF]/.test(q);
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
+
+    // Order Tracking Query (e.g. 980)
+    const orderMatch = userPrompt.match(/\b\d{3,4}\b/);
+    if (orderMatch) {
+      const orderId = orderMatch[0];
+      try {
+        const orderRes = await fetch(`${baseUrl}/orders/${orderId}`);
+        if (orderRes.ok) {
+          const ord = await orderRes.json();
+          if (isEnglish) {
+            return `Order #${orderId} Details:\nStatus: ${ord.status?.toUpperCase()}\nCustomer: ${ord.customerName}\nTotal Amount: ৳${ord.totalAmount}`;
+          } else {
+            return `আপনার অর্ডার #${orderId} এর বর্তমান স্ট্যাটাস: ${ord.status?.toUpperCase()}\nগ্রাহকের নাম: ${ord.customerName}\nমোট পরিমাণ: ৳${ord.totalAmount}`;
+          }
+        }
+      } catch (e) {}
+
+      if (isEnglish) {
+        return `Order #${orderId} is currently being processed by our logistics team. You can track live updates on the Track Order page.`;
+      } else {
+        return `আপনার অর্ডার #${orderMatch[0]} বর্তমানে লজিস্টিক টিমের মাধ্যমে প্রসেসিং এ আছে। লাইভ ট্র্যাকিং দেখতে "Track Order" পেজে অনুসন্ধান করুন।`;
+      }
+    }
+
+    // Product Search Query
+    const matchedProducts = products.filter(
+      (p) => q.includes(p.title.toLowerCase()) || (p.category && q.includes(p.category.toLowerCase()))
+    );
+
+    if (matchedProducts.length > 0) {
+      const p = matchedProducts[0];
+      if (isEnglish) {
+        return `We have "${p.title}" available for ৳${p.price}. ${p.shortDescription || 'In stock and ready for fast delivery across Bangladesh.'}`;
+      } else {
+        return `আমাদের কালেকশনে "${p.title}" রয়েছে। বর্তমান অফার প্রাইজ ৳${p.price}। সম্পূর্ণ বাংলাদেশ জুড়ে ক্যাশ অন ডেলিভারিতে অর্ডার করতে পারবেন।`;
+      }
+    }
+
+    // Delivery / Shipping Query
+    if (q.includes('delivery') || q.includes('shipping') || q.includes('ডেলিভারি') || q.includes('চার্জ')) {
+      if (isEnglish) {
+        return 'Delivery Charges:\n• Inside Dhaka: ৳80 (24-48 hours)\n• Outside Dhaka: ৳120 (2-3 days)\nCash on Delivery (COD) is available!';
+      } else {
+        return 'ডেলিভারি চার্জ:\n• ঢাকার ভেতরে: ৳৮০ (২৪-৪৮ ঘণ্টা)\n• ঢাকার বাইরে: ৳১২০ (২-৩ দিন)\nক্যাশ অন ডেলিভারি (COD) সুবিধা রয়েছে!';
+      }
+    }
+
+    // Return & Warranty Query
+    if (q.includes('return') || q.includes('warranty') || q.includes('রিটার্ন') || q.includes('ওয়ারেন্টি')) {
+      if (isEnglish) {
+        return 'ArdhiMart provides a 7-day hassle-free replacement warranty for any defective or damaged products.';
+      } else {
+        return 'ArdhiMart এ প্রতিটি পণ্যে ৭ দিনের ফ্রি রিপ্লেসমেন্ট গ্যারান্টি এবং প্রস্তুতকারক ওয়ারেন্টি সুবিধা রয়েছে।';
+      }
+    }
+
+    // General Response
+    if (isEnglish) {
+      return 'Thank you for reaching out to ArdhiMart! You can explore our catalog online or place your order directly via Cash on Delivery.';
+    } else {
+      return 'ArdhiMart এ আপনাকে স্বাগতম! আপনার পছন্দের পণ্য অর্ডার করতে সরাসরি ক্যাশ অন ডেলিভারিতে অর্ডার কনফার্ম করুন।';
+    }
+  };
+
+  // Gemini AI Service Handler with Multilingual & No-Repeat Greetings Rules
   const getAiResponse = async (userPrompt: string): Promise<string> => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
 
-    // Check if user is asking for order tracking (e.g. 980)
+    // Order Lookup
     const orderMatch = userPrompt.match(/\b\d{3,4}\b/);
     let orderContext = '';
     if (orderMatch) {
@@ -74,46 +143,44 @@ export const StorefrontAiChatbot: React.FC = () => {
         const orderRes = await fetch(`${baseUrl}/orders/${orderId}`);
         if (orderRes.ok) {
           const ord = await orderRes.json();
-          orderContext = `Real Database Order Details for #${orderId}:
+          orderContext = `Real Database Order Info for #${orderId}:
 Status: ${ord.status}
 Customer: ${ord.customerName} (${ord.customerPhone})
-Total Amount: ৳${ord.totalAmount}
-Items: ${(ord.order_items || ord.items || []).map((i: any) => i.productName || i.title).join(', ')}`;
+Total Amount: ৳${ord.totalAmount}`;
         }
       } catch (e) {}
     }
 
-    // Build Product Catalog Snippet
     const productCatalogSnippet = products
       .slice(0, 10)
       .map(
         (p) =>
-          `• ${p.title} - ৳${p.price} (Category: ${p.category}, Status: In Stock, SKU: ${p.sku || 'N/A'})`
+          `• ${p.title} - ৳${p.price} (Category: ${p.category}, In Stock, SKU: ${p.sku || 'N/A'})`
       )
       .join('\n');
 
-    const systemPrompt = `You are the friendly, expert AI Customer Support Agent for "ArdhiMart", a premier luxury & tech e-commerce store in Bangladesh.
-Your goal is to answer customer questions in polite, helpful, clear Bengali (বাংলা) language.
+    const systemPrompt = `You are the expert AI Customer Support Agent for "ArdhiMart", a premier luxury & tech e-commerce store in Bangladesh.
 
-Store Policies & Knowledge Base:
-- Store Name: ArdhiMart (আরধিমার্ট)
-- Delivery Fee: Inside Dhaka = ৳80 (24-48 hours delivery), Outside Dhaka = ৳120 (2-3 days delivery).
-- Payment Methods: Cash On Delivery (COD), bKash Merchant, Credit/Debit Card.
-- Return Policy: 7-day replacement warranty for defective or wrong products.
+STRICT CRITICAL RULES:
+1. DO NOT greet the customer with "আসসালামু আলাইকুম" or "Hello" or greetings anymore! The greeting was already given in the first message. Answer the question DIRECTLY without any salutations or intro greetings.
+2. DETECT THE USER'S LANGUAGE AUTOMATICALLY:
+   - If the user writes in English, reply strictly in clean, polite ENGLISH.
+   - If the user writes in Bengali (বাংলা) or Banglish, reply strictly in clear BENGALI.
+3. Be concise, direct, helpful, and polite.
 
-Available Products in Store Catalog:
-${productCatalogSnippet || 'Featured Tech Accessories, Power Banks, Smartwatches, Wireless Headphones'}
+Store Knowledge Base:
+- Store Name: ArdhiMart
+- Delivery Charges: Inside Dhaka = ৳80 (24-48 hours delivery), Outside Dhaka = ৳120 (2-3 days delivery).
+- Payment Options: Cash On Delivery (COD), bKash Merchant, Credit/Debit Card.
+- Return Policy: 7-day free replacement warranty for damaged or wrong products.
 
-${orderContext ? `Order Info Requested:\n${orderContext}\n` : ''}
+Available Products:
+${productCatalogSnippet || 'Tech Accessories, Power Banks, Smartwatches, Headphones'}
+
+${orderContext ? `Order Info Found:\n${orderContext}\n` : ''}
 
 Customer Query:
-"${userPrompt}"
-
-Instructions:
-1. Respond concisely and nicely in natural Bengali (বাংলা).
-2. If asking about products or prices, reference product names and prices in Taka (৳).
-3. If asking about an order, provide the exact order status found in order info.
-4. Keep the tone warm, professional, and trustworthy!`;
+"${userPrompt}"`;
 
     const apiKey = DEFAULT_GEMINI_KEY;
     const models = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-2.0-flash'];
@@ -127,28 +194,26 @@ Instructions:
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [{ parts: [{ text: systemPrompt }] }],
-              generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
+              generationConfig: { temperature: 0.6, maxOutputTokens: 800 },
             }),
           }
         );
 
         const data = await res.json();
         if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-          return data.candidates[0].content.parts[0].text;
+          const text = data.candidates[0].content.parts[0].text.trim();
+          // Remove accidental repeated greetings if generated
+          return text
+            .replace(/^আসসালামু আলাইকুম!/gi, '')
+            .replace(/^আসসালামু আলাইকুম/gi, '')
+            .replace(/^hello!/gi, '')
+            .trim();
         }
       } catch (e) {}
     }
 
-    // Fallback response if API key limits reached
-    if (userPrompt.includes('ডেলিভারি') || userPrompt.includes('চার্জ')) {
-      return 'ঢাকার ভেতরে ডেলিভারি চার্জ ৳৮০ (২৪ ঘণ্টার মধ্যে ডেলিভারি) এবং ঢাকার বাইরে ৳১২০ (২-৩ দিনের মধ্যে)। ক্যাশ অন ডেলিভারি সুবিধা রয়েছে! 🚚';
-    } else if (userPrompt.includes('রিটার্ন') || userPrompt.includes('ওয়ারেন্টি')) {
-      return 'ArdhiMart এ প্রতিটি পণ্যে ৭ দিনের রিপ্লেসমেন্ট গ্যারান্টি এবং ১ বছরের ওয়ারেন্টি রয়েছে। কোনো ত্রুটি থাকলে আমরা বিনামূল্যে পরিবর্তন করে দিই। 🛡️';
-    } else if (orderMatch) {
-      return `আপনার অর্ডার #${orderMatch[0]} ব্যাকএন্ডে প্রসেসিং এ আছে। ট্র্যাক করতে "Track Order" পেজে আইডি লিখুন! 📦`;
-    }
-
-    return 'ধন্যবাদ আপনার মেসেজের জন্য! ArdhiMart এ আপনার পছন্দের পণ্য কিনতে ওয়েবসাইট ব্রাউজ করুন অথবা সরাসরি ক্যাশ অন ডেলিভারিতে অর্ডার কনফার্ম করুন। ❤️';
+    // Fallback if AI Rate limits hit
+    return getLocalFallbackResponse(userPrompt);
   };
 
   const handleSendMessage = async (textToSend?: string) => {
@@ -176,13 +241,14 @@ Instructions:
       };
       setMessages((prev) => [...prev, botMsg]);
     } catch (err) {
+      const fallbackText = await getLocalFallbackResponse(query);
       setMessages((prev) => [
         ...prev,
         {
-          id: `bot-err-${Date.now()}`,
+          id: `bot-fallback-${Date.now()}`,
           sender: 'bot',
-          text: 'দুঃখিত, কোনো টেকনিক্যাল সমস্যার কারণে উত্তর দিতে বিলম্ব হচ্ছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।',
-          timestamp: 'Just now',
+          text: fallbackText,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
     } finally {
@@ -226,12 +292,12 @@ Instructions:
               </div>
               <div>
                 <h3 className="text-xs font-black text-white flex items-center gap-1.5">
-                  ArdhiMart AI Support
+                  ArdhiMart AI Assistant
                   <Sparkles className="w-3 h-3 text-cyan-400" />
                 </h3>
                 <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Online • Powered by Gemini AI
+                  Bilingual Support (বাংলা / English)
                 </span>
               </div>
             </div>
@@ -279,7 +345,7 @@ Instructions:
             {isTyping && (
               <div className="flex gap-2 items-center text-slate-400 text-xs p-2">
                 <Bot className="w-4 h-4 animate-bounce text-cyan-400" />
-                <span>ArdhiMart AI উত্তর তৈরি করছে...</span>
+                <span>AI Assistant is typing...</span>
               </div>
             )}
 
@@ -312,7 +378,7 @@ Instructions:
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="প্রশ্ন লিখুন (e.g. পাওয়ার ব্যাংক এর দাম কত?)..."
+                placeholder="Ask in English or Bengali (e.g. price of powerbank?)..."
                 className="flex-1 px-3.5 py-2 text-xs bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-sans"
               />
               <button
