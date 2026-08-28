@@ -6,6 +6,7 @@ import CartDrawer from '@/components/CartDrawer';
 import SearchModal from '@/components/SearchModal';
 import MobileNavDrawer from '@/components/MobileNavDrawer';
 import PageNavigationLoader from '@/components/PageNavigationLoader';
+import StorefrontAiChatbot from '@/components/StorefrontAiChatbot';
 import { useRouter } from 'next/navigation';
 
 const StoreShellInner: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -32,6 +33,9 @@ const StoreShellInner: React.FC<{ children: ReactNode }> = ({ children }) => {
       </Suspense>
 
       {children}
+
+      {/* Global AI Support Assistant Chatbot */}
+      <StorefrontAiChatbot />
 
       {/* Global Slide-over Mobile Menu Navigation */}
       <MobileNavDrawer
