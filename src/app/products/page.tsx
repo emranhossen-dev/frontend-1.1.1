@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BottomNavBar from '@/components/BottomNavBar';
@@ -10,31 +11,34 @@ import {
   ChevronRight,
   SlidersHorizontal,
   ArrowUpDown,
-  Heart,
-  Plus,
-  Star,
   X,
   Check,
-  Loader2,
 } from 'lucide-react';
 
 import { ProductCard, ProductSkeletonCard } from '@/components/ProductCard';
 
-export default function AllProductsPage() {
+function ProductsContent() {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get('category');
+
   const {
     products,
     isLoading,
     storeConfig,
     categories,
-    wishlistIds,
-    toggleWishlist,
-    addToCart,
   } = useStore();
 
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [selectedCategory, setSelectedCategory] = useState<string>(categoryParam || 'All');
   const [sortBy, setSortBy] = useState<'featured' | 'price-low' | 'price-high' | 'rating'>('featured');
   const [maxPrice, setMaxPrice] = useState<number>(20000);
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
+
+  // Sync URL search param category to selectedCategory state
+  useEffect(() => {
+    if (categoryParam) {
+      setSelectedCategory(categoryParam);
+    }
+  }, [categoryParam]);
 
   // Filter & Sort Logic
   const filteredProducts = products
@@ -53,105 +57,102 @@ export default function AllProductsPage() {
     });
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col font-sans">
-      {/* Top Header */}
-      <Header />
+    <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-4 pb-12">
+      {/* Breadcrumb Navigation */}
+      <nav className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-3">
+        <Link href="/" className="hover:text-black dark:hover:text-white transition-colors">
+          Home
+        </Link>
+        <ChevronRight className="w-3.5 h-3.5" />
+        <span className="text-gray-900 dark:text-white font-semibold">
+          {selectedCategory !== 'All' ? selectedCategory : 'All Products'}
+        </span>
+      </nav>
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-4 pb-12">
-        {/* Breadcrumb Navigation */}
-        <nav className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-3">
-          <Link href="/" className="hover:text-black dark:hover:text-white transition-colors">
-            Home
-          </Link>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <span className="text-gray-900 dark:text-white font-semibold">All Products</span>
-        </nav>
+      {/* Page Header */}
+      <div className="mb-4">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          {selectedCategory !== 'All' ? `${selectedCategory} Collection` : 'All Products & Collections'}
+        </h1>
+        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Showing {filteredProducts.length} of {products.length} products
+        </p>
+      </div>
 
-        {/* Page Header */}
-        <div className="mb-4">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-            All Products & Collections
-          </h1>
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Showing {filteredProducts.length} of {products.length} products
-          </p>
-        </div>
+      {/* Category Pills Bar */}
+      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-3">
+        {['All', ...categories.map((c) => c.name)].map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+              selectedCategory.toLowerCase() === cat.toLowerCase()
+                ? 'bg-black text-white dark:bg-white dark:text-black shadow-sm'
+                : 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
 
-        {/* Category Pills Bar */}
-        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-3">
-          {['All', ...categories.map((c) => c.name)].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                selectedCategory.toLowerCase() === cat.toLowerCase()
-                  ? 'bg-black text-white dark:bg-white dark:text-black shadow-sm'
-                  : 'bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              {cat}
-            </button>
+      {/* Sticky Filter & Sort Control Bar */}
+      <div className="sticky top-16 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-y border-gray-200/80 dark:border-slate-800 -mx-4 px-4 py-2.5 flex items-center justify-between gap-3 mb-6">
+        <button
+          onClick={() => setIsFilterOpen(true)}
+          className="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-full border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors shadow-xs cursor-pointer"
+        >
+          <SlidersHorizontal className="w-4 h-4" />
+          Filter {selectedCategory !== 'All' ? `(${selectedCategory})` : ''}
+        </button>
+
+        <button
+          onClick={() =>
+            setSortBy((prev) =>
+              prev === 'featured'
+                ? 'price-low'
+                : prev === 'price-low'
+                ? 'price-high'
+                : prev === 'price-high'
+                ? 'rating'
+                : 'featured'
+            )
+          }
+          className="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-full border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors shadow-xs cursor-pointer"
+        >
+          <ArrowUpDown className="w-4 h-4" />
+          Sort ({sortBy === 'featured' ? 'Featured' : sortBy === 'price-low' ? 'Low → High' : sortBy === 'price-high' ? 'High → Low' : 'Top Rated'})
+        </button>
+      </div>
+
+      {/* Products Grid or Skeleton Loading Cards */}
+      {isLoading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+          {[1, 2, 3, 4, 5, 6].map((n) => (
+            <ProductSkeletonCard key={n} />
           ))}
         </div>
-
-        {/* Sticky Filter & Sort Control Bar */}
-        <div className="sticky top-16 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-y border-gray-200/80 dark:border-slate-800 -mx-4 px-4 py-2.5 flex items-center justify-between gap-3 mb-6">
+      ) : filteredProducts.length === 0 ? (
+        <div className="py-16 text-center space-y-3">
+          <p className="text-gray-500 text-sm font-semibold">No products found matching filter criteria.</p>
           <button
-            onClick={() => setIsFilterOpen(true)}
-            className="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-full border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors shadow-xs cursor-pointer"
+            onClick={() => {
+              setSelectedCategory('All');
+              setMaxPrice(20000);
+              setSortBy('featured');
+            }}
+            className="px-6 py-2 bg-black dark:bg-white text-white dark:text-black font-bold text-xs rounded-xl cursor-pointer"
           >
-            <SlidersHorizontal className="w-4 h-4" />
-            Filter {selectedCategory !== 'All' ? `(${selectedCategory})` : ''}
-          </button>
-
-          <button
-            onClick={() =>
-              setSortBy((prev) =>
-                prev === 'featured'
-                  ? 'price-low'
-                  : prev === 'price-low'
-                  ? 'price-high'
-                  : prev === 'price-high'
-                  ? 'rating'
-                  : 'featured'
-              )
-            }
-            className="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-full border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors shadow-xs cursor-pointer"
-          >
-            <ArrowUpDown className="w-4 h-4" />
-            Sort ({sortBy === 'featured' ? 'Featured' : sortBy === 'price-low' ? 'Low → High' : sortBy === 'price-high' ? 'High → Low' : 'Top Rated'})
+            Reset Filters
           </button>
         </div>
-
-        {/* Products Grid or Skeleton Loading Cards */}
-        {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-            {[1, 2, 3, 4, 5, 6].map((n) => (
-              <ProductSkeletonCard key={n} />
-            ))}
-          </div>
-        ) : filteredProducts.length === 0 ? (
-          <div className="py-16 text-center space-y-3">
-            <p className="text-gray-500 text-sm font-semibold">No products found matching filter criteria.</p>
-            <button
-              onClick={() => {
-                setSelectedCategory('All');
-                setMaxPrice(20000);
-                setSortBy('featured');
-              }}
-              className="px-6 py-2 bg-black dark:bg-white text-white dark:text-black font-bold text-xs rounded-xl"
-            >
-              Reset Filters
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-            {filteredProducts.map((prod) => (
-              <ProductCard key={prod.id} product={prod} />
-            ))}
-          </div>
-        )}
-      </main>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+          {filteredProducts.map((prod) => (
+            <ProductCard key={prod.id} product={prod} />
+          ))}
+        </div>
+      )}
 
       {/* Filter Modal / Drawer */}
       {isFilterOpen && (
@@ -169,7 +170,7 @@ export default function AllProductsPage() {
                 </h3>
                 <button
                   onClick={() => setIsFilterOpen(false)}
-                  className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full"
+                  className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -185,7 +186,7 @@ export default function AllProductsPage() {
                     <button
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}
-                      className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-semibold text-left transition-colors ${
+                      className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
                         selectedCategory.toLowerCase() === cat.toLowerCase()
                           ? 'bg-black text-white dark:bg-white dark:text-black font-bold'
                           : 'hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-gray-300'
@@ -228,7 +229,7 @@ export default function AllProductsPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="w-full bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-3 text-xs font-bold text-gray-900 dark:text-white outline-none"
+                  className="w-full bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-3 text-xs font-bold text-gray-900 dark:text-white outline-none cursor-pointer"
                 >
                   <option value="featured">Featured Collection</option>
                   <option value="price-low">Price: Low to High</option>
@@ -246,13 +247,13 @@ export default function AllProductsPage() {
                   setMaxPrice(20000);
                   setSortBy('featured');
                 }}
-                className="flex-1 py-3 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 font-bold text-xs rounded-xl"
+                className="flex-1 py-3 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 font-bold text-xs rounded-xl cursor-pointer"
               >
                 Reset
               </button>
               <button
                 onClick={() => setIsFilterOpen(false)}
-                className="flex-1 py-3 bg-black dark:bg-white text-white dark:text-black font-bold text-xs rounded-xl"
+                className="flex-1 py-3 bg-black dark:bg-white text-white dark:text-black font-bold text-xs rounded-xl cursor-pointer"
               >
                 Apply
               </button>
@@ -260,11 +261,25 @@ export default function AllProductsPage() {
           </div>
         </div>
       )}
+    </main>
+  );
+}
 
-      {/* Comprehensive Footer */}
+export default function AllProductsPage() {
+  return (
+    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col font-sans">
+      <Header />
+      <Suspense fallback={
+        <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8 text-center">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 dark:bg-slate-800 rounded w-1/3 mx-auto" />
+            <div className="h-4 bg-gray-200 dark:bg-slate-800 rounded w-1/4 mx-auto" />
+          </div>
+        </main>
+      }>
+        <ProductsContent />
+      </Suspense>
       <Footer />
-
-      {/* Sticky Bottom Navigation Bar */}
       <BottomNavBar />
     </div>
   );

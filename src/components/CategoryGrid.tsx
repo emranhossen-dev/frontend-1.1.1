@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Category } from '@/types/store';
 
 interface CategoryGridProps {
@@ -22,8 +23,9 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {categories.map((cat) => (
-          <div
+          <Link
             key={cat.id}
+            href={`/products?category=${encodeURIComponent(cat.name)}`}
             onClick={() => onSelectCategory && onSelectCategory(cat)}
             className="group cursor-pointer flex flex-col items-center"
           >
@@ -34,7 +36,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
                 className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 rounded-lg"
               />
             </div>
-            <p className="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-black dark:group-hover:text-gray-200 transition-colors">
+            <p className="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-[#FF6B00] transition-colors">
               {cat.name}
             </p>
             {cat.itemCount && (
@@ -42,7 +44,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
                 {cat.itemCount} Items
               </span>
             )}
-          </div>
+          </Link>
         ))}
       </div>
     </section>

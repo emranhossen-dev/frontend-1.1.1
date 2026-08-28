@@ -122,14 +122,17 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
       <Header />
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28 sm:pb-12">
-        {/* Breadcrumb Navigation */}
+        {/* Breadcrumb Navigation with Category Filter Link */}
         <div className="mb-6 pb-3 border-b border-gray-200/80 dark:border-slate-800">
           <nav className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400">
             <Link href="/" className="hover:text-[#FF6B00] transition-colors">
               Home
             </Link>
             <span>/</span>
-            <Link href="/products" className="hover:text-[#FF6B00] transition-colors">
+            <Link
+              href={`/products?category=${encodeURIComponent(product.category || 'All')}`}
+              className="hover:text-[#FF6B00] transition-colors"
+            >
               {product.category || 'Products'}
             </Link>
             <span>/</span>
@@ -214,9 +217,12 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
               {/* Action Metadata Row below Full-Width Title */}
               <div className="flex items-center justify-between pt-1">
-                <span className="text-xs font-extrabold text-[#FF6B00] uppercase tracking-wider truncate whitespace-nowrap">
+                <Link
+                  href={`/products?category=${encodeURIComponent(product.category || 'All')}`}
+                  className="text-xs font-extrabold text-[#FF6B00] hover:underline uppercase tracking-wider truncate whitespace-nowrap"
+                >
                   {product.brand || product.category}
-                </span>
+                </Link>
 
                 <div className="flex items-center gap-2">
                   <button
