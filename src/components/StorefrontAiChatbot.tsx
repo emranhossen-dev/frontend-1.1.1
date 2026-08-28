@@ -189,7 +189,7 @@ export const StorefrontAiChatbot: React.FC = () => {
     }
   };
 
-  // Gemini AI Handler with Complete, Un-truncated Responses
+  // Gemini AI Handler with Full Un-truncated 1024 Token Capacity
   const getAiResponse = async (userPrompt: string): Promise<string> => {
     // 1. Try In-Chat Direct Order Placement
     const orderPlacementResult = await attemptPlaceOrderInChat(userPrompt);
@@ -214,23 +214,24 @@ export const StorefrontAiChatbot: React.FC = () => {
     }
 
     const productCatalogSnippet = products
-      .slice(0, 8)
-      .map((p) => `• ${p.title}: ৳${p.price}`)
+      .slice(0, 10)
+      .map((p) => `• ${p.title}: ৳${p.price} (${p.category || 'General'})`)
       .join('\n');
 
-    const systemPrompt = `You are the expert AI Live Support Agent for "ArdhiMart" e-commerce store in Bangladesh.
+    const systemPrompt = `You are the expert AI Live Support & Sales Agent for "ArdhiMart" e-commerce store in Bangladesh.
 
-CRITICAL RESPONSE RULES:
-1. Provide a clear, complete, helpful, and polished response (1-3 sentences max). ALWAYS COMPLETE YOUR SENTENCES FULLY. Do not stop mid-sentence.
-2. DO NOT greet or salute. Answer the question directly without "Assalamu Alaikum" or "Hello".
+RESPONSE GUIDELINES:
+1. Provide complete, natural, polite, and well-structured answers based on the customer's context. Always complete your thoughts fully.
+2. DO NOT greet or salute with "Assalamu Alaikum" or "Hello" if the conversation is ongoing. Answer the user's query directly.
 3. DETECT LANGUAGE AUTOMATICALLY:
-   - If user asks in English -> reply in clean English.
-   - If user asks in Bengali/Banglish -> reply in natural Bengali.
-4. IN-CHAT ORDER GUIDELINE:
-   - If user asks to order, politely ask for: 1. Product Name, 2. Full Name, 3. Mobile Number, 4. Full Delivery Address to confirm instantly in chat!
+   - If user asks in English -> reply in clean, professional English.
+   - If user asks in Bengali/Banglish -> reply in natural, polite Bengali.
+4. IN-CHAT DIRECT ORDER GUIDELINE:
+   - If user wants to place an order, ask for their Product Name, Full Name, Mobile Number, and Delivery Address to confirm instantly in chat!
 
 Store Knowledge Base:
-- Delivery: Inside Dhaka ৳80 (24-48h), Outside Dhaka ৳120 (2-3 days). COD available.
+- Store Name: ArdhiMart
+- Delivery: Inside Dhaka ৳80 (24-48h), Outside Dhaka ৳120 (2-3 days). Cash on Delivery available.
 - Return: 7-day replacement warranty.
 Products:
 ${productCatalogSnippet || 'Featured Tech Accessories, Power Banks, Smartwatches'}
@@ -250,7 +251,7 @@ Customer Query: "${userPrompt}"`;
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [{ parts: [{ text: systemPrompt }] }],
-              generationConfig: { temperature: 0.5, maxOutputTokens: 350 },
+              generationConfig: { temperature: 0.6, maxOutputTokens: 1024 },
             }),
           }
         );
@@ -352,7 +353,7 @@ Customer Query: "${userPrompt}"`;
                 </h3>
                 <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  In-Chat Direct Order Active
+                  Full Response AI Assistant Active
                 </span>
               </div>
             </div>
