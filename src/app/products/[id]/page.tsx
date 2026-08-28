@@ -337,11 +337,11 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               </div>
             </div>
 
-            {/* SIDE-BY-SIDE ADD TO CART & BUY NOW BUTTONS IN A SINGLE ROW WITH ANIMATIONS */}
+            {/* SIDE-BY-SIDE ADD TO CART & BUY NOW BUTTONS IN A SINGLE ROW WITH SHIMMER LIGHT SLIDE & NEON GLOW ANIMATIONS */}
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
                 onClick={handleAddToCart}
-                className="w-full py-3.5 px-3 border-2 border-gray-900 dark:border-white text-gray-900 dark:text-white hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black font-extrabold text-xs uppercase tracking-wider rounded-2xl transition-all duration-200 shadow-sm hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                className="btn-shimmer w-full py-3.5 px-3 border-2 border-gray-900 dark:border-white text-gray-900 dark:text-white hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black font-extrabold text-xs uppercase tracking-wider rounded-2xl transition-all duration-300 shadow-sm hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <ShoppingBag className="w-4 h-4 shrink-0" />
                 <span className="truncate whitespace-nowrap">Add to Cart</span>
@@ -349,7 +349,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
               <button
                 onClick={handleBuyNow}
-                className="w-full py-3.5 px-3 bg-[#FF6B00] hover:bg-[#e05e00] text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-lg hover:shadow-orange-500/30 transition-all duration-200 hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                className="btn-shimmer btn-glow-orange w-full py-3.5 px-3 bg-[#FF6B00] hover:bg-[#e05e00] text-white font-black text-xs uppercase tracking-wider rounded-2xl transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Zap className="w-4 h-4 shrink-0" />
                 <span className="truncate whitespace-nowrap">Buy Now</span>
@@ -493,7 +493,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
       <div className="fixed bottom-16 sm:bottom-0 left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-gray-200/80 dark:border-slate-800 px-4 py-3 flex gap-3 z-30 shadow-2xl">
         <button
           onClick={handleAddToCart}
-          className="flex-1 border border-gray-300 dark:border-slate-700 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors bg-white dark:bg-slate-900 active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+          className="btn-shimmer flex-1 border border-gray-300 dark:border-slate-700 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors bg-white dark:bg-slate-900 active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
         >
           <ShoppingBag className="w-4 h-4 shrink-0" />
           <span className="truncate whitespace-nowrap">Add to Cart</span>
@@ -501,7 +501,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
         <button
           onClick={handleBuyNow}
-          className="flex-[1.5] bg-[#FF6B00] text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-[#e05e00] transition-colors shadow-lg active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+          className="btn-shimmer btn-glow-orange flex-[1.5] bg-[#FF6B00] text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-[#e05e00] transition-colors active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
         >
           <Zap className="w-4 h-4 shrink-0" />
           <span className="truncate whitespace-nowrap">Buy Now</span>
