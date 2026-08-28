@@ -124,13 +124,13 @@ export const StorefrontAiChatbot: React.FC = () => {
 
     // General Response
     if (isEnglish) {
-      return 'Explore our store catalog online or place your order directly via Cash on Delivery!';
+      return 'I am ArdhiMart Shopping Assistant. Please ask about our products, prices, or orders!';
     } else {
-      return 'পছন্দের পণ্য কিনতে ওয়েবসাইট ব্রাউজ করুন অথবা ক্যাশ অন ডেলিভারিতে অর্ডার কনফার্ম করুন!';
+      return 'আমি ArdhiMart এর শপিং এসিস্ট্যান্ট। আমাদের স্টোরের পণ্য, দাম বা অর্ডার নিয়ে প্রশ্ন করুন!';
     }
   };
 
-  // Gemini AI Service Handler with Concise Token Optimization
+  // Gemini AI Service Handler with Concise Token & Out-of-Scope Guardrails
   const getAiResponse = async (userPrompt: string): Promise<string> => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
 
@@ -153,14 +153,16 @@ export const StorefrontAiChatbot: React.FC = () => {
       .map((p) => `• ${p.title}: ৳${p.price}`)
       .join('\n');
 
-    const systemPrompt = `You are the AI Customer Support Agent for "ArdhiMart" e-commerce Bangladesh.
+    const systemPrompt = `You are the AI Customer Support Agent for "ArdhiMart" e-commerce store in Bangladesh.
 
-CRITICAL RULES FOR TOKEN OPTIMIZATION & FAST RESPONSE:
+CRITICAL RULES:
 1. KEEP YOUR RESPONSE EXTREMELY SHORT AND ULTRA-CONCISE (MAX 1 OR 2 SHORT SENTENCES, UNDER 25 WORDS). DO NOT WRITE LONG EXPLANATIONS OR PARAGRAPHS.
 2. DO NOT GREET OR SALUTE. Answer the question directly without "Assalamu Alaikum" or "Hello".
 3. DETECT LANGUAGE AUTOMATICALLY:
    - If user asks in English -> reply in short English.
    - If user asks in Bengali/Banglish -> reply in short Bengali.
+4. OUT-OF-SCOPE & IRRELEVANT QUESTIONS GUARDRAIL:
+   - If the user asks about third-party stores, competitors, non-store items, or irrelevant topics (e.g. weather, politics, external links), politely state that you are ArdhiMart's Shopping Assistant and invite them to ask about ArdhiMart products, prices, or orders.
 
 Store Knowledge:
 - Delivery: Inside Dhaka ৳80, Outside Dhaka ৳120. COD available.
@@ -183,7 +185,7 @@ Customer Question: "${userPrompt}"`;
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [{ parts: [{ text: systemPrompt }] }],
-              generationConfig: { temperature: 0.4, maxOutputTokens: 120 },
+              generationConfig: { temperature: 0.3, maxOutputTokens: 120 },
             }),
           }
         );
