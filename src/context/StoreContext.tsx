@@ -65,7 +65,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const fetchProducts = async () => {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
-        const res = await fetch(`${baseUrl}/products`);
+        const res = await fetch(`${baseUrl}/products`, {
+          next: { revalidate: 30 }
+        });
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && isMounted) {
