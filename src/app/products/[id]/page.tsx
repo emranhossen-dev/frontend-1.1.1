@@ -122,11 +122,11 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col font-sans select-none">
       {/* Header */}
       <Header />
 
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28 sm:pb-12">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28 lg:pb-12">
         {/* Breadcrumb Navigation with Category Filter Link */}
         <div className="mb-6 pb-3 border-b border-gray-200/80 dark:border-slate-800">
           <nav className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400">
@@ -295,7 +295,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               )}
             </div>
 
-            {/* Single Dynamic Variant Selector (ONLY RENDERS IF VARIANT OPTIONS ACTUALLY EXIST IN DATABASE) */}
+            {/* Single Dynamic Variant Selector */}
             {variantOptions.length > 0 && (
               <div className="space-y-2">
                 <h3 className="text-xs font-extrabold uppercase tracking-wider text-gray-900 dark:text-white">
@@ -348,7 +348,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               </div>
             </div>
 
-            {/* SIDE-BY-SIDE ADD TO CART & BUY NOW BUTTONS WITH CLEAN SHIMMER LIGHT SLIDE ONLY */}
+            {/* SIDE-BY-SIDE ADD TO CART & BUY NOW BUTTONS */}
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
                 onClick={handleAddToCart}
@@ -496,8 +496,8 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
         </div>
       </main>
 
-      {/* Mobile-Friendly Fixed Bottom Bar (Positioned above BottomNavBar on mobile) */}
-      <div className="fixed bottom-16 sm:bottom-0 left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-gray-200/80 dark:border-slate-800 px-4 py-3 flex gap-3 z-30 shadow-2xl">
+      {/* Mobile-Only Fixed Bottom Bar (Hidden on Desktop 'sm:hidden') */}
+      <div className="sm:hidden fixed bottom-16 left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-gray-200/80 dark:border-slate-800 px-4 py-3 flex gap-3 z-30 shadow-2xl">
         <button
           onClick={handleAddToCart}
           className="btn-shimmer flex-1 border border-gray-300 dark:border-slate-700 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors bg-white dark:bg-slate-900 active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
