@@ -24,11 +24,11 @@ interface ChatMessage {
   timestamp: string;
 }
 
-const DEFAULT_GEMINI_KEY = 'AQ.Ab8RN6IYh-WQBwLnUYZIiN-xWdaONnzX3tzEVR1V6Qd7Zle1oA';
+const DEFAULT_GEMINI_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || '';
 
 export const StorefrontAiChatbot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { products } = useStore();
+  const { products, storeConfig } = useStore();
 
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -38,7 +38,7 @@ export const StorefrontAiChatbot: React.FC = () => {
     {
       id: 'welcome-1',
       sender: 'bot',
-      text: 'আসসালামু আলাইকুম! 👋 আমি ArdhiMart এর AI কাস্টমার সাপোর্ট এসিস্ট্যান্ট। আমাদের গ্যাজেট, দাম, স্টক, ডেলিভারি চার্জ বা আপনার অর্ডারের বর্তমান অবস্থা নিয়ে যেকোনো প্রশ্ন করতে পারেন। কীভাবে সাহায্য করতে পারি?',
+      text: 'আসসালামু আলাইকুম! 👋 আমি ArdhiMart এর AI কাস্টমার সাপোর্ট এসিস্ট্যান্ট। আমাদের পণ্য, অফার প্রাইজ, স্টক, ডেলিভারি চার্জ বা আপনার অর্ডারের বর্তমান স্ট্যাটাস নিয়ে যেকোনো প্রশ্ন করতে পারেন। কীভাবে সাহায্য করতে পারি?',
       timestamp: 'Just now',
     },
   ]);
@@ -55,13 +55,13 @@ export const StorefrontAiChatbot: React.FC = () => {
 
   // Quick Prompt Chips
   const quickPrompts = [
-    '⚡ পাওয়ার ব্যাংক বা গ্যাজেটের দাম কত?',
+    '⚡ পাওয়া ব্যাংক বা গ্যাজেটের দাম কত?',
     '🚚 ডেলিভারি চার্জ এবং সময় কতদিন?',
     '📦 আমার অর্ডার ৯৮০ এর বর্তমান স্ট্যাটাস কি?',
     '🔄 প্রোডাক্ট রিটার্ন বা রিপ্লেসমেন্ট পলিসি কি?'
   ];
 
-  // Gemini AI Service Handler with Catalog & Order Context
+  // Direct Gemini AI Handler with Rich Personalized Context
   const getAiResponse = async (userPrompt: string): Promise<string> => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
 
@@ -74,48 +74,50 @@ export const StorefrontAiChatbot: React.FC = () => {
         const orderRes = await fetch(`${baseUrl}/orders/${orderId}`);
         if (orderRes.ok) {
           const ord = await orderRes.json();
-          orderContext = `Real Database Order Details for #${orderId}:
+          orderContext = `Real Database Order Information for Order #${orderId}:
 Status: ${ord.status}
-Customer: ${ord.customerName} (${ord.customerPhone})
+Customer Name: ${ord.customerName}
+Customer Phone: ${ord.customerPhone}
 Total Amount: ৳${ord.totalAmount}
-Items: ${(ord.order_items || ord.items || []).map((i: any) => i.productName || i.title).join(', ')}`;
+Shipping Address: ${ord.shippingAddress || 'Dhaka'}
+Ordered Items: ${(ord.order_items || ord.items || []).map((i: any) => `${i.productName || i.title} (Qty: ${i.quantity || 1}, Price: ৳${i.price || 0})`).join(', ')}`;
         }
       } catch (e) {}
     }
 
-    // Build Product Catalog Snippet
+    // Build Detailed Product Catalog Snippet from Store DB
     const productCatalogSnippet = products
-      .slice(0, 10)
+      .slice(0, 15)
       .map(
         (p) =>
-          `• ${p.title} - ৳${p.price} (Category: ${p.category}, Status: In Stock, SKU: ${p.sku || 'N/A'})`
+          `• Product Name: ${p.title} | Price: ৳${p.price} | Category: ${p.category || 'General'} | In Stock: Yes`
       )
       .join('\n');
 
-    const systemPrompt = `You are the friendly, expert AI Customer Support Agent for "ArdhiMart", a premier luxury & tech e-commerce store in Bangladesh.
-Your goal is to answer customer questions in polite, helpful, clear Bengali (বাংলা) language.
+    const systemPrompt = `You are the personalized AI Customer Support & Sales Assistant for "ArdhiMart", a luxury tech & everyday essentials e-commerce store in Bangladesh.
 
-Store Policies & Knowledge Base:
-- Store Name: ArdhiMart (আরধিমার্ট)
-- Delivery Fee: Inside Dhaka = ৳80 (24-48 hours delivery), Outside Dhaka = ৳120 (2-3 days delivery).
-- Payment Methods: Cash On Delivery (COD), bKash Merchant, Credit/Debit Card.
-- Return Policy: 7-day replacement warranty for defective or wrong products.
+Store Identity & Knowledge Base:
+- Store Name: ArdhiMart
+- Store Currency: BDT (৳ Taka)
+- Delivery Charge: Inside Dhaka = ৳80 (24-48 hours delivery), Outside Dhaka = ৳120 (2-3 days delivery).
+- Payment Method: Cash On Delivery (COD) across all districts in Bangladesh.
+- Return & Replacement Policy: 7-day replacement warranty for manufacturing defects or damaged items.
 
-Available Products in Store Catalog:
-${productCatalogSnippet || 'Featured Tech Accessories, Power Banks, Smartwatches, Wireless Headphones'}
+Live Database Product Catalog:
+${productCatalogSnippet || 'Featured Tech Accessories, Power Banks, Smartwatches, Wireless Earbuds'}
 
-${orderContext ? `Order Info Requested:\n${orderContext}\n` : ''}
+${orderContext ? `Requested Customer Order Details:\n${orderContext}\n` : ''}
 
-Customer Query:
+Customer Question/Message:
 "${userPrompt}"
 
 Instructions:
-1. Respond concisely and nicely in natural Bengali (বাংলা).
-2. If asking about products or prices, reference product names and prices in Taka (৳).
-3. If asking about an order, provide the exact order status found in order info.
-4. Keep the tone warm, professional, and trustworthy!`;
+1. Provide a direct, personalized, intelligent, and helpful answer in natural, polite Bengali (বাংলা) language.
+2. If customer asks about products or prices, mention exact product names and prices from the catalog in Taka (৳).
+3. If order details are available, give a personalized update about their order status, customer name, and amount.
+4. Keep the response natural, warm, and tailored strictly to the customer's question!`;
 
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || DEFAULT_GEMINI_KEY;
+    const apiKey = DEFAULT_GEMINI_KEY || 'AQ.Ab8RN6IYh-WQBwLnUYZIiN-xWdaONnzX3tzEVR1V6Qd7Zle1oA';
     const models = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
 
     for (const model of models) {
@@ -137,6 +139,10 @@ Instructions:
                   ],
                 },
               ],
+              generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 1024,
+              },
             }),
           }
         );
@@ -148,16 +154,25 @@ Instructions:
       } catch (err) {}
     }
 
-    // Fallback if API response is delayed
+    // Dynamic Intelligent Fallback if API key is invalid/unset
     const q = userPrompt.toLowerCase();
+    
+    // Order tracking query
+    if (orderContext) {
+      return `আপনার অর্ডার #${orderMatch![0]} এর তথ্য পাওয়া গেছে। কাস্টমার: ${orderContext.split('\n')[2]?.replace('Customer Name: ', '') || ''}, বর্তমান স্ট্যাটাস: ${orderContext.split('\n')[1]?.replace('Status: ', '').toUpperCase() || 'PROCESSING'}।`;
+    }
+
+    // Product pricing query
+    const matchedProd = products.find((p) => q.includes(p.title.toLowerCase()) || (p.category && q.includes(p.category.toLowerCase())));
+    if (matchedProd) {
+      return `আমাদের স্টোরে "${matchedProd.title}" এর বর্তমান অফার প্রাইজ ৳${matchedProd.price}। ঢাকার ভেতরে ৳৮০ এবং ঢাকার বাইরে ৳১২০ ডেলিভারি চার্জে সরাসরি ক্যাশ অন ডেলিভারিতে অর্ডার করতে পারেন!`;
+    }
+
     if (q.includes('ডেলিভারি') || q.includes('delivery')) {
       return 'ArdhiMart এ ঢাকার ভেতরে ডেলিভারি চার্জ ৳৮০ (২৪-৪৮ ঘণ্টা) এবং ঢাকার বাইরে ৳১২০ (২-৩ দিন)। সম্পূর্ণ ক্যাশ অন ডেলিভারিতে অর্ডার গ্রহণ করা হয়!';
     }
-    if (q.includes('অর্ডার') || q.includes('order')) {
-      return 'অর্ডার ট্র্যাক করতে আপনার অর্ডার নম্বর (যেমন ৯৮০) মেসেজে লিখুন অথবা আপনার অ্যাকাউন্টের Track Order পেজে চেক করুন।';
-    }
 
-    return 'ধন্যবাদ আপনার মেসেজের জন্য! ArdhiMart এ আপনার পছন্দের পণ্য কিনতে ওয়েবসাইট ব্রাউজ করুন অথবা সরাসরি ক্যাশ অন ডেলিভারিতে অর্ডার কনফার্ম করুন। ❤️';
+    return 'ArdhiMart এ আপনাকে স্বাগতম! আমাদের যেকোনো পণ্য, অফার প্রাইজ বা অর্ডার ট্র্যাক করার বিষয়ে প্রশ্ন করুন, আমি তথ্য দিয়ে সাহায্য করছি। ❤️';
   };
 
   const handleSendMessage = async (textToSend?: string) => {
