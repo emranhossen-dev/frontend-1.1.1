@@ -24,6 +24,8 @@ interface ChatMessage {
   timestamp: string;
 }
 
+const DEFAULT_GEMINI_KEY = 'AQ.Ab8RN6IYh-WQBwLnUYZIiN-xWdaONnzX3tzEVR1V6Qd7Zle1oA';
+
 export const StorefrontAiChatbot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { products } = useStore();
@@ -36,7 +38,7 @@ export const StorefrontAiChatbot: React.FC = () => {
     {
       id: 'welcome-1',
       sender: 'bot',
-      text: 'আসসালামু আলাইকুম! 👋 আমি ArdhiMart এর Live Chat AI এসিস্ট্যান্ট। পণ্য, দাম, ডেলিভারি বা অর্ডারের বিষয়ে প্রশ্ন করুন অথবা চ্যাটের ভেতরেই সহজে অর্ডার কনফার্ম করুন।\nHello! Ask about products or place an order directly here.',
+      text: 'আসসালামু আলাইকুম! 👋 আমি ArdhiMart এর AI কাস্টমার সাপোর্ট এসিস্ট্যান্ট। আমাদের গ্যাজেট, দাম, স্টক, ডেলিভারি চার্জ বা আপনার অর্ডারের বর্তমান অবস্থা নিয়ে যেকোনো প্রশ্ন করতে পারেন। কীভাবে সাহায্য করতে পারি?',
       timestamp: 'Just now',
     },
   ]);
@@ -51,224 +53,111 @@ export const StorefrontAiChatbot: React.FC = () => {
     }
   }, [messages, isOpen]);
 
-  // Quick Prompts Chips
+  // Quick Prompt Chips
   const quickPrompts = [
-    '💬 চ্যাটে অর্ডার করতে চাই',
     '⚡ পাওয়ার ব্যাংক বা গ্যাজেটের দাম কত?',
-    '🚚 Delivery fee and shipping time?',
-    '📦 আমার অর্ডার ৯৮০ এর স্ট্যাটাস কি?'
+    '🚚 ডেলিভারি চার্জ এবং সময় কতদিন?',
+    '📦 আমার অর্ডার ৯৮০ এর বর্তমান স্ট্যাটাস কি?',
+    '🔄 প্রোডাক্ট রিটার্ন বা রিপ্লেসমেন্ট পলিসি কি?'
   ];
 
-  // Automatic Backend Order Creator
-  const attemptPlaceOrderInChat = async (userPrompt: string): Promise<string | null> => {
-    const phoneMatch = userPrompt.match(/(?:01|8801|\+8801)\d{8,9}/);
-    const orderKeywords = ['order', 'buy', 'অর্ডার', 'কিনব', 'বুক', 'নিতে চাই'];
-    const hasOrderIntent = orderKeywords.some((k) => userPrompt.toLowerCase().includes(k));
-
-    if (phoneMatch && hasOrderIntent) {
-      const phone = phoneMatch[0];
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
-
-      // Parse name and address roughly from text
-      const cleanText = userPrompt.replace(phone, '').trim();
-      const parts = cleanText.split(/[,|\n-]/).map((s) => s.trim()).filter(Boolean);
-      const name = parts[0] || 'Customer';
-      const address = parts.slice(1).join(', ') || 'Dhaka, Bangladesh';
-
-      const selectedProduct = products[0] || {
-        id: 'prod-1',
-        title: 'Wireless Power Bank 10000mAh',
-        price: 1200,
-        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500',
-      };
-
-      try {
-        const res = await fetch(`${baseUrl}/orders`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            customerName: name,
-            customerPhone: phone,
-            shippingAddress: address,
-            city: 'Dhaka',
-            items: [
-              {
-                productId: selectedProduct.id,
-                productName: selectedProduct.title,
-                quantity: 1,
-                price: selectedProduct.price,
-                image: selectedProduct.image,
-              },
-            ],
-            subtotal: selectedProduct.price,
-            shippingFee: 80,
-            totalAmount: selectedProduct.price + 80,
-            paymentMethod: 'COD',
-          }),
-        });
-
-        if (res.ok) {
-          const ord = await res.json();
-          const orderNum = ord.orderNumber || ord.id || '981';
-          return `🎉 অভিনন্দন! আপনার অর্ডারটি সফলভাবে কনফার্ম করা হয়েছে।\n📦 অর্ডার নম্বর: #${orderNum}\n👤 কাস্টমার: ${name} (${phone})\n📍 ঠিকানা: ${address}\n💵 পেমেন্ট: ক্যাশ অন ডেলিভারি (৳${selectedProduct.price + 80})\n\nআমাদের কুরিয়ার প্রতিনিধি দ্রুত আপনার সাথে যোগাযোগ করবেন। ❤️`;
-        }
-      } catch (e) {}
-    }
-
-    return null;
-  };
-
-  // Smart Intelligent Context Engine
-  const getSmartContextResponse = async (userPrompt: string, currentMessages: ChatMessage[]): Promise<string> => {
-    const q = userPrompt.trim().toLowerCase();
+  // Gemini AI Service Handler with Catalog & Order Context
+  const getAiResponse = async (userPrompt: string): Promise<string> => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
 
-    // Get previous bot & user messages for context awareness
-    const lastUserMsg = currentMessages.filter((m) => m.sender === 'user').slice(-2)[0]?.text || '';
-    const lastBotMsg = currentMessages.filter((m) => m.sender === 'bot').slice(-1)[0]?.text || '';
-
-    // Check for short queries like "kn", "kno", "keno", "why"
-    const isWhyQuery = ['kn', 'kno', 'keno', 'kene', 'why', 'কেন'].includes(q);
-    if (isWhyQuery) {
-      if (lastBotMsg.includes('অর্ডার') || lastBotMsg.includes('order')) {
-        return 'আমাদের শপে ক্যাশ অন ডেলিভারিতে নিরাপদ কেনাকাটা ও দ্রুত ডেলিভারির সুবিধা নিশ্চিত করতেই অর্ডার করার সময় নাম, মোবাইল নম্বর ও সঠিক ঠিকানা প্রয়োজন হয়।';
-      }
-      return 'অনুগ্রহ করে কোন বিষয়টি সম্পর্কে বিস্তারিত জানতে চান একটু খুলে বলুন, আমি আপনাকে প্রয়োজনীয় তথ্য দিয়ে সাহায্য করব।';
-    }
-
-    // Order intent without complete info
-    if (q.includes('অর্ডার') || q.includes('order') || q.includes('buy') || q.includes('কিনব') || q.includes('নিতে চাই')) {
-      return 'চ্যাটে সরাসরি অর্ডার কনফার্ম করতে অনুগ্রহ করে প্রদান করুন:\n১. পণ্যের নাম\n২. আপনার পূর্ণ নাম\n৩. মোবাইল নম্বর\n৪. ফুল ডেলিভারি ঠিকানা\n\nতথ্যগুলো একবারে লিখে পাঠালেই আপনার অর্ডার বুকিং হয়ে যাবে!';
-    }
-
-    // Order Tracking Query (e.g. 980)
+    // Check if user is asking for order tracking (e.g. 980)
     const orderMatch = userPrompt.match(/\b\d{3,4}\b/);
+    let orderContext = '';
     if (orderMatch) {
       const orderId = orderMatch[0];
       try {
         const orderRes = await fetch(`${baseUrl}/orders/${orderId}`);
         if (orderRes.ok) {
           const ord = await orderRes.json();
-          return `অর্ডার #${orderId} এর বর্তমান অবস্থা: ${ord.status?.toUpperCase()} (গ্রাহক: ${ord.customerName}, মোট দেয়: ৳${ord.totalAmount})। আপনার পার্সেল লজিস্টিক টিমের প্রক্রিয়াধীন আছে।`;
+          orderContext = `Real Database Order Details for #${orderId}:
+Status: ${ord.status}
+Customer: ${ord.customerName} (${ord.customerPhone})
+Total Amount: ৳${ord.totalAmount}
+Items: ${(ord.order_items || ord.items || []).map((i: any) => i.productName || i.title).join(', ')}`;
         }
       } catch (e) {}
-
-      return `অর্ডার #${orderMatch[0]} এর প্রসেসিং চলছে। আমাদের ডেলিভারি টিম দ্রুত পার্সেল হ্যান্ডওভার করবে।`;
     }
 
-    // Matching product from store database
-    const matched = products.filter(
-      (p) => q.includes(p.title.toLowerCase()) || (p.category && q.includes(p.category.toLowerCase()))
-    );
+    // Build Product Catalog Snippet
+    const productCatalogSnippet = products
+      .slice(0, 10)
+      .map(
+        (p) =>
+          `• ${p.title} - ৳${p.price} (Category: ${p.category}, Status: In Stock, SKU: ${p.sku || 'N/A'})`
+      )
+      .join('\n');
 
-    if (matched.length > 0) {
-      const p = matched[0];
-      return `"${p.title}" আমাদের স্টকে এভেইলএবল রয়েছে! স্পেশাল প্রাইস ৳${p.price}। ঢাকার ভেতরে ৳৮০ এবং ঢাকার বাইরে ৳১২০ ডেলিভারি চার্জে সম্পূর্ণ ক্যাশ অন ডেলিভারিতে অর্ডার করতে পারেন।`;
-    }
+    const systemPrompt = `You are the friendly, expert AI Customer Support Agent for "ArdhiMart", a premier luxury & tech e-commerce store in Bangladesh.
+Your goal is to answer customer questions in polite, helpful, clear Bengali (বাংলা) language.
 
-    // Delivery & Shipping query
-    if (q.includes('delivery') || q.includes('shipping') || q.includes('ডেলিভারি') || q.includes('চার্জ') || q.includes('কবে')) {
-      return 'ডেলিভারি চার্জ: ঢাকার ভেতরে ৳৮০ (২৪-৪৮ ঘণ্টা), ঢাকার বাইরে ৳১২০ (২-৩ দিন)। সম্পূর্ণ পণ্য হাতে পেয়ে মূল্য পরিশোধ (Cash on Delivery) করতে পারবেন!';
-    }
+Store Policies & Knowledge Base:
+- Store Name: ArdhiMart (আরধিমার্ট)
+- Delivery Fee: Inside Dhaka = ৳80 (24-48 hours delivery), Outside Dhaka = ৳120 (2-3 days delivery).
+- Payment Methods: Cash On Delivery (COD), bKash Merchant, Credit/Debit Card.
+- Return Policy: 7-day replacement warranty for defective or wrong products.
 
-    // Return policy query
-    if (q.includes('return') || q.includes('replacement') || q.includes('রিটার্ন') || q.includes('ওয়ারেন্টি')) {
-      return 'ArdhiMart এর প্রতিটি পণ্যে রয়েছে ৭ দিনের ক্যাশলেস রিপ্লেসমেন্ট গ্যারান্টি। কোনো সমস্যা থাকলে তাৎক্ষণিক ডেলিভারিম্যানকে অথবা আমাদের সাথে চ্যাটে যোগাযোগ করুন।';
-    }
+Available Products in Store Catalog:
+${productCatalogSnippet || 'Featured Tech Accessories, Power Banks, Smartwatches, Wireless Headphones'}
 
-    // Natural conversation fallback
-    return 'ArdhiMart এর কাস্টমার কেয়ার এ আপনাকে স্বাগতম! পণ্য, ক্যাশ অন ডেলিভারি অথবা সরাসরি অর্ডার সংক্রান্ত যেকোনো তথ্য জানতে লিখে পাঠান।';
-  };
+${orderContext ? `Order Info Requested:\n${orderContext}\n` : ''}
 
-  // Gemini AI Handler
-  const getAiResponse = async (userPrompt: string, currentMessages: ChatMessage[]): Promise<string> => {
-    // 1. Try In-Chat Direct Order Placement
-    const orderPlacementResult = await attemptPlaceOrderInChat(userPrompt);
-    if (orderPlacementResult) {
-      return orderPlacementResult;
-    }
+Customer Query:
+"${userPrompt}"
 
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+Instructions:
+1. Respond concisely and nicely in natural Bengali (বাংলা).
+2. If asking about products or prices, reference product names and prices in Taka (৳).
+3. If asking about an order, provide the exact order status found in order info.
+4. Keep the tone warm, professional, and trustworthy!`;
 
-    if (apiKey && apiKey.startsWith('AIzaSy')) {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
+    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || DEFAULT_GEMINI_KEY;
+    const models = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
 
-      // Order Lookup
-      const orderMatch = userPrompt.match(/\b\d{3,4}\b/);
-      let orderContext = '';
-      if (orderMatch) {
-        const orderId = orderMatch[0];
-        try {
-          const orderRes = await fetch(`${baseUrl}/orders/${orderId}`);
-          if (orderRes.ok) {
-            const ord = await orderRes.json();
-            orderContext = `Order #${orderId} Info: Status: ${ord.status}, Customer: ${ord.customerName}, Amount: ৳${ord.totalAmount}`;
+    for (const model of models) {
+      try {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    {
+                      text: systemPrompt,
+                    },
+                  ],
+                },
+              ],
+            }),
           }
-        } catch (e) {}
-      }
+        );
 
-      const productCatalogSnippet = products
-        .slice(0, 10)
-        .map((p) => `• ${p.title}: ৳${p.price} (${p.category || 'General'})`)
-        .join('\n');
-
-      const systemPrompt = `You are the helpful AI Live Chat Agent for "ArdhiMart" e-commerce store in Bangladesh.
-
-RULES:
-1. Provide accurate, natural, context-aware responses based on customer's queries.
-2. If customer asks short questions like "kn", "why", "kno", answer according to previous messages.
-3. Automatically match user's language (Bengali/English).
-4. Store Info: Delivery inside Dhaka ৳80, Outside Dhaka ৳120. COD available.
-
-Products available:
-${productCatalogSnippet}
-${orderContext ? `\nContext: ${orderContext}` : ''}`;
-
-      const recentHistory = currentMessages
-        .filter((m) => m.id !== 'welcome-1')
-        .slice(-6)
-        .map((m) => ({
-          role: m.sender === 'user' ? 'user' : 'model',
-          parts: [{ text: m.text }],
-        }));
-
-      const contentsPayload = [
-        { role: 'user', parts: [{ text: systemPrompt }] },
-        ...recentHistory,
-        { role: 'user', parts: [{ text: userPrompt }] },
-      ];
-
-      const models = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
-
-      for (const model of models) {
-        try {
-          const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                contents: contentsPayload,
-                generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
-              }),
-            }
-          );
-
-          const data = await res.json();
-          if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-            const text = data.candidates[0].content.parts[0].text.trim();
-            return text
-              .replace(/^আসসালামু আলাইকুম!/gi, '')
-              .replace(/^আসসালামু আলাইকুম/gi, '')
-              .replace(/^hello!/gi, '')
-              .trim();
-          }
-        } catch (e) {}
-      }
+        const data = await res.json();
+        if (res.ok && data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+          return data.candidates[0].content.parts[0].text.trim();
+        }
+      } catch (err) {}
     }
 
-    // Smart context response engine fallback
-    return getSmartContextResponse(userPrompt, currentMessages);
+    // Fallback if API response is delayed
+    const q = userPrompt.toLowerCase();
+    if (q.includes('ডেলিভারি') || q.includes('delivery')) {
+      return 'ArdhiMart এ ঢাকার ভেতরে ডেলিভারি চার্জ ৳৮০ (২৪-৪৮ ঘণ্টা) এবং ঢাকার বাইরে ৳১২০ (২-৩ দিন)। সম্পূর্ণ ক্যাশ অন ডেলিভারিতে অর্ডার গ্রহণ করা হয়!';
+    }
+    if (q.includes('অর্ডার') || q.includes('order')) {
+      return 'অর্ডার ট্র্যাক করতে আপনার অর্ডার নম্বর (যেমন ৯৮০) মেসেজে লিখুন অথবা আপনার অ্যাকাউন্টের Track Order পেজে চেক করুন।';
+    }
+
+    return 'ধন্যবাদ আপনার মেসেজের জন্য! ArdhiMart এ আপনার পছন্দের পণ্য কিনতে ওয়েবসাইট ব্রাউজ করুন অথবা সরাসরি ক্যাশ অন ডেলিভারিতে অর্ডার কনফার্ম করুন। ❤️';
   };
 
   const handleSendMessage = async (textToSend?: string) => {
@@ -282,13 +171,12 @@ ${orderContext ? `\nContext: ${orderContext}` : ''}`;
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    const updatedMessages = [...messages, userMsg];
-    setMessages(updatedMessages);
+    setMessages((prev) => [...prev, userMsg]);
     if (!textToSend) setInputMessage('');
     setIsTyping(true);
 
     try {
-      const botText = await getAiResponse(query.trim(), updatedMessages);
+      const botText = await getAiResponse(query);
       const botMsg: ChatMessage = {
         id: `bot-${Date.now()}`,
         sender: 'bot',
@@ -297,14 +185,13 @@ ${orderContext ? `\nContext: ${orderContext}` : ''}`;
       };
       setMessages((prev) => [...prev, botMsg]);
     } catch (err) {
-      const fallbackText = await getSmartContextResponse(query.trim(), updatedMessages);
       setMessages((prev) => [
         ...prev,
         {
-          id: `bot-fallback-${Date.now()}`,
+          id: `bot-err-${Date.now()}`,
           sender: 'bot',
-          text: fallbackText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          text: 'দুঃখিত, কোনো টেকনিক্যাল সমস্যার কারণে উত্তর দিতে বিলম্ব হচ্ছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।',
+          timestamp: 'Just now',
         },
       ]);
     } finally {
@@ -313,22 +200,22 @@ ${orderContext ? `\nContext: ${orderContext}` : ''}`;
   };
 
   return (
-    <div className="fixed bottom-24 right-4 sm:bottom-20 sm:right-6 z-50 select-none">
+    <div className="fixed bottom-5 right-4 z-50 select-none">
       {/* FLOATING TRIGGER BUTTON */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="group relative flex items-center gap-2.5 px-4 py-3.5 bg-[#0F396F] hover:bg-[#164685] text-white rounded-full shadow-2xl transition-all duration-300 active:scale-95 cursor-pointer border border-cyan-400/40 glow-indigo"
-          aria-label="Open Live Chat"
+          className="group relative flex items-center gap-2 px-4 py-3 bg-[#0F396F] hover:bg-[#164685] text-white rounded-full shadow-2xl transition-all duration-300 active:scale-95 cursor-pointer border border-indigo-400/30"
+          aria-label="Open AI Assistant"
         >
           <div className="relative flex items-center justify-center">
-            <MessageSquare className="w-5 h-5 text-cyan-300 fill-cyan-400/20" />
+            <Bot className="w-6 h-6 text-cyan-300" />
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full ring-2 ring-slate-900 animate-ping" />
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full ring-2 ring-slate-900" />
           </div>
 
-          <span className="font-extrabold text-xs tracking-wider text-white">
-            Live Chat
+          <span className="font-extrabold text-xs tracking-wider text-white hidden sm:inline">
+            ArdhiMart AI Support
           </span>
 
           <span className="px-1.5 py-0.5 text-[9px] font-black bg-cyan-400 text-slate-950 rounded-full uppercase">
@@ -348,12 +235,12 @@ ${orderContext ? `\nContext: ${orderContext}` : ''}`;
               </div>
               <div>
                 <h3 className="text-xs font-black text-white flex items-center gap-1.5">
-                  ArdhiMart Live Chat AI
+                  ArdhiMart AI Support
                   <Sparkles className="w-3 h-3 text-cyan-400" />
                 </h3>
                 <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Full Context AI Assistant Active
+                  Online • Powered by Gemini AI
                 </span>
               </div>
             </div>
@@ -401,7 +288,7 @@ ${orderContext ? `\nContext: ${orderContext}` : ''}`;
             {isTyping && (
               <div className="flex gap-2 items-center text-slate-400 text-xs p-2">
                 <Bot className="w-4 h-4 animate-bounce text-cyan-400" />
-                <span>AI Live Chat typing...</span>
+                <span>ArdhiMart AI উত্তর তৈরি করছে...</span>
               </div>
             )}
 
@@ -434,7 +321,7 @@ ${orderContext ? `\nContext: ${orderContext}` : ''}`;
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Ask or send name, phone & address to order..."
+                placeholder="প্রশ্ন লিখুন (e.g. পাওয়ার ব্যাংক এর দাম কত?)..."
                 className="flex-1 px-3.5 py-2 text-xs bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-sans"
               />
               <button
