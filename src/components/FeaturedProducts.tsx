@@ -30,7 +30,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
             <ProductSkeletonCard key={n} />
           ))}
@@ -47,7 +47,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
         </div>
       ) : (
         /* STANDARD 2-COL MOBILE, 3-COL TABLET, 4-COL DESKTOP, 5-COL LARGE GRID */
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
           {productsList.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

@@ -86,6 +86,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               shortDescription: item.shortDescription || '',
               description: item.description || '',
               usability: item.usability || '',
+              features: item.features && Array.isArray(item.features) ? item.features : [],
               material: item.material || '',
               warranty: item.warranty || '',
               deliveryInsideDhaka: item.deliveryInsideDhaka ? Number(item.deliveryInsideDhaka) : 80,
