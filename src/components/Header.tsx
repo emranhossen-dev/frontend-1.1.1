@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, ShoppingBag, Search } from 'lucide-react';
+import { Menu, ShoppingBag, Search, Sun, Moon } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 
 interface HeaderProps {
@@ -22,6 +22,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenSearch: customOpenSearch,
 }) => {
   const {
+    theme,
+    toggleTheme,
     storeConfig,
     cartItems,
     setIsCartOpen,
@@ -91,6 +93,19 @@ export const Header: React.FC<HeaderProps> = ({
             className="p-2 sm:p-2.5 bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white hover:bg-gray-200 rounded-lg transition-all active:scale-95 cursor-pointer"
           >
             <Search className="w-5 h-5" />
+          </button>
+
+          <button
+            onClick={toggleTheme}
+            aria-label="Toggle Theme Mode"
+            title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+            className="p-2 sm:p-2.5 bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white hover:bg-gray-200 rounded-lg transition-all active:scale-95 cursor-pointer"
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-5 h-5 text-amber-400" />
+            ) : (
+              <Moon className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+            )}
           </button>
 
           <button

@@ -11,6 +11,9 @@ import {
 import { notifySuccess, notifyInfo } from '@/lib/sweetalert';
 
 interface StoreContextType {
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
+  toggleTheme: () => void;
   storeConfig: StoreConfig;
   categories: Category[];
   products: Product[];
@@ -34,6 +37,40 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [theme, setThemeState] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ardhimart_theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+    }
+    return 'light'; // DEFAULT LIGHT MODE!
+  });
+
+  const setTheme = (newTheme: 'light' | 'dark') => {
+    setThemeState(newTheme);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('ardhimart_theme', newTheme);
+      if (newTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+  }, [theme]);
+
   const [storeConfig] = useState<StoreConfig>(defaultStoreConfig);
   const [categories] = useState<Category[]>(defaultCategories);
   const [products, setProducts] = useState<Product[]>(() => {
@@ -185,6 +222,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   return (
     <StoreContext.Provider
       value={{
+        theme,
+        setTheme,
+        toggleTheme,
         storeConfig,
         categories,
         products,
