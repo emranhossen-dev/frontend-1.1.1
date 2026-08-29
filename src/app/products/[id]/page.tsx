@@ -29,11 +29,9 @@ import {
   Zap,
   MessageSquare,
   MessageCircle,
-  Phone,
   CheckCircle2,
   FileText,
   HelpCircle,
-  Sparkles,
 } from 'lucide-react';
 
 interface ProductDetailsPageProps {
@@ -57,6 +55,18 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
   const { user: currentUser } = useAuth();
 
+  const [userOrders, setUserOrders] = useState<any[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('ardhimart_user_orders');
+        return saved ? JSON.parse(saved) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+
   // Find product by id or urlSlug
   const product: Product | undefined = products.find(
     (p) => p.id === productId || p.urlSlug === productId
@@ -70,7 +80,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  // Verified Reviews State
+  // Reviews State
   const [reviewsList, setReviewsList] = useState<
     Array<{
       id: string;
@@ -96,9 +106,9 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
   if (!product || isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col font-sans">
+      <div className="min-h-screen bg-white dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col font-sans">
         <Header />
-        <main className="flex-1 w-full max-w-7xl mx-auto p-4 lg:p-8 space-y-6">
+        <main className="flex-1 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             <div className="lg:col-span-6 w-full aspect-square bg-gray-200 dark:bg-slate-800 rounded-md animate-pulse" />
             <div className="lg:col-span-6 space-y-4">
@@ -119,7 +129,6 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     ...(product.galleryImages && Array.isArray(product.galleryImages) ? product.galleryImages : []),
   ].filter(Boolean);
 
-  // Split comma-separated variants from database if present (product.color)
   const variantOptions = product.color
     ? product.color.split(',').map((s) => s.trim()).filter(Boolean)
     : [];
@@ -130,7 +139,6 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
     : 0;
 
-  // Filter Related Products (Same category, excluding current product)
   const relatedProducts = products
     .filter((p) => p.id !== product.id)
     .slice(0, 6);
@@ -150,7 +158,6 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     setIsLightboxOpen(true);
   };
 
-  // Review Image File Handler
   const handleReviewImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -161,11 +168,23 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     reader.readAsDataURL(file);
   };
 
-  // Review Form Submit Handler (Verified buyers only)
+  // Check if current logged-in user has purchased this product
+  const hasPurchased = currentUser && userOrders.some((order: any) =>
+    order.items?.some((item: any) => item.product?.id === product.id || item.productId === product.id)
+  );
+
   const handleReviewSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Requirement 13: Unauthenticated user -> Redirect to login page and return after login
     if (!currentUser) {
-      router.push('/login');
+      router.push(`/login?redirect=${encodeURIComponent(`/products/${product.id}`)}`);
+      return;
+    }
+
+    // Check purchase history
+    if (!hasPurchased && userOrders.length > 0) {
+      alert('সতর্কতা: শুধুমাত্র পণ্যটি ক্রয়কৃত ভেরিফাইড কাস্টমারগণ রিভিউ দিতে পারবেন।');
       return;
     }
 
@@ -173,12 +192,12 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
     const newRev = {
       id: `rev-${Date.now()}`,
-      userName: currentUser.displayName || currentUser.email?.split('@')[0] || 'Verified Customer',
+      userName: currentUser.displayName || currentUser.email?.split('@')[0] || 'Customer',
       rating: newRating,
       comment: newComment,
-      date: new Date().toLocaleDateString('bn-BD', {
+      date: new Date().toLocaleDateString('en-US', {
         year: 'numeric',
-        month: 'long',
+        month: 'short',
         day: 'numeric',
       }),
       image: newReviewImage || undefined,
@@ -188,7 +207,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     setNewComment('');
     setNewReviewImage('');
     setNewRating(5);
-    alert('ধন্যবাদ! আপনার রিভিউটি সফলভাবে প্রকাশিত হয়েছে।');
+    alert('Thank you! Your review has been submitted successfully.');
   };
 
   const featuresList = product.features && product.features.length > 0 ? product.features : [
@@ -199,7 +218,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col font-sans select-none">
+    <div className="min-h-screen bg-white dark:bg-slate-950 text-gray-900 dark:text-gray-100 flex flex-col font-sans select-none">
       {/* Header */}
       <Header />
 
@@ -222,13 +241,12 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
           </nav>
         </div>
 
-        {/* 2-Column Responsive Layout (Blended Background, Compact Spacing) */}
+        {/* 2-Column Responsive Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
           
-          {/* Left Column: Product Gallery Slider (Square Shaped Container - Point 6) */}
+          {/* Left Column: Product Gallery Slider */}
           <div className="lg:col-span-6 lg:sticky lg:top-24 space-y-3">
-            {/* Main Stage Square Image Viewer */}
-            <div className="relative w-full aspect-square bg-white dark:bg-slate-900 rounded-md border border-gray-200/80 dark:border-slate-800 overflow-hidden group shadow-xs flex items-center justify-center">
+            <div className="relative w-full aspect-square bg-gray-50 dark:bg-slate-900 rounded-md border border-gray-200/80 dark:border-slate-800 overflow-hidden group shadow-xs flex items-center justify-center">
               <img
                 src={galleryImages[activeImageIndex] || product.image}
                 alt={product.title}
@@ -236,7 +254,6 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                 onClick={() => openLightbox(activeImageIndex)}
               />
 
-              {/* Lightbox Zoom Button */}
               <button
                 onClick={() => openLightbox(activeImageIndex)}
                 className="absolute top-3 right-3 p-2 bg-black/60 dark:bg-white/80 backdrop-blur-md text-white dark:text-black rounded-md shadow hover:scale-105 transition-all opacity-80 hover:opacity-100 cursor-pointer"
@@ -245,7 +262,6 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                 <Maximize2 className="w-3.5 h-3.5" />
               </button>
 
-              {/* Prev/Next Chevron Controls */}
               {galleryImages.length > 1 && (
                 <>
                   <button
@@ -288,16 +304,15 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             )}
           </div>
 
-          {/* Right Column: Title, Pricing, Variants & CTAs (Blended Background - Point 11) */}
+          {/* Right Column: Title, Pricing, Variants & CTAs */}
           <div className="lg:col-span-6 space-y-4 py-1">
             
-            {/* FULL WIDTH TITLE (Justified & Lighter Font - Point 7) */}
+            {/* Title */}
             <div className="space-y-1.5">
               <h1 className="text-base sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white leading-normal w-full text-left sm:text-justify block tracking-normal">
                 {product.title}
               </h1>
 
-              {/* Action Metadata Row */}
               <div className="flex items-center justify-between pt-0.5">
                 <Link
                   href={`/products?category=${encodeURIComponent(product.category || 'All')}`}
@@ -310,7 +325,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                   <button
                     onClick={() => toggleWishlist(product.id)}
                     aria-label="Wishlist"
-                    className="p-2 rounded-md bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 text-gray-500 hover:text-red-500 transition-all cursor-pointer shadow-xs active:scale-90"
+                    className="p-2 rounded-md bg-gray-100 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 text-gray-500 hover:text-red-500 transition-all cursor-pointer shadow-xs active:scale-90"
                   >
                     <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
                   </button>
@@ -325,12 +340,12 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                           });
                         } else if (typeof window !== 'undefined' && navigator.clipboard) {
                           await navigator.clipboard.writeText(window.location.href);
-                          alert('প্রডাক্টের লিংক কপি করা হয়েছে!');
+                          alert('Link copied to clipboard!');
                         }
                       } catch {}
                     }}
                     aria-label="Share"
-                    className="p-2 rounded-md bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 text-gray-500 hover:text-black dark:hover:text-white transition-all cursor-pointer shadow-xs active:scale-90"
+                    className="p-2 rounded-md bg-gray-100 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 text-gray-500 hover:text-black dark:hover:text-white transition-all cursor-pointer shadow-xs active:scale-90"
                   >
                     <Share2 className="w-4 h-4" />
                   </button>
@@ -338,7 +353,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               </div>
             </div>
 
-            {/* Ratings & Stock Row (Cleaned up - Point 8) */}
+            {/* Ratings & Stock Row (Single language title - Requirement 11) */}
             <div className="flex items-center gap-2 text-xs">
               <div className="flex text-amber-400">
                 {[...Array(5)].map((_, i) => (
@@ -346,7 +361,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                 ))}
               </div>
               <span className="font-medium text-gray-600 dark:text-gray-400">
-                ({reviewsList.length + (product.reviewsCount || 0)})
+                ({reviewsList.length + (product.reviewsCount || 0)} Reviews)
               </span>
               <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
                 In Stock
@@ -406,7 +421,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             {/* Quantity Selector */}
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Quantity:</span>
-              <div className="flex items-center border border-gray-200 dark:border-slate-800 rounded-md p-0.5 bg-white dark:bg-slate-900 shrink-0">
+              <div className="flex items-center border border-gray-200 dark:border-slate-800 rounded-md p-0.5 bg-gray-50 dark:bg-slate-900 shrink-0">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   className="p-1 rounded text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white transition-all cursor-pointer"
@@ -425,11 +440,11 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               </div>
             </div>
 
-            {/* ADD TO CART & BUY NOW BUTTONS (Square-shaped rounded-md - Point 9) */}
+            {/* 3 CTA BUTTONS TOTAL: ADD TO CART, BUY NOW, ORDER ON WHATSAPP (Requirement 9) */}
             <div className="grid grid-cols-2 gap-2 pt-1">
               <button
                 onClick={handleAddToCart}
-                className="btn-shimmer w-full py-2.5 px-2 border-2 border-gray-900 dark:border-white text-gray-900 dark:text-white hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black font-bold text-xs uppercase tracking-wider rounded-md transition-all shadow-xs active:scale-98 cursor-pointer flex items-center justify-center gap-1.5"
+                className="btn-shimmer w-full py-2.5 px-2 border-2 border-[#0F396F] text-[#0F396F] hover:bg-[#0F396F] hover:text-white dark:border-white dark:text-white font-bold text-xs uppercase tracking-wider rounded-md transition-all shadow-xs active:scale-98 cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <ShoppingBag className="w-4 h-4 shrink-0" />
                 <span className="truncate whitespace-nowrap">Add to Cart</span>
@@ -444,40 +459,32 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               </button>
             </div>
 
-            {/* WHATSAPP & CALL FOR ORDER BUTTONS WITH SLIDING SHIMMER ANIMATION & SMALLER READABLE TEXT (Point 10 & 13) */}
-            <div className="grid grid-cols-2 gap-2 pt-1">
+            {/* THIRD CTA BUTTON: ORDER ON WHATSAPP WITH SLIDING SHIMMER ANIMATION */}
+            <div className="pt-0.5">
               <a
                 href={`https://wa.me/8801700000000?text=${encodeURIComponent(
-                  `আসসালামু আলাইকুম, আমি "${product.title}" প্রডাক্টটি অর্ডার করতে চাই।\nমূল্য: ৳${product.price}`
+                  `Hello, I would like to order "${product.title}".\nPrice: ৳${product.price}`
                 )}`}
                 target="_blank"
                 rel="noreferrer"
-                className="btn-shimmer w-full py-2.5 px-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-[11px] sm:text-xs rounded-md transition-all shadow-xs active:scale-98 cursor-pointer flex items-center justify-center gap-1 text-center"
+                className="btn-shimmer w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-md transition-all shadow-xs active:scale-98 cursor-pointer flex items-center justify-center gap-1.5 text-center"
               >
                 <MessageCircle className="w-4 h-4 shrink-0 text-white" />
                 <span className="truncate whitespace-nowrap">Order on WhatsApp</span>
-              </a>
-
-              <a
-                href="tel:+8801700000000"
-                className="btn-shimmer w-full py-2.5 px-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-[11px] sm:text-xs rounded-md transition-all shadow-xs active:scale-98 cursor-pointer flex items-center justify-center gap-1 text-center"
-              >
-                <Phone className="w-4 h-4 shrink-0 text-white" />
-                <span className="truncate whitespace-nowrap">Call for Order</span>
               </a>
             </div>
           </div>
         </div>
 
-        {/* STACKED CONTENT SECTIONS (Blended Background, No Isolated Card Containers - Point 11 & 12) */}
+        {/* STACKED CONTENT SECTIONS */}
         <div className="mt-6 space-y-6">
           
-          {/* Section 1: Product Description (পণ্য বিবরণ - Bangla Predominant) */}
+          {/* Section 1: Product Description */}
           <section className="border-b border-gray-200/80 dark:border-slate-800 pb-5 space-y-2.5">
             <div className="flex items-center gap-2 pb-1">
               <FileText className="w-4 h-4 text-[#FF6B00]" />
               <h2 className="text-base font-bold text-gray-900 dark:text-white">
-                পণ্য বিবরণ (Product Overview)
+                Product Details
               </h2>
             </div>
             <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed space-y-2">
@@ -492,12 +499,11 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             </div>
           </section>
 
-          {/* Section 2: Key Features (মূল বৈশিষ্ট্যসমূহ - Clean Bullet List - Point 12) */}
+          {/* Section 2: Key Features */}
           <section className="border-b border-gray-200/80 dark:border-slate-800 pb-5 space-y-2.5">
             <div className="flex items-center gap-2 pb-1">
-              <Sparkles className="w-4 h-4 text-indigo-500" />
               <h2 className="text-base font-bold text-gray-900 dark:text-white">
-                মূল বৈশিষ্ট্যসমূহ (Key Features)
+                Key Features
               </h2>
             </div>
             <ul className="space-y-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
@@ -510,12 +516,12 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             </ul>
           </section>
 
-          {/* Section 3: How to Use (ব্যবহারবিধি ও সতর্কতা - Blended Text - Point 12) */}
+          {/* Section 3: How to Use & Care Instructions */}
           <section className="border-b border-gray-200/80 dark:border-slate-800 pb-5 space-y-2.5">
             <div className="flex items-center gap-2 pb-1">
               <HelpCircle className="w-4 h-4 text-cyan-500" />
               <h2 className="text-base font-bold text-gray-900 dark:text-white">
-                ব্যবহারবিধি ও যত্ন (How to Use & Care Instructions)
+                How to Use & Care Instructions
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line font-normal">
@@ -525,39 +531,30 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             </p>
           </section>
 
-          {/* Section 4: Customer Reviews (গ্রাহক রিভিউ ও মতামত) */}
+          {/* Section 4: Customer Reviews (Single language title, clean 1-line reviewer info - Requirements 11 & 12) */}
           <section className="space-y-4 pb-4">
             <div className="flex items-center justify-between border-b border-gray-200/80 dark:border-slate-800 pb-2">
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-amber-500" />
                 <h2 className="text-base font-bold text-gray-900 dark:text-white">
-                  গ্রাহক রিভিউ (Customer Reviews)
+                  Customer Reviews
                 </h2>
               </div>
-              <span className="text-[11px] font-bold text-[#FF6B00]">
-                {reviewsList.length} Verified Reviews
+              <span className="text-xs font-bold text-gray-600 dark:text-gray-400">
+                {reviewsList.length} {reviewsList.length === 1 ? 'Review' : 'Reviews'}
               </span>
             </div>
 
-            {/* List of Verified Reviews */}
+            {/* List of Customer Reviews (1-line reviewer title - Requirement 12) */}
             {reviewsList.length > 0 ? (
               <div className="space-y-3">
                 {reviewsList.map((rev) => (
                   <div key={rev.id} className="py-2.5 border-b border-gray-100 dark:border-slate-800/60 space-y-1">
-                    <div className="flex justify-between items-start">
+                    {/* Reviewer Name and Rating on Single Line */}
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-[#FF6B00]/20 text-[#FF6B00] font-extrabold flex items-center justify-center text-xs">
-                          {rev.userName.charAt(0)}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-bold text-xs text-gray-900 dark:text-white">{rev.userName}</span>
-                            <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 text-[9px] font-bold rounded flex items-center gap-0.5">
-                              <ShieldCheck className="w-3 h-3" /> Verified Buyer
-                            </span>
-                          </div>
-                          <span className="text-[10px] text-gray-400">{rev.date}</span>
-                        </div>
+                        <span className="font-semibold text-xs text-gray-900 dark:text-white">{rev.userName}</span>
+                        <span className="text-[10px] text-gray-400">{rev.date}</span>
                       </div>
                       <div className="flex text-amber-400">
                         {[...Array(5)].map((_, i) => (
@@ -565,7 +562,8 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                         ))}
                       </div>
                     </div>
-                    <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed pt-1">{rev.comment}</p>
+                    {/* Multi-line Review Comment */}
+                    <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed pt-0.5">{rev.comment}</p>
                     {rev.image && (
                       <div className="w-16 h-16 rounded-md overflow-hidden border border-gray-200 dark:border-slate-800 mt-1">
                         <img src={rev.image} alt="Review Attachment" className="w-full h-full object-cover" />
@@ -576,91 +574,73 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               </div>
             ) : (
               <div className="py-4 text-center space-y-1 text-xs text-gray-500">
-                <MessageSquare className="w-6 h-6 text-gray-300 dark:text-slate-700 mx-auto" />
-                <p>এখনও কোনো কাস্টমার রিভিউ পোস্ট করা হয়নি। প্রথম রিভিউটি আপনি দিন!</p>
+                <p>No customer reviews yet. Be the first to review!</p>
               </div>
             )}
 
-            {/* Submit Review Form (Verified Buyers Only) */}
+            {/* Submit Review Form (Clean Header, Input Box, Image, Submit - Requirement 13) */}
             <div className="pt-2 space-y-3">
-              <h3 className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-[#FF6B00]" />
-                আপনার রিভিউ জমা দিন (Submit Your Review)
+              <h3 className="text-xs font-bold text-gray-900 dark:text-white">
+                Submit Your Review
               </h3>
 
-              {!currentUser ? (
-                <div className="p-3 bg-amber-50/80 dark:bg-slate-900/60 border border-amber-200/80 dark:border-slate-800 rounded-md flex items-center justify-between gap-2 text-xs">
-                  <div className="flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
-                    <ShieldCheck className="w-4 h-4 shrink-0" />
-                    <span>রিভিউ দিতে হলে আপনাকে প্রথমে একাউন্টে লগইন করতে হবে।</span>
+              <form onSubmit={handleReviewSubmit} className="space-y-3">
+                <div>
+                  <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1">
+                    Rating:
+                  </label>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setNewRating(star)}
+                        className="p-1 text-amber-400 hover:scale-105 transition-transform cursor-pointer"
+                      >
+                        <Star className={`w-5 h-5 ${star <= newRating ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-slate-700'}`} />
+                      </button>
+                    ))}
                   </div>
-                  <button
-                    onClick={() => router.push('/login')}
-                    className="px-3 py-1.5 bg-[#FF6B00] text-white font-bold rounded-md text-xs hover:bg-[#e05e00] transition-colors cursor-pointer shrink-0"
-                  >
-                    লগইন করুন
-                  </button>
                 </div>
-              ) : (
-                <form onSubmit={handleReviewSubmit} className="space-y-3">
-                  <div>
-                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1">
-                      আপনার রেটিং নির্ধারণ করুন:
-                    </label>
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          onClick={() => setNewRating(star)}
-                          className="p-1 text-amber-400 hover:scale-105 transition-transform cursor-pointer"
-                        >
-                          <Star className={`w-5 h-5 ${star <= newRating ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-slate-700'}`} />
-                        </button>
-                      ))}
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1">
+                    Your Review:
+                  </label>
+                  <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    rows={3}
+                    placeholder="Write your review here..."
+                    className="w-full p-2.5 text-xs bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-md text-gray-900 dark:text-white focus:outline-none focus:border-[#FF6B00]"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1">
+                    Attach Image (Optional):
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleReviewImageUpload}
+                    className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#FF6B00]/10 file:text-[#FF6B00] hover:file:bg-[#FF6B00]/20 cursor-pointer"
+                  />
+                  {newReviewImage && (
+                    <div className="mt-1.5 w-14 h-14 rounded-md overflow-hidden border border-gray-200">
+                      <img src={newReviewImage} alt="Review attachment" className="w-full h-full object-cover" />
                     </div>
-                  </div>
+                  )}
+                </div>
 
-                  <div>
-                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1">
-                      পণ্যটির অভিজ্ঞতা লিখে জানান:
-                    </label>
-                    <textarea
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      rows={3}
-                      placeholder="পণ্যটির গুণগত মান, ডেলিভারি সার্ভিস এবং ব্যবহার অভিজ্ঞতা বিস্তারিত লিখুন..."
-                      className="w-full p-2.5 text-xs bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-md text-gray-900 dark:text-white focus:outline-none focus:border-[#FF6B00]"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1">
-                      ছবি সংযুক্ত করুন (অপশনাল):
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleReviewImageUpload}
-                      className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#FF6B00]/10 file:text-[#FF6B00] hover:file:bg-[#FF6B00]/20 cursor-pointer"
-                    />
-                    {newReviewImage && (
-                      <div className="mt-1.5 w-14 h-14 rounded-md overflow-hidden border border-gray-200">
-                        <img src={newReviewImage} alt="Review attachment" className="w-full h-full object-cover" />
-                      </div>
-                    )}
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full py-2.5 bg-[#FF6B00] hover:bg-[#e05e00] text-white font-bold text-xs rounded-md transition-all shadow-xs active:scale-98 cursor-pointer flex items-center justify-center gap-1.5"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    রিভিউ জমা দিন (Submit Review)
-                  </button>
-                </form>
-              )}
+                <button
+                  type="submit"
+                  className="w-full py-2.5 bg-[#FF6B00] hover:bg-[#e05e00] text-white font-bold text-xs rounded-md transition-all shadow-xs active:scale-98 cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  Submit Review
+                </button>
+              </form>
             </div>
           </section>
         </div>
@@ -689,35 +669,43 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
           </div>
         </section>
 
-        {/* Related Products Showcase */}
+        {/* Related Products Showcase (Requirement 3: Unified Padding Matched with Top Section) */}
         <div className="mt-6 border-t border-gray-200 dark:border-slate-800 pt-4">
-          <FeaturedProducts title="You May Also Like" products={relatedProducts} />
+          <FeaturedProducts title="You May Also Like" products={relatedProducts} hideCountLabel={true} />
         </div>
       </main>
 
-      {/* Mobile-Only Fixed Bottom Bar */}
-      <div className="sm:hidden fixed bottom-16 left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-gray-200/80 dark:border-slate-800 px-3 py-2.5 flex gap-2 z-30 shadow-2xl">
+      {/* Mobile-Only Fixed Bottom Bar (3 CTA Buttons) */}
+      <div className="sm:hidden fixed bottom-16 left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-gray-200/80 dark:border-slate-800 px-2 py-2 flex gap-1.5 z-30 shadow-2xl">
         <button
           onClick={handleAddToCart}
-          className="btn-shimmer flex-1 border border-gray-300 dark:border-slate-700 py-2.5 rounded-md font-bold text-xs uppercase tracking-wider text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors bg-white dark:bg-slate-900 active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+          className="btn-shimmer flex-1 border border-[#0F396F] text-[#0F396F] py-2 rounded font-bold text-[11px] uppercase text-center bg-white dark:bg-slate-900 active:scale-95 cursor-pointer truncate"
         >
-          <ShoppingBag className="w-4 h-4 shrink-0" />
-          <span className="truncate whitespace-nowrap">Add to Cart</span>
+          Add to Cart
         </button>
 
         <button
           onClick={handleBuyNow}
-          className="btn-shimmer flex-[1.5] bg-[#FF6B00] text-white py-2.5 rounded-md font-bold text-xs uppercase tracking-wider hover:bg-[#e05e00] transition-colors active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shadow-md"
+          className="btn-shimmer flex-1 bg-[#FF6B00] text-white py-2 rounded font-bold text-[11px] uppercase text-center active:scale-95 cursor-pointer truncate"
         >
-          <Zap className="w-4 h-4 shrink-0" />
-          <span className="truncate whitespace-nowrap">Buy Now</span>
+          Buy Now
         </button>
+
+        <a
+          href={`https://wa.me/8801700000000?text=${encodeURIComponent(
+            `Hello, I would like to order "${product.title}".\nPrice: ৳${product.price}`
+          )}`}
+          target="_blank"
+          rel="noreferrer"
+          className="btn-shimmer flex-1 bg-emerald-600 text-white py-2 rounded font-bold text-[11px] text-center active:scale-95 cursor-pointer truncate"
+        >
+          WhatsApp
+        </a>
       </div>
 
       {/* Full-Screen Image Lightbox Modal */}
       {isLightboxOpen && (
         <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 animate-fade-in">
-          {/* Top Bar */}
           <div className="flex justify-between items-center text-white">
             <span className="text-xs font-extrabold uppercase tracking-wider text-gray-400">
               Image {lightboxIndex + 1} of {galleryImages.length}
@@ -731,7 +719,6 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             </button>
           </div>
 
-          {/* Full Screen Image View */}
           <div className="relative flex-1 flex items-center justify-center py-4">
             <img
               src={galleryImages[lightboxIndex] || product.image}
@@ -739,7 +726,6 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               className="max-h-[80vh] max-w-full object-contain rounded-md shadow-2xl transition-all"
             />
 
-            {/* Prev/Next Controls */}
             {galleryImages.length > 1 && (
               <>
                 <button
@@ -762,7 +748,6 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             )}
           </div>
 
-          {/* Bottom Thumbnails Strip */}
           <div className="flex justify-center gap-2 py-2 overflow-x-auto">
             {galleryImages.map((img, idx) => (
               <button

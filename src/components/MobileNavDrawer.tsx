@@ -13,7 +13,6 @@ import {
   Truck,
   PhoneCall,
   ChevronRight,
-  Sparkles,
 } from 'lucide-react';
 import { Category } from '@/types/store';
 
@@ -168,7 +167,6 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                   className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-xs font-semibold text-gray-700 dark:text-gray-300 transition-colors text-left cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    <Sparkles className="w-3.5 h-3.5 text-gray-400" />
                     <span>{cat.name}</span>
                   </div>
                   {cat.itemCount && (
