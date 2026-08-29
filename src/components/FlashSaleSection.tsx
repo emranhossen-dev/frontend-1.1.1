@@ -40,7 +40,7 @@ export const FlashSaleSection: React.FC = () => {
   const flashProducts = products.slice(0, 4);
 
   return (
-    <section className="py-5 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto select-none">
+    <section className="py-4 w-full select-none">
       {/* Header with Single Line Title, Timer & View All Link (Requirements 14 & 15) */}
       <div className="flex items-center justify-between gap-3 mb-3 pb-2.5 border-b border-gray-200/80 dark:border-slate-800">
         <div className="flex items-center gap-2 min-w-0">

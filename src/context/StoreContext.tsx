@@ -8,7 +8,7 @@ import {
   defaultProducts,
   defaultHeroBanner,
 } from '@/config/storeConfig';
-import { notifySuccess, notifyInfo } from '@/lib/sweetalert';
+import { notifySuccess, notifyInfo, showAddToCartModal } from '@/lib/sweetalert';
 
 interface StoreContextType {
   theme: 'light' | 'dark';
@@ -45,15 +45,23 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return 'light'; // DEFAULT LIGHT MODE!
   });
 
+  const applyTheme = (t: 'light' | 'dark') => {
+    if (typeof window !== 'undefined') {
+      if (t === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.body.classList.remove('dark');
+      }
+    }
+  };
+
   const setTheme = (newTheme: 'light' | 'dark') => {
     setThemeState(newTheme);
     if (typeof window !== 'undefined') {
       localStorage.setItem('ardhimart_theme', newTheme);
-      if (newTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+      applyTheme(newTheme);
     }
   };
 
@@ -62,13 +70,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }
+    applyTheme(theme);
   }, [theme]);
 
   const [storeConfig] = useState<StoreConfig>(defaultStoreConfig);
@@ -180,8 +182,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       return [...prev, { product, quantity, selectedVariant }];
     });
 
-    notifySuccess('Added to Shopping Bag!', product.title);
-    setIsCartOpen(true);
+    showAddToCartModal(product.title, product.image, () => setIsCartOpen(true));
   };
 
   const removeFromCart = (productId: string) => {

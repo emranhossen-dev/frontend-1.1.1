@@ -12,6 +12,7 @@ interface FeaturedProductsProps {
   title?: string;
   viewAllLink?: string;
   hideCountLabel?: boolean;
+  className?: string;
 }
 
 export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
@@ -19,12 +20,13 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   title = 'Trending Collections',
   viewAllLink = '/products',
   hideCountLabel = false,
+  className = '',
 }) => {
   const { products: defaultProds, isLoading } = useStore();
   const productsList = customProducts || defaultProds;
 
   return (
-    <section className="py-5 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto select-none">
+    <section className={`py-4 w-full select-none ${className}`}>
       {/* Section Header: Single line title + View All Link on the Right (Requirements 4 & 14) */}
       <div className="flex items-center justify-between mb-3 border-b border-gray-200/80 dark:border-slate-800 pb-2.5">
         <h3 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white tracking-tight truncate whitespace-nowrap">

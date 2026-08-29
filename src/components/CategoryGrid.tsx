@@ -35,7 +35,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
   }, [isHovered]);
 
   return (
-    <section className="py-5 px-3 sm:px-6 max-w-7xl mx-auto select-none">
+    <section className="py-4 w-full select-none">
       <div className="flex items-center justify-between mb-3">
         <div>
           <h3 className="text-base sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
