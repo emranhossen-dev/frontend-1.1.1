@@ -24,8 +24,6 @@ interface ChatMessage {
   timestamp: string;
 }
 
-const DEFAULT_GEMINI_KEY = 'AQ.Ab8RN6IYh-WQBwLnUYZIiN-xWdaONnzX3tzEVR1V6Qd7Zle1oA';
-
 export const StorefrontAiChatbot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { products } = useStore();
@@ -120,26 +118,27 @@ export const StorefrontAiChatbot: React.FC = () => {
     return null;
   };
 
-  // Smart Local Keyword Fallback
-  const getLocalFallbackResponse = async (userPrompt: string): Promise<string> => {
+  // Smart Intelligent Context Engine
+  const getSmartContextResponse = async (userPrompt: string, currentMessages: ChatMessage[]): Promise<string> => {
     const q = userPrompt.trim().toLowerCase();
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
 
-    // Check if query is short Banglish question (e.g. kn, kno, why, keno)
-    const banglishWhy = ['kn', 'kno', 'keno', 'kene', 'keneh', 'why'];
-    if (banglishWhy.includes(q)) {
-      return 'আপনার প্রশ্নটি একটু বুঝিয়ে বলুন বা কোন পণ্য সম্পর্কে জানতে চান লিখুন, আমি তথ্য দিয়ে সাহায্য করব।';
+    // Get previous bot & user messages for context awareness
+    const lastUserMsg = currentMessages.filter((m) => m.sender === 'user').slice(-2)[0]?.text || '';
+    const lastBotMsg = currentMessages.filter((m) => m.sender === 'bot').slice(-1)[0]?.text || '';
+
+    // Check for short queries like "kn", "kno", "keno", "why"
+    const isWhyQuery = ['kn', 'kno', 'keno', 'kene', 'why', 'কেন'].includes(q);
+    if (isWhyQuery) {
+      if (lastBotMsg.includes('অর্ডার') || lastBotMsg.includes('order')) {
+        return 'আমাদের শপে ক্যাশ অন ডেলিভারিতে নিরাপদ কেনাকাটা ও দ্রুত ডেলিভারির সুবিধা নিশ্চিত করতেই অর্ডার করার সময় নাম, মোবাইল নম্বর ও সঠিক ঠিকানা প্রয়োজন হয়।';
+      }
+      return 'অনুগ্রহ করে কোন বিষয়টি সম্পর্কে বিস্তারিত জানতে চান একটু খুলে বলুন, আমি আপনাকে প্রয়োজনীয় তথ্য দিয়ে সাহায্য করব।';
     }
 
-    const isEnglish = /[a-z]/i.test(q) && !/[\u0980-\u09FF]/.test(q) && !banglishWhy.includes(q);
-
-    // Order Intent without full details
-    if (q.includes('অর্ডার') || q.includes('order') || q.includes('buy')) {
-      if (isEnglish) {
-        return 'To place your order directly in chat, please provide: 1. Product Name 2. Full Name 3. Mobile Number 4. Delivery Address.';
-      } else {
-        return 'চ্যাটে সরাসরি অর্ডার কনফার্ম করতে প্রদান করুন: ১. পণ্যের নাম ২. আপনার নাম ৩. মোবাইল নম্বর ৪. ফুল ডেলিভারি ঠিকানা।';
-      }
+    // Order intent without complete info
+    if (q.includes('অর্ডার') || q.includes('order') || q.includes('buy') || q.includes('কিনব') || q.includes('নিতে চাই')) {
+      return 'চ্যাটে সরাসরি অর্ডার কনফার্ম করতে অনুগ্রহ করে প্রদান করুন:\n১. পণ্যের নাম\n২. আপনার পূর্ণ নাম\n৩. মোবাইল নম্বর\n৪. ফুল ডেলিভারি ঠিকানা\n\nতথ্যগুলো একবারে লিখে পাঠালেই আপনার অর্ডার বুকিং হয়ে যাবে!';
     }
 
     // Order Tracking Query (e.g. 980)
@@ -150,53 +149,38 @@ export const StorefrontAiChatbot: React.FC = () => {
         const orderRes = await fetch(`${baseUrl}/orders/${orderId}`);
         if (orderRes.ok) {
           const ord = await orderRes.json();
-          if (isEnglish) {
-            return `Order #${orderId} Status: ${ord.status?.toUpperCase()} (${ord.customerName}, Total Payable ৳${ord.totalAmount}).`;
-          } else {
-            return `অর্ডার #${orderId} এর বর্তমান অবস্থা: ${ord.status?.toUpperCase()} (গ্রাহক: ${ord.customerName}, মোট দেয় ৳${ord.totalAmount})।`;
-          }
+          return `অর্ডার #${orderId} এর বর্তমান অবস্থা: ${ord.status?.toUpperCase()} (গ্রাহক: ${ord.customerName}, মোট দেয়: ৳${ord.totalAmount})। আপনার পার্সেল লজিস্টিক টিমের প্রক্রিয়াধীন আছে।`;
         }
       } catch (e) {}
 
-      if (isEnglish) {
-        return `Order #${orderId} is currently being processed. You can check live tracking on Track Order page.`;
-      } else {
-        return `অর্ডার #${orderMatch[0]} লজিস্টিক টিমের মাধ্যমে প্রসেসিং এ আছে। বিস্তারিত জানতে ট্র্যাকিং পেজে অনুসন্ধান করুন।`;
-      }
+      return `অর্ডার #${orderMatch[0]} এর প্রসেসিং চলছে। আমাদের ডেলিভারি টিম দ্রুত পার্সেল হ্যান্ডওভার করবে।`;
     }
 
-    // Product Search Query
-    const matchedProducts = products.filter(
+    // Matching product from store database
+    const matched = products.filter(
       (p) => q.includes(p.title.toLowerCase()) || (p.category && q.includes(p.category.toLowerCase()))
     );
 
-    if (matchedProducts.length > 0) {
-      const p = matchedProducts[0];
-      if (isEnglish) {
-        return `"${p.title}" is available for ৳${p.price}. In stock with Cash on Delivery across Bangladesh!`;
-      } else {
-        return `"${p.title}" এর বর্তমান অফার প্রাইজ ৳${p.price}। সম্পূর্ণ বাংলাদেশে ক্যাশ অন ডেলিভারিতে পাওয়া যাচ্ছে!`;
-      }
+    if (matched.length > 0) {
+      const p = matched[0];
+      return `"${p.title}" আমাদের স্টকে এভেইলএবল রয়েছে! স্পেশাল প্রাইস ৳${p.price}। ঢাকার ভেতরে ৳৮০ এবং ঢাকার বাইরে ৳১২০ ডেলিভারি চার্জে সম্পূর্ণ ক্যাশ অন ডেলিভারিতে অর্ডার করতে পারেন।`;
     }
 
-    // Delivery / Shipping Query
-    if (q.includes('delivery') || q.includes('shipping') || q.includes('ডেলিভারি') || q.includes('চার্জ')) {
-      if (isEnglish) {
-        return 'Delivery Fee: Inside Dhaka ৳80 (24-48h), Outside Dhaka ৳120 (2-3 days). Cash on Delivery available!';
-      } else {
-        return 'ডেলিভারি চার্জ: ঢাকার ভেতরে ৳৮০ (২৪-৪৮ ঘণ্টা), ঢাকার বাইরে ৳১২০ (২-৩ দিন)। ক্যাশ অন ডেলিভারি প্রযোজ্য!';
-      }
+    // Delivery & Shipping query
+    if (q.includes('delivery') || q.includes('shipping') || q.includes('ডেলিভারি') || q.includes('চার্জ') || q.includes('কবে')) {
+      return 'ডেলিভারি চার্জ: ঢাকার ভেতরে ৳৮০ (২৪-৪৮ ঘণ্টা), ঢাকার বাইরে ৳১২০ (২-৩ দিন)। সম্পূর্ণ পণ্য হাতে পেয়ে মূল্য পরিশোধ (Cash on Delivery) করতে পারবেন!';
     }
 
-    // General Contextual Response
-    if (isEnglish) {
-      return 'How can I assist you with ArdhiMart products or orders today? Feel free to ask!';
-    } else {
-      return 'ArdhiMart এ আপনাকে কীভাবে সাহায্য করতে পারি? পণ্য বা অর্ডারের বিষয়ে কিছু জানতে চাইলে লিখে জানান।';
+    // Return policy query
+    if (q.includes('return') || q.includes('replacement') || q.includes('রিটার্ন') || q.includes('ওয়ারেন্টি')) {
+      return 'ArdhiMart এর প্রতিটি পণ্যে রয়েছে ৭ দিনের ক্যাশলেস রিপ্লেসমেন্ট গ্যারান্টি। কোনো সমস্যা থাকলে তাৎক্ষণিক ডেলিভারিম্যানকে অথবা আমাদের সাথে চ্যাটে যোগাযোগ করুন।';
     }
+
+    // Natural conversation fallback
+    return 'ArdhiMart এর কাস্টমার কেয়ার এ আপনাকে স্বাগতম! পণ্য, ক্যাশ অন ডেলিভারি অথবা সরাসরি অর্ডার সংক্রান্ত যেকোনো তথ্য জানতে লিখে পাঠান।';
   };
 
-  // Gemini AI Handler with Multi-Turn Conversational Memory & Valid Models
+  // Gemini AI Handler
   const getAiResponse = async (userPrompt: string, currentMessages: ChatMessage[]): Promise<string> => {
     // 1. Try In-Chat Direct Order Placement
     const orderPlacementResult = await attemptPlaceOrderInChat(userPrompt);
@@ -204,97 +188,87 @@ export const StorefrontAiChatbot: React.FC = () => {
       return orderPlacementResult;
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
+    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
 
-    // Order Lookup
-    const orderMatch = userPrompt.match(/\b\d{3,4}\b/);
-    let orderContext = '';
-    if (orderMatch) {
-      const orderId = orderMatch[0];
-      try {
-        const orderRes = await fetch(`${baseUrl}/orders/${orderId}`);
-        if (orderRes.ok) {
-          const ord = await orderRes.json();
-          orderContext = `Order #${orderId} DB Info: Status: ${ord.status}, Customer: ${ord.customerName}, Amount: ৳${ord.totalAmount}`;
-        }
-      } catch (e) {}
-    }
+    if (apiKey && apiKey.startsWith('AIzaSy')) {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
 
-    const productCatalogSnippet = products
-      .slice(0, 10)
-      .map((p) => `• ${p.title}: ৳${p.price} (${p.category || 'General'})`)
-      .join('\n');
-
-    const systemPrompt = `You are the friendly, intelligent AI Live Support & Sales Assistant for "ArdhiMart" e-commerce store in Bangladesh.
-
-IMPORTANT CONVERSATION RULES:
-1. Pay close attention to previous messages in the chat history. Never repeat greeting or welcome text if conversation is ongoing.
-2. If customer asks "kn" / "kno" / "why" or short questions, respond contextually based on what was just discussed previously.
-3. Language:
-   - If user speaks English -> reply in clear English.
-   - If user speaks Banglish or Bengali -> reply in natural, polite Bengali.
-4. IN-CHAT ORDER:
-   - If user wants to order, ask for Product Name, Full Name, Mobile Number, and Delivery Address.
-
-Store Knowledge:
-- Delivery: Inside Dhaka ৳80 (24-48h), Outside Dhaka ৳120 (2-3 days). COD available.
-Products:
-${productCatalogSnippet || 'Power Banks, Smartwatches, Audio & Tech Accessories'}
-${orderContext ? `\nOrder Info: ${orderContext}` : ''}`;
-
-    // Format conversation history for multi-turn Gemini payload
-    const recentHistory = currentMessages
-      .filter((m) => m.id !== 'welcome-1')
-      .slice(-6)
-      .map((m) => ({
-        role: m.sender === 'user' ? 'user' : 'model',
-        parts: [{ text: m.text }],
-      }));
-
-    const contentsPayload = [
-      {
-        role: 'user',
-        parts: [{ text: systemPrompt }],
-      },
-      ...recentHistory,
-      {
-        role: 'user',
-        parts: [{ text: userPrompt }],
-      },
-    ];
-
-    const apiKey = DEFAULT_GEMINI_KEY;
-    // Valid Google Gemini API models only
-    const models = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
-
-    for (const model of models) {
-      try {
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: contentsPayload,
-              generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
-            }),
+      // Order Lookup
+      const orderMatch = userPrompt.match(/\b\d{3,4}\b/);
+      let orderContext = '';
+      if (orderMatch) {
+        const orderId = orderMatch[0];
+        try {
+          const orderRes = await fetch(`${baseUrl}/orders/${orderId}`);
+          if (orderRes.ok) {
+            const ord = await orderRes.json();
+            orderContext = `Order #${orderId} Info: Status: ${ord.status}, Customer: ${ord.customerName}, Amount: ৳${ord.totalAmount}`;
           }
-        );
+        } catch (e) {}
+      }
 
-        const data = await res.json();
-        if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-          const text = data.candidates[0].content.parts[0].text.trim();
-          return text
-            .replace(/^আসসালামু আলাইকুম!/gi, '')
-            .replace(/^আসসালামু আলাইকুম/gi, '')
-            .replace(/^hello!/gi, '')
-            .trim();
-        }
-      } catch (e) {}
+      const productCatalogSnippet = products
+        .slice(0, 10)
+        .map((p) => `• ${p.title}: ৳${p.price} (${p.category || 'General'})`)
+        .join('\n');
+
+      const systemPrompt = `You are the helpful AI Live Chat Agent for "ArdhiMart" e-commerce store in Bangladesh.
+
+RULES:
+1. Provide accurate, natural, context-aware responses based on customer's queries.
+2. If customer asks short questions like "kn", "why", "kno", answer according to previous messages.
+3. Automatically match user's language (Bengali/English).
+4. Store Info: Delivery inside Dhaka ৳80, Outside Dhaka ৳120. COD available.
+
+Products available:
+${productCatalogSnippet}
+${orderContext ? `\nContext: ${orderContext}` : ''}`;
+
+      const recentHistory = currentMessages
+        .filter((m) => m.id !== 'welcome-1')
+        .slice(-6)
+        .map((m) => ({
+          role: m.sender === 'user' ? 'user' : 'model',
+          parts: [{ text: m.text }],
+        }));
+
+      const contentsPayload = [
+        { role: 'user', parts: [{ text: systemPrompt }] },
+        ...recentHistory,
+        { role: 'user', parts: [{ text: userPrompt }] },
+      ];
+
+      const models = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
+
+      for (const model of models) {
+        try {
+          const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: contentsPayload,
+                generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
+              }),
+            }
+          );
+
+          const data = await res.json();
+          if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            const text = data.candidates[0].content.parts[0].text.trim();
+            return text
+              .replace(/^আসসালামু আলাইকুম!/gi, '')
+              .replace(/^আসসালামু আলাইকুম/gi, '')
+              .replace(/^hello!/gi, '')
+              .trim();
+          }
+        } catch (e) {}
+      }
     }
 
-    // Fallback if AI Rate limits hit
-    return getLocalFallbackResponse(userPrompt);
+    // Smart context response engine fallback
+    return getSmartContextResponse(userPrompt, currentMessages);
   };
 
   const handleSendMessage = async (textToSend?: string) => {
@@ -323,7 +297,7 @@ ${orderContext ? `\nOrder Info: ${orderContext}` : ''}`;
       };
       setMessages((prev) => [...prev, botMsg]);
     } catch (err) {
-      const fallbackText = await getLocalFallbackResponse(query.trim());
+      const fallbackText = await getSmartContextResponse(query.trim(), updatedMessages);
       setMessages((prev) => [
         ...prev,
         {
@@ -379,7 +353,7 @@ ${orderContext ? `\nOrder Info: ${orderContext}` : ''}`;
                 </h3>
                 <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Full Response AI Assistant Active
+                  Full Context AI Assistant Active
                 </span>
               </div>
             </div>
