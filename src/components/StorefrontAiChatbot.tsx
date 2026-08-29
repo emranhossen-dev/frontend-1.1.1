@@ -122,9 +122,16 @@ export const StorefrontAiChatbot: React.FC = () => {
 
   // Smart Local Keyword Fallback
   const getLocalFallbackResponse = async (userPrompt: string): Promise<string> => {
-    const q = userPrompt.toLowerCase();
-    const isEnglish = /[a-z]/i.test(q) && !/[\u0980-\u09FF]/.test(q);
+    const q = userPrompt.trim().toLowerCase();
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
+
+    // Check if query is short Banglish question (e.g. kn, kno, why, keno)
+    const banglishWhy = ['kn', 'kno', 'keno', 'kene', 'keneh', 'why'];
+    if (banglishWhy.includes(q)) {
+      return 'আপনার প্রশ্নটি একটু বুঝিয়ে বলুন বা কোন পণ্য সম্পর্কে জানতে চান লিখুন, আমি তথ্য দিয়ে সাহায্য করব।';
+    }
+
+    const isEnglish = /[a-z]/i.test(q) && !/[\u0980-\u09FF]/.test(q) && !banglishWhy.includes(q);
 
     // Order Intent without full details
     if (q.includes('অর্ডার') || q.includes('order') || q.includes('buy')) {
@@ -181,16 +188,16 @@ export const StorefrontAiChatbot: React.FC = () => {
       }
     }
 
-    // General Response
+    // General Contextual Response
     if (isEnglish) {
-      return 'Welcome to ArdhiMart! Feel free to ask about any product or send your address & phone to place an order instantly.';
+      return 'How can I assist you with ArdhiMart products or orders today? Feel free to ask!';
     } else {
-      return 'ArdhiMart এ আপনাকে স্বাগতম! যেকোনো পণ্য সম্পর্কে জানতে অথবা সরাসরি অর্ডার করতে আপনার ঠিকানা ও মোবাইল নম্বর লিখুন।';
+      return 'ArdhiMart এ আপনাকে কীভাবে সাহায্য করতে পারি? পণ্য বা অর্ডারের বিষয়ে কিছু জানতে চাইলে লিখে জানান।';
     }
   };
 
-  // Gemini AI Handler with Full Un-truncated 1024 Token Capacity
-  const getAiResponse = async (userPrompt: string): Promise<string> => {
+  // Gemini AI Handler with Multi-Turn Conversational Memory & Valid Models
+  const getAiResponse = async (userPrompt: string, currentMessages: ChatMessage[]): Promise<string> => {
     // 1. Try In-Chat Direct Order Placement
     const orderPlacementResult = await attemptPlaceOrderInChat(userPrompt);
     if (orderPlacementResult) {
@@ -218,29 +225,47 @@ export const StorefrontAiChatbot: React.FC = () => {
       .map((p) => `• ${p.title}: ৳${p.price} (${p.category || 'General'})`)
       .join('\n');
 
-    const systemPrompt = `You are the expert AI Live Support & Sales Agent for "ArdhiMart" e-commerce store in Bangladesh.
+    const systemPrompt = `You are the friendly, intelligent AI Live Support & Sales Assistant for "ArdhiMart" e-commerce store in Bangladesh.
 
-RESPONSE GUIDELINES:
-1. Provide complete, natural, polite, and well-structured answers based on the customer's context. Always complete your thoughts fully.
-2. DO NOT greet or salute with "Assalamu Alaikum" or "Hello" if the conversation is ongoing. Answer the user's query directly.
-3. DETECT LANGUAGE AUTOMATICALLY:
-   - If user asks in English -> reply in clean, professional English.
-   - If user asks in Bengali/Banglish -> reply in natural, polite Bengali.
-4. IN-CHAT DIRECT ORDER GUIDELINE:
-   - If user wants to place an order, ask for their Product Name, Full Name, Mobile Number, and Delivery Address to confirm instantly in chat!
+IMPORTANT CONVERSATION RULES:
+1. Pay close attention to previous messages in the chat history. Never repeat greeting or welcome text if conversation is ongoing.
+2. If customer asks "kn" / "kno" / "why" or short questions, respond contextually based on what was just discussed previously.
+3. Language:
+   - If user speaks English -> reply in clear English.
+   - If user speaks Banglish or Bengali -> reply in natural, polite Bengali.
+4. IN-CHAT ORDER:
+   - If user wants to order, ask for Product Name, Full Name, Mobile Number, and Delivery Address.
 
-Store Knowledge Base:
-- Store Name: ArdhiMart
-- Delivery: Inside Dhaka ৳80 (24-48h), Outside Dhaka ৳120 (2-3 days). Cash on Delivery available.
-- Return: 7-day replacement warranty.
+Store Knowledge:
+- Delivery: Inside Dhaka ৳80 (24-48h), Outside Dhaka ৳120 (2-3 days). COD available.
 Products:
-${productCatalogSnippet || 'Featured Tech Accessories, Power Banks, Smartwatches'}
-${orderContext ? `\nFound Info: ${orderContext}` : ''}
+${productCatalogSnippet || 'Power Banks, Smartwatches, Audio & Tech Accessories'}
+${orderContext ? `\nOrder Info: ${orderContext}` : ''}`;
 
-Customer Query: "${userPrompt}"`;
+    // Format conversation history for multi-turn Gemini payload
+    const recentHistory = currentMessages
+      .filter((m) => m.id !== 'welcome-1')
+      .slice(-6)
+      .map((m) => ({
+        role: m.sender === 'user' ? 'user' : 'model',
+        parts: [{ text: m.text }],
+      }));
+
+    const contentsPayload = [
+      {
+        role: 'user',
+        parts: [{ text: systemPrompt }],
+      },
+      ...recentHistory,
+      {
+        role: 'user',
+        parts: [{ text: userPrompt }],
+      },
+    ];
 
     const apiKey = DEFAULT_GEMINI_KEY;
-    const models = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-2.0-flash'];
+    // Valid Google Gemini API models only
+    const models = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
 
     for (const model of models) {
       try {
@@ -250,8 +275,8 @@ Customer Query: "${userPrompt}"`;
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              contents: [{ parts: [{ text: systemPrompt }] }],
-              generationConfig: { temperature: 0.6, maxOutputTokens: 1024 },
+              contents: contentsPayload,
+              generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
             }),
           }
         );
@@ -283,12 +308,13 @@ Customer Query: "${userPrompt}"`;
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
     if (!textToSend) setInputMessage('');
     setIsTyping(true);
 
     try {
-      const botText = await getAiResponse(query);
+      const botText = await getAiResponse(query.trim(), updatedMessages);
       const botMsg: ChatMessage = {
         id: `bot-${Date.now()}`,
         sender: 'bot',
@@ -297,7 +323,7 @@ Customer Query: "${userPrompt}"`;
       };
       setMessages((prev) => [...prev, botMsg]);
     } catch (err) {
-      const fallbackText = await getLocalFallbackResponse(query);
+      const fallbackText = await getLocalFallbackResponse(query.trim());
       setMessages((prev) => [
         ...prev,
         {
@@ -314,7 +340,7 @@ Customer Query: "${userPrompt}"`;
 
   return (
     <div className="fixed bottom-24 right-4 sm:bottom-20 sm:right-6 z-50 select-none">
-      {/* FLOATING TRIGGER BUTTON (ROUNDED SHAPE & LIVE CHAT BADGE, RAISED HIGHER) */}
+      {/* FLOATING TRIGGER BUTTON */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
