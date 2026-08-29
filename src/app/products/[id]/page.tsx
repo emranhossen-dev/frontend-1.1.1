@@ -467,10 +467,10 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                 )}`}
                 target="_blank"
                 rel="noreferrer"
-                className="btn-shimmer w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-md transition-all shadow-xs active:scale-98 cursor-pointer flex items-center justify-center gap-1.5 text-center"
+                className="btn-shimmer w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs uppercase tracking-wider rounded-md transition-all shadow-xs active:scale-98 cursor-pointer flex items-center justify-center gap-2 text-center"
               >
                 <MessageCircle className="w-4 h-4 shrink-0 text-white" />
-                <span className="truncate whitespace-nowrap">Order on WhatsApp</span>
+                <span className="truncate whitespace-nowrap">ORDER ON WHATSAPP</span>
               </a>
             </div>
           </div>
@@ -487,13 +487,13 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                 Product Details
               </h2>
             </div>
-            <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed space-y-2">
+            <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed space-y-2 text-justify">
               {product.shortDescription && (
-                <p className="font-semibold text-gray-900 dark:text-white">
+                <p className="font-semibold text-gray-900 dark:text-white text-justify">
                   {product.shortDescription}
                 </p>
               )}
-              <p className="whitespace-pre-line leading-relaxed">
+              <p className="whitespace-pre-line leading-relaxed text-justify">
                 {product.description || 'পণ্যটির বিস্তারিত বিবরণ এবং প্রস্তুত প্রণালী বাংলা ভাষায় সুন্দরভাবে উপস্থাপিত।'}
               </p>
             </div>
@@ -510,7 +510,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
               {featuresList.map((feat: string, idx: number) => (
                 <li key={idx} className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span className="leading-snug">{feat}</span>
+                  <span className="leading-snug text-justify">{feat}</span>
                 </li>
               ))}
             </ul>
@@ -524,7 +524,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                 How to Use & Care Instructions
               </h2>
             </div>
-            <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line font-normal">
+            <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line font-normal text-justify">
               {product.usability || `১. ব্যবহারের পূর্বে প্যাকেটের ইউজার নির্দেশিকা সতর্কতার সাথে পড়ুন।
 ২. পানি, আর্দ্রতা এবং অতিরিক্ত উত্তাপ থেকে পণ্যটিকে দূরে সংরক্ষণ করুন।
 ৩. সঠিক ও নিয়মিত যত্নের মাধ্যমে পণ্যটির স্থায়িত্ব দীর্ঘমেয়াদী বজায় রাখুন।`}
@@ -671,7 +671,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
 
         {/* Related Products Showcase (Requirement 3: Unified Padding Matched with Top Section) */}
         <div className="mt-6 border-t border-gray-200 dark:border-slate-800 pt-4">
-          <FeaturedProducts title="You May Also Like" products={relatedProducts} hideCountLabel={true} />
+          <FeaturedProducts title="You May Also Like" products={relatedProducts} hideCountLabel={true} className="!px-0 !max-w-none" />
         </div>
       </main>
 
