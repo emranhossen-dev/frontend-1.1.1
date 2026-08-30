@@ -116,7 +116,7 @@ export const Header: React.FC<HeaderProps> = ({
                 alt="Cart Bag" 
                 width={34} 
                 height={34} 
-                className="w-8 h-8 sm:w-8.5 sm:h-8.5 object-contain transition-transform hover:scale-110"
+                className="w-8 h-8 sm:w-8.5 sm:h-8.5 object-contain dark:brightness-0 dark:invert transition-transform hover:scale-110"
               />
               {cartCount > 0 && (
                 <span className="absolute -top-1.5 -right-2 bg-[#FF6B00] text-white font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center shadow-xs animate-pulse">

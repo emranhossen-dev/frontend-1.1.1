@@ -107,7 +107,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
                     alt="Cart"
                     width={26}
                     height={26}
-                    className="w-6.5 h-6.5 object-contain"
+                    className="w-6.5 h-6.5 object-contain dark:brightness-0 dark:invert"
                   />
                 ) : (
                   <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px]' : 'stroke-2'}`} />
@@ -142,7 +142,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
                   alt="Cart"
                   width={26}
                   height={26}
-                  className="w-6.5 h-6.5 object-contain"
+                  className="w-6.5 h-6.5 object-contain dark:brightness-0 dark:invert"
                 />
               ) : (
                 <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px]' : 'stroke-2'}`} />

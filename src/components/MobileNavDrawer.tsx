@@ -133,7 +133,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                     alt="My Cart"
                     width={22}
                     height={22}
-                    className="w-5 h-5 object-contain"
+                    className="w-5 h-5 object-contain dark:brightness-0 dark:invert"
                   />
                   <span>My Cart</span>
                 </div>
