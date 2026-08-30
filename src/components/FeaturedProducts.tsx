@@ -50,8 +50,8 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4">
-          {[1, 2, 3, 4].map((n) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+          {[1, 2, 3, 4, 5, 6].map((n) => (
             <ProductSkeletonCard key={n} />
           ))}
         </div>
@@ -63,9 +63,9 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
           <h4 className="text-xs font-bold text-gray-900 dark:text-white">No products found</h4>
         </div>
       ) : (
-        /* 4 PRODUCTS PER ROW SHOWCASE (Requirement 15) */
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4">
-          {productsList.slice(0, 4).map((product) => (
+        /* 6 PRODUCTS PER ROW SHOWCASE ON DESKTOP */
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+          {productsList.slice(0, 6).map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

@@ -37,11 +37,11 @@ export const FlashSaleSection: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const flashProducts = products.slice(0, 4);
+  const flashProducts = products.slice(0, 6);
 
   return (
     <section className="py-5 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto select-none">
-      {/* Header with Single Line Title, Timer & View All Link (Requirements 14 & 15) */}
+      {/* Header with Single Line Title, Timer & View All Link */}
       <div className="flex items-center justify-between gap-3 mb-3 pb-2.5 border-b border-gray-200/80 dark:border-slate-800">
         <div className="flex items-center gap-2 min-w-0">
           <div className="p-1.5 bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-400 rounded-lg shrink-0">
@@ -72,10 +72,10 @@ export const FlashSaleSection: React.FC = () => {
         </Link>
       </div>
 
-      {/* 4 PRODUCTS PER ROW SHOWCASE (Requirement 15) */}
+      {/* 6 PRODUCTS PER ROW SHOWCASE ON DESKTOP */}
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4">
-          {[1, 2, 3, 4].map((n) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+          {[1, 2, 3, 4, 5, 6].map((n) => (
             <ProductSkeletonCard key={n} />
           ))}
         </div>
@@ -87,7 +87,7 @@ export const FlashSaleSection: React.FC = () => {
           <h4 className="text-xs font-bold text-gray-900 dark:text-white">No Flash Sale Products</h4>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
           {flashProducts.map((prod, idx) => (
             <ProductCard
               key={prod.id}

@@ -11,7 +11,7 @@ export const ProductGrid: React.FC = () => {
     useCart();
   const [sortBy, setSortBy] = useState<"featured" | "low" | "high" | "rating">("featured");
 
-  let filteredProducts = PRODUCTS_DATA.filter((product) => {
+  const filteredProducts = PRODUCTS_DATA.filter((product) => {
     // Category Filter
     if (selectedCategory === "Wishlist") {
       if (!wishlist.includes(product.id)) return false;

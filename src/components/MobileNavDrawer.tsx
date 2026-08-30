@@ -13,6 +13,7 @@ import {
   Truck,
   PhoneCall,
   ChevronRight,
+  Settings,
 } from 'lucide-react';
 import { Category } from '@/types/store';
 
@@ -139,6 +140,17 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                 <div className="flex items-center gap-3">
                   <User className="w-4 h-4 text-gray-500" />
                   <span>Account Dashboard</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </button>
+
+              <button
+                onClick={() => handleNav('/account')}
+                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 text-sm font-bold text-gray-900 dark:text-white transition-colors text-left cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <Settings className="w-4 h-4 text-gray-500" />
+                  <span>Settings & Preferences</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
               </button>

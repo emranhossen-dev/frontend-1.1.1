@@ -16,7 +16,7 @@ import { useStore } from '@/context/StoreContext';
 export default function Home() {
   const { storeConfig, heroBanner, categories, products } = useStore();
 
-  const newArrivals = products.filter((p) => p.isNew || p.isFeatured).slice(0, 4);
+  const newArrivals = products.filter((p) => p.isNew || p.isFeatured).slice(0, 6);
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 font-sans text-gray-900 dark:text-gray-100 flex flex-col">

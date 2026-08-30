@@ -11,6 +11,7 @@ import {
   HiOutlineMagnifyingGlass,
   HiOutlineShoppingBag,
   HiOutlineUser,
+  HiOutlineCog6Tooth,
   HiXMark,
 } from "react-icons/hi2";
 
@@ -51,20 +52,20 @@ export const Navbar: React.FC = () => {
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-gray-200/80 dark:border-slate-800 text-gray-900 dark:text-white shadow-xs">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
         
-        {/* Left Section: 1. Hamburger Icon + 2. Logo + 3. Brand Name */}
+        {/* Left Section: 1. Hamburger Icon (lg:hidden) + 2. Logo + 3. Brand Name */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-1.5 text-gray-800 dark:text-gray-100 hover:text-[#FF6B00] dark:hover:text-[#FF6B00] transition-colors cursor-pointer shrink-0 group flex flex-col justify-center gap-1.2 items-start"
+            className="lg:hidden p-1.5 text-gray-800 dark:text-gray-100 hover:text-[#FF6B00] dark:hover:text-[#FF6B00] transition-colors cursor-pointer shrink-0 group flex flex-col justify-center gap-1.5 items-start"
             aria-label="Open Menu"
           >
             {mobileMenuOpen ? (
               <HiXMark className="w-6 h-6 text-gray-800 dark:text-gray-100" />
             ) : (
               <>
-                <span className="w-5.5 h-0.5 bg-current rounded-full transition-all group-hover:w-5.5 group-hover:bg-[#FF6B00]" />
-                <span className="w-3.5 h-0.5 bg-current rounded-full transition-all group-hover:w-5.5 group-hover:bg-[#FF6B00]" />
-                <span className="w-4.5 h-0.5 bg-current rounded-full transition-all group-hover:w-5.5 group-hover:bg-[#FF6B00]" />
+                <span className="w-6 h-0.5 bg-current rounded-full transition-all group-hover:w-6 group-hover:bg-[#FF6B00]" />
+                <span className="w-4 h-0.5 bg-current rounded-full transition-all group-hover:w-6 group-hover:bg-[#FF6B00]" />
+                <span className="w-5 h-0.5 bg-current rounded-full transition-all group-hover:w-6 group-hover:bg-[#FF6B00]" />
               </>
             )}
           </button>
@@ -118,7 +119,7 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Section: Cart Icon & Profile Icon */}
+        {/* Right Section: Cart Icon, Profile Icon & Settings Icon */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           
           <Link
@@ -148,6 +149,16 @@ export const Navbar: React.FC = () => {
                 {user.displayName || user.email}
               </span>
             )}
+          </Link>
+
+          <Link
+            href="/account"
+            className="p-2 sm:p-2.5 rounded-lg bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer"
+            aria-label="Settings"
+            title="Settings"
+          >
+            <HiOutlineCog6Tooth className="w-5 h-5 text-gray-600 dark:text-gray-300 hover:rotate-45 transition-transform" />
+            <span className="hidden md:inline text-xs font-bold text-gray-800 dark:text-gray-200">Settings</span>
           </Link>
 
         </div>

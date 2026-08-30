@@ -131,7 +131,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               deliveryInsideDhaka: item.deliveryInsideDhaka ? Number(item.deliveryInsideDhaka) : 80,
               deliveryOutsideDhaka: item.deliveryOutsideDhaka ? Number(item.deliveryOutsideDhaka) : 120,
               sku: item.sku || '',
-              urlSlug: item.urlSlug || '',
+              urlSlug: item.urlSlug || item.slug || (item.title ? item.title.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-') : '') || String(item.id),
             }));
             setProducts(mapped);
             setIsLoading(false);

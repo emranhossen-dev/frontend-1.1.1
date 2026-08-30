@@ -1,7 +1,5 @@
 'use client';
 
-export const runtime = 'edge';
-
 import React, { useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -67,9 +65,12 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     return [];
   });
 
-  // Find product by id or urlSlug
+  // Find product by id, urlSlug or title slug
   const product: Product | undefined = products.find(
-    (p) => p.id === productId || p.urlSlug === productId
+    (p) =>
+      p.id === productId ||
+      p.urlSlug === productId ||
+      (p.title && p.title.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-') === productId)
   );
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -351,6 +352,13 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
                   </button>
                 </div>
               </div>
+
+              {/* Product Short Description for Desktop Only (Hidden on Mobile) */}
+              {product.shortDescription && (
+                <p className="hidden lg:block text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed text-justify border-t border-gray-100 dark:border-slate-800/80 pt-2 mt-1">
+                  {product.shortDescription}
+                </p>
+              )}
             </div>
 
             {/* Ratings & Stock Row (Single language title - Requirement 11) */}

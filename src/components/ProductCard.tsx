@@ -26,7 +26,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     <div className="group relative flex flex-col bg-white dark:bg-slate-900 rounded-lg border border-gray-200/80 dark:border-slate-800 overflow-hidden hover:shadow-lg transition-all duration-300">
       {/* Product Thumbnail Container - Full Width Edge to Edge */}
       <div className="relative w-full aspect-[4/3] sm:aspect-square bg-gray-50 dark:bg-slate-800 overflow-hidden shrink-0">
-        <Link href={`/products/${product.id}`}>
+        <Link href={`/products/${product.urlSlug || product.id}`}>
           <img
             src={product.image}
             alt={product.title}
@@ -54,8 +54,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       {/* Card Details Body */}
       <div className="p-2 sm:p-2.5 flex flex-col flex-1 justify-between">
         <div>
-          <Link href={`/products/${product.id}`}>
-            <h3 className="font-semibold text-xs text-gray-900 dark:text-white line-clamp-2 sm:line-clamp-3 hover:underline leading-snug">
+          <Link href={`/products/${product.urlSlug || product.id}`}>
+            <h3 className="font-semibold text-xs text-gray-900 dark:text-white text-justify line-clamp-2 sm:line-clamp-3 hover:underline leading-snug">
               {product.title}
             </h3>
           </Link>
