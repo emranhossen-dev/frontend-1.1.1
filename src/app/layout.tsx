@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     "ArdhiMart",
     "online gift shop bangladesh",
     "gadgets and accessories bd",
-    "personalized gifts bd",
+    "gadget gift items bd",
     "birthday gift shop bd",
     "tech gadgets accessories bd",
     "unique gift items bd",
