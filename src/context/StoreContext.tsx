@@ -92,7 +92,18 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
     return [];
   });
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('ardhimart_cached_products');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return false;
+        }
+      } catch (e) {}
+    }
+    return true;
+  });
   const [heroBanner] = useState(defaultHeroBanner);
 
   // Fetch real database products from NestJS REST API with resilient retry logic
