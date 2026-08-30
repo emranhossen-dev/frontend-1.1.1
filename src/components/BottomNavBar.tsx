@@ -81,7 +81,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full z-40 bg-[#FF6B00] dark:bg-slate-900/95 backdrop-blur-lg border-t border-orange-600/50 dark:border-slate-800 h-16 flex items-center justify-around px-2 sm:hidden transition-colors shadow-2xl">
+    <nav className="fixed bottom-0 left-0 w-full z-40 bg-[#FF6B00] border-t border-[#e05e00] h-16 flex items-center justify-around px-2 sm:hidden transition-colors shadow-2xl text-white">
       {tabs.map((tab) => {
         const IconComponent = tab.icon;
         const active = tab.isActive;
@@ -96,8 +96,8 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
               }}
               className={`flex flex-col items-center justify-center w-14 py-1 relative transition-all active:scale-90 ${
                 active
-                  ? 'text-white dark:text-[#FF6B00] font-black'
-                  : 'text-orange-100/85 dark:text-gray-400 hover:text-white dark:hover:text-gray-200 font-medium'
+                  ? 'text-white font-black scale-105'
+                  : 'text-orange-100/90 hover:text-white font-medium'
               }`}
             >
               <div className="relative">
@@ -108,14 +108,14 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
                     width={26}
                     height={26}
                     className={`w-6.5 h-6.5 object-contain transition-all brightness-0 invert ${
-                      active ? 'opacity-100 scale-105' : 'opacity-80 dark:opacity-60'
+                      active ? 'opacity-100 scale-105' : 'opacity-85'
                     }`}
                   />
                 ) : (
-                  <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px] text-white dark:text-[#FF6B00]' : 'stroke-2'}`} />
+                  <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px] text-white' : 'stroke-2 text-orange-100'}`} />
                 )}
                 {tab.badge !== undefined && (
-                  <span className="absolute -top-1.5 -right-2.5 bg-white dark:bg-[#FF6B00] text-[#FF6B00] dark:text-white font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-md">
+                  <span className="absolute -top-1.5 -right-2.5 bg-white text-[#FF6B00] font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-md">
                     {tab.badge}
                   </span>
                 )}
@@ -133,8 +133,8 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
             href={tab.href!}
             className={`flex flex-col items-center justify-center w-14 py-1 relative transition-all active:scale-90 ${
               active
-                ? 'text-white dark:text-[#FF6B00] font-black'
-                : 'text-orange-100/85 dark:text-gray-400 hover:text-white dark:hover:text-gray-200 font-medium'
+                ? 'text-white font-black scale-105'
+                : 'text-orange-100/90 hover:text-white font-medium'
             }`}
           >
             <div className="relative">
@@ -145,14 +145,14 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
                   width={26}
                   height={26}
                   className={`w-6.5 h-6.5 object-contain transition-all brightness-0 invert ${
-                    active ? 'opacity-100 scale-105' : 'opacity-80 dark:opacity-60'
+                    active ? 'opacity-100 scale-105' : 'opacity-85'
                   }`}
                 />
               ) : (
-                <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px] text-white dark:text-[#FF6B00]' : 'stroke-2'}`} />
+                <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px] text-white' : 'stroke-2 text-orange-100'}`} />
               )}
               {tab.badge !== undefined && (
-                <span className="absolute -top-1.5 -right-2.5 bg-white dark:bg-[#FF6B00] text-[#FF6B00] dark:text-white font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-md">
+                <span className="absolute -top-1.5 -right-2.5 bg-white text-[#FF6B00] font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-md">
                   {tab.badge}
                 </span>
               )}
