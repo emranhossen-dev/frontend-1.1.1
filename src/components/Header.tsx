@@ -30,6 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
     setIsMenuOpen,
   } = useStore();
   const { user } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const computedCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const cartCount = customCartCount !== undefined ? customCartCount : computedCartCount;
@@ -39,7 +40,8 @@ export const Header: React.FC<HeaderProps> = ({
     if (customOpenMenu) customOpenMenu();
   };
 
-  const handleSearchClick = () => {
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setIsSearchOpen(true);
     if (customOpenSearch) customOpenSearch();
   };
@@ -87,21 +89,36 @@ export const Header: React.FC<HeaderProps> = ({
           </Link>
         </div>
 
-        {/* Center: Full Interactive Search Bar Input */}
-        <div className="flex-1 max-w-md mx-0.5 sm:mx-2 min-w-0">
-          <button
-            onClick={handleSearchClick}
-            className="w-full h-9 sm:h-10 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200/80 dark:hover:bg-slate-700/80 border border-gray-200 dark:border-slate-700 rounded-md px-2 sm:px-3 flex items-center justify-between text-gray-400 dark:text-gray-400 text-xs font-semibold transition-all cursor-pointer shadow-xs group"
-          >
-            <div className="flex items-center gap-1.5 truncate min-w-0">
-              <Search className="w-4 h-4 text-gray-400 group-hover:text-[#FF6B00] transition-colors shrink-0" />
-              <span className="truncate text-[11px] sm:text-xs">Search gifts, gadgets...</span>
-            </div>
-            <kbd className="hidden md:inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-mono font-bold text-gray-400 bg-gray-200 dark:bg-slate-700 rounded shrink-0">
-              Search
-            </kbd>
-          </button>
-        </div>
+        {/* Center: Full Interactive Search Bar Input with Search Icon on Right (No Cross Button) */}
+        <form
+          onSubmit={handleSearchSubmit}
+          className="flex-1 max-w-md mx-0.5 sm:mx-2 min-w-0"
+        >
+          <div className="relative flex items-center w-full">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleSearchSubmit();
+                }
+              }}
+              placeholder="Search gifts, gadgets..."
+              className="w-full h-8 sm:h-9 bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md pl-2.5 pr-8 text-[11px] sm:text-xs font-medium text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#FF6B00] dark:focus:border-[#FF6B00] transition-colors"
+            />
+            {/* Search Icon Button on Right Side */}
+            <button
+              type="submit"
+              onClick={handleSearchSubmit}
+              aria-label="Search"
+              className="absolute right-0 top-0 bottom-0 px-2.5 text-gray-500 hover:text-[#FF6B00] dark:text-gray-400 dark:hover:text-[#FF6B00] flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+          </div>
+        </form>
 
         {/* Right Actions: Cart & Register Button (Text ALWAYS visible) */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
