@@ -9,9 +9,11 @@ import { ProductCard, ProductSkeletonCard } from '@/components/ProductCard';
 export const FlashSaleSection: React.FC = () => {
   const { products, isLoading } = useStore();
 
+  const [mounted, setMounted] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
+    setMounted(true);
     const calculateTimeLeft = () => {
       const now = new Date();
       const target = new Date();
@@ -73,7 +75,7 @@ export const FlashSaleSection: React.FC = () => {
       </div>
 
       {/* 6 PRODUCTS PER ROW SHOWCASE ON DESKTOP */}
-      {isLoading ? (
+      {!mounted || isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
           {[1, 2, 3, 4, 5, 6].map((n) => (
             <ProductSkeletonCard key={n} />

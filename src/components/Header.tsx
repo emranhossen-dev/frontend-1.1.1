@@ -3,8 +3,9 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingBag, Search, User } from 'lucide-react';
+import { ShoppingBag, Search, User, UserPlus } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface HeaderProps {
   siteName?: string;
@@ -28,6 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
     setIsSearchOpen,
     setIsMenuOpen,
   } = useStore();
+  const { user } = useAuth();
 
   const computedCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const cartCount = customCartCount !== undefined ? customCartCount : computedCartCount;
@@ -116,14 +118,30 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </button>
 
-          <Link
-            href="/account"
-            aria-label="Profile"
-            title="Profile"
-            className="p-2 sm:p-2.5 bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white hover:bg-gray-200 rounded-lg transition-all active:scale-95 cursor-pointer flex items-center justify-center"
-          >
-            <User className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-          </Link>
+          {/* Register or Account Button in Top Nav */}
+          {user ? (
+            <Link
+              href="/account"
+              aria-label="Profile Account"
+              title="My Account"
+              className="p-2 sm:p-2.5 bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white hover:bg-gray-200 rounded-lg transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
+            >
+              <User className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+              <span className="hidden sm:inline text-xs font-bold text-gray-800 dark:text-gray-200">
+                {user.displayName ? user.displayName.split(' ')[0] : 'Account'}
+              </span>
+            </Link>
+          ) : (
+            <Link
+              href="/register"
+              aria-label="Register Account"
+              title="Register"
+              className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#FF6B00] hover:bg-[#e05e00] text-white text-xs font-extrabold rounded-lg shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer shrink-0"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>Register</span>
+            </Link>
+          )}
         </div>
       </div>
     </header>

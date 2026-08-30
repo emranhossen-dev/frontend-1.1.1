@@ -37,13 +37,7 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<'light' | 'dark'>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('ardhimart_theme');
-      if (saved === 'dark' || saved === 'light') return saved;
-    }
-    return 'light'; // DEFAULT LIGHT MODE!
-  });
+  const [theme, setThemeState] = useState<'light' | 'dark'>('light');
 
   const applyTheme = (t: 'light' | 'dark') => {
     if (typeof window !== 'undefined') {
@@ -61,49 +55,29 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setThemeState(newTheme);
     if (typeof window !== 'undefined') {
       localStorage.setItem('ardhimart_theme', newTheme);
-      applyTheme(newTheme);
     }
+    applyTheme(newTheme);
   };
 
   const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
   };
 
   React.useEffect(() => {
-    applyTheme(theme);
-  }, [theme]);
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ardhimart_theme');
+      if (saved === 'dark' || saved === 'light') {
+        setThemeState(saved);
+        applyTheme(saved);
+      }
+    }
+  }, []);
 
   const [storeConfig] = useState<StoreConfig>(defaultStoreConfig);
   const [categories] = useState<Category[]>(defaultCategories);
-  const [products, setProducts] = useState<Product[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const cached = localStorage.getItem('ardhimart_cached_products');
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            const clean = parsed.filter((p: any) => p.id && !p.id.startsWith('prod-') && p.title !== 'Ceramic Minimalist Vase');
-            if (clean.length > 0) return clean;
-          }
-        }
-      } catch (e) {
-        console.warn('Cache read error:', e);
-      }
-    }
-    return [];
-  });
-  const [isLoading, setIsLoading] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const cached = localStorage.getItem('ardhimart_cached_products');
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) return false;
-        }
-      } catch (e) {}
-    }
-    return true;
-  });
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [heroBanner] = useState(defaultHeroBanner);
 
   // Fetch real database products from NestJS REST API with resilient retry logic
