@@ -55,12 +55,12 @@ export default function LoginPage() {
     <div className="min-h-screen bg-white dark:bg-slate-950 text-gray-900 dark:text-white flex flex-col justify-between">
       <Header />
 
-      <main className="flex-1 max-w-md w-full mx-auto px-6 sm:px-10 py-6 sm:py-10 flex flex-col justify-center">
+      <main className="flex-1 max-w-md w-full mx-auto px-4 sm:px-10 py-6 sm:py-10 flex flex-col justify-center">
         <div className="space-y-6">
 
           {/* Header Title */}
-          <div className="text-center">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-tight">
+          <div className="text-center overflow-hidden">
+            <h1 className="text-lg min-[360px]:text-[20px] sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight whitespace-nowrap">
               Welcome back to ArdhiMart
             </h1>
           </div>
