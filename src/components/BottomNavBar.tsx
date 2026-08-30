@@ -81,7 +81,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-gray-200/80 dark:border-slate-800 h-16 flex items-center justify-around px-2 sm:hidden transition-colors shadow-lg">
+    <nav className="fixed bottom-0 left-0 w-full z-40 bg-[#FF6B00] dark:bg-slate-900/95 backdrop-blur-lg border-t border-orange-600/50 dark:border-slate-800 h-16 flex items-center justify-around px-2 sm:hidden transition-colors shadow-2xl">
       {tabs.map((tab) => {
         const IconComponent = tab.icon;
         const active = tab.isActive;
@@ -96,8 +96,8 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
               }}
               className={`flex flex-col items-center justify-center w-14 py-1 relative transition-all active:scale-90 ${
                 active
-                  ? 'text-[#FF6B00] dark:text-[#FF6B00] font-bold'
-                  : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-medium'
+                  ? 'text-white dark:text-[#FF6B00] font-black'
+                  : 'text-orange-100/85 dark:text-gray-400 hover:text-white dark:hover:text-gray-200 font-medium'
               }`}
             >
               <div className="relative">
@@ -107,15 +107,15 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
                     alt="Cart"
                     width={26}
                     height={26}
-                    className={`w-6.5 h-6.5 object-contain transition-all ${
-                      active ? 'brightness-100' : 'opacity-60 dark:brightness-0 dark:invert'
+                    className={`w-6.5 h-6.5 object-contain transition-all brightness-0 invert ${
+                      active ? 'opacity-100 scale-105' : 'opacity-80 dark:opacity-60'
                     }`}
                   />
                 ) : (
-                  <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px] text-[#FF6B00]' : 'stroke-2'}`} />
+                  <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px] text-white dark:text-[#FF6B00]' : 'stroke-2'}`} />
                 )}
                 {tab.badge !== undefined && (
-                  <span className="absolute -top-1.5 -right-2.5 bg-[#FF6B00] text-white font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                  <span className="absolute -top-1.5 -right-2.5 bg-white dark:bg-[#FF6B00] text-[#FF6B00] dark:text-white font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-md">
                     {tab.badge}
                   </span>
                 )}
@@ -133,8 +133,8 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
             href={tab.href!}
             className={`flex flex-col items-center justify-center w-14 py-1 relative transition-all active:scale-90 ${
               active
-                ? 'text-[#FF6B00] dark:text-[#FF6B00] font-bold'
-                : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-medium'
+                ? 'text-white dark:text-[#FF6B00] font-black'
+                : 'text-orange-100/85 dark:text-gray-400 hover:text-white dark:hover:text-gray-200 font-medium'
             }`}
           >
             <div className="relative">
@@ -144,15 +144,15 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
                   alt="Cart"
                   width={26}
                   height={26}
-                  className={`w-6.5 h-6.5 object-contain transition-all ${
-                    active ? 'brightness-100' : 'opacity-60 dark:brightness-0 dark:invert'
+                  className={`w-6.5 h-6.5 object-contain transition-all brightness-0 invert ${
+                    active ? 'opacity-100 scale-105' : 'opacity-80 dark:opacity-60'
                   }`}
                 />
               ) : (
-                <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px] text-[#FF6B00]' : 'stroke-2'}`} />
+                <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px] text-white dark:text-[#FF6B00]' : 'stroke-2'}`} />
               )}
               {tab.badge !== undefined && (
-                <span className="absolute -top-1.5 -right-2.5 bg-[#FF6B00] text-white font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                <span className="absolute -top-1.5 -right-2.5 bg-white dark:bg-[#FF6B00] text-[#FF6B00] dark:text-white font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-md">
                   {tab.badge}
                 </span>
               )}
