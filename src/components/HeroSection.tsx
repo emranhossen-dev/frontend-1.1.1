@@ -99,14 +99,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ banner }) => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 w-full sm:w-auto">
             <Link
               href={slides[currentSlide].ctaPrimaryLink}
-              className="btn-shimmer w-full sm:w-auto px-8 h-12 bg-[#FF6B00] hover:bg-[#E56000] text-white font-extrabold text-sm rounded-xl flex items-center justify-center transition-all shadow-lg active:scale-95 cursor-pointer"
+              className="btn-shimmer w-full sm:w-auto px-6 h-10 bg-[#FF6B00] hover:bg-[#E56000] text-white font-extrabold text-xs sm:text-sm rounded-md flex items-center justify-center transition-all shadow-md active:scale-95 cursor-pointer"
             >
               {slides[currentSlide].ctaPrimaryText}
             </Link>
 
             <Link
               href={slides[currentSlide].ctaSecondaryLink}
-              className="btn-shimmer w-full sm:w-auto px-8 h-12 bg-[#0F396F] hover:bg-[#164685] text-white font-bold text-sm rounded-xl flex items-center justify-center transition-all shadow-md active:scale-95 cursor-pointer"
+              className="btn-shimmer w-full sm:w-auto px-6 h-10 bg-[#0F396F] hover:bg-[#164685] text-white font-bold text-xs sm:text-sm rounded-md flex items-center justify-center transition-all shadow-md active:scale-95 cursor-pointer"
             >
               {slides[currentSlide].ctaSecondaryText}
             </Link>
