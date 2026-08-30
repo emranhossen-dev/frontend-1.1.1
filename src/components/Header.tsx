@@ -54,11 +54,11 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
         
         {/* Left Group: Hamburger Menu + Logo (Text hidden on mobile) */}
-        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+        <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
           <button
             onClick={handleMenuClick}
             aria-label="Open Mobile Menu"
-            className="lg:hidden p-1 pr-0.5 text-gray-800 dark:text-gray-100 hover:text-[#FF6B00] dark:hover:text-[#FF6B00] transition-colors cursor-pointer group flex flex-col justify-center gap-1.5 items-start"
+            className="lg:hidden p-0.5 pr-0 text-gray-800 dark:text-gray-100 hover:text-[#FF6B00] dark:hover:text-[#FF6B00] transition-colors cursor-pointer group flex flex-col justify-center gap-1.5 items-start"
           >
             <span className="w-5 sm:w-6 h-0.5 bg-current rounded-full transition-all group-hover:w-6 group-hover:bg-[#FF6B00]" />
             <span className="w-3.5 sm:w-4 h-0.5 bg-current rounded-full transition-all group-hover:w-6 group-hover:bg-[#FF6B00]" />
@@ -67,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <Link
             href="/"
-            className="flex items-center gap-2 group shrink-0"
+            className="flex items-center gap-1 group shrink-0"
             title="ArdhiMart"
           >
             <Image
@@ -91,7 +91,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex-1 max-w-md mx-1 sm:mx-4 min-w-0">
           <button
             onClick={handleSearchClick}
-            className="w-full h-9 sm:h-10 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200/80 dark:hover:bg-slate-700/80 border border-gray-200 dark:border-slate-700 rounded-xl px-2.5 sm:px-4 flex items-center justify-between text-gray-400 dark:text-gray-400 text-xs font-semibold transition-all cursor-pointer shadow-xs group"
+            className="w-full h-9 sm:h-10 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200/80 dark:hover:bg-slate-700/80 border border-gray-200 dark:border-slate-700 rounded-md px-2.5 sm:px-4 flex items-center justify-between text-gray-400 dark:text-gray-400 text-xs font-semibold transition-all cursor-pointer shadow-xs group"
           >
             <div className="flex items-center gap-2 truncate min-w-0">
               <Search className="w-4 h-4 text-gray-400 group-hover:text-[#FF6B00] transition-colors shrink-0" />
