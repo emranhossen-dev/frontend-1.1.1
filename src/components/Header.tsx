@@ -144,7 +144,7 @@ export const Header: React.FC<HeaderProps> = ({
               href="/register"
               aria-label="Register Account"
               title="Register"
-              className="px-2.5 py-1 sm:px-3.5 sm:py-1.5 bg-[#FF6B00] hover:bg-[#e05e00] text-white text-[10px] sm:text-[11px] font-bold rounded-lg shadow-2xs hover:shadow-xs transition-all active:scale-95 cursor-pointer shrink-0 inline-block text-center"
+              className="px-3 py-1.5 sm:px-4 sm:py-2 h-8 sm:h-9 bg-[#FF6B00] hover:bg-[#e05e00] text-white text-[11px] sm:text-xs font-bold rounded-lg shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer shrink-0 flex items-center justify-center text-center"
             >
               Register
             </Link>
