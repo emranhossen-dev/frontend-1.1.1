@@ -26,7 +26,7 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-white dark:bg-slate-950 text-gray-900 dark:text-gray-100 py-2 md:pt-12 md:pb-8 border-t border-gray-200/80 dark:border-slate-800 transition-colors">
+    <footer className="bg-white dark:bg-slate-950 text-gray-900 dark:text-gray-100 pt-4 pb-20 md:pt-12 md:pb-8 border-t border-gray-200/80 dark:border-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 space-y-2 md:space-y-12">
         {/* Newsletter Banner (Hidden on Mobile) */}
         <div className="hidden md:flex bg-gray-100 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
