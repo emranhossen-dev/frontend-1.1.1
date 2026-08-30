@@ -25,30 +25,30 @@ export const defaultHeroBanner: HeroBanner = {
 export const defaultCategories: Category[] = [
   {
     id: "cat-1",
-    name: "Clothing",
+    name: "Clothing & Gifts",
     slug: "clothing",
-    image: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?q=80&w=600&auto=format&fit=crop",
+    image: "/images/ardhimart-giftbox-valentine-set.webp",
     itemCount: 42,
   },
   {
     id: "cat-2",
-    name: "Electronics",
+    name: "Electronics & Tech",
     slug: "electronics",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600&auto=format&fit=crop",
+    image: "/images/ardhimart-smart-pen-holder.webp",
     itemCount: 28,
   },
   {
     id: "cat-3",
-    name: "Accessories",
+    name: "Accessories & Decor",
     slug: "accessories",
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600&auto=format&fit=crop",
+    image: "/images/ardhimart-giftbox-set.webp",
     itemCount: 34,
   },
   {
     id: "cat-4",
-    name: "Gifts & Living",
+    name: "Luxury Hampers",
     slug: "gifts",
-    image: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=600&auto=format&fit=crop",
+    image: "/images/ardhimart-giftbox-valentine-set.webp",
     itemCount: 19,
   },
 ];
