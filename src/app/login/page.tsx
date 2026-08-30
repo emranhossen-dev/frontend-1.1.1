@@ -58,8 +58,8 @@ export default function LoginPage() {
         <div className="space-y-6">
 
           {/* Header Title */}
-          <div className="text-center space-y-1.5">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          <div className="text-center space-y-1.5 overflow-hidden">
+            <h1 className="text-lg sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight whitespace-nowrap">
               Welcome back to ArdhiMart
             </h1>
             <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
