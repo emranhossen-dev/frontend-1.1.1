@@ -21,15 +21,15 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ardhimart.com"),
-  title: "ArdhiMart — Gift Shop, Tech Gadgets & Custom Gifts in BD",
-  description: "Shop unique gifts, tech gadgets, customized presents & surprise items at ArdhiMart. Enjoy fast 24h delivery across Bangladesh with Cash on Delivery!",
+  title: "ArdhiMart — Gift Shop, Gadgets & Accessories in BD",
+  description: "Shop unique gifts, trendy gadgets & premium accessories at ArdhiMart. Enjoy fast 24h delivery across Bangladesh with Cash on Delivery!",
   keywords: [
     "ArdhiMart",
     "online gift shop bangladesh",
-    "tech gadgets bd",
+    "gadgets and accessories bd",
     "personalized gifts bd",
     "birthday gift shop bd",
-    "gadgets as gifts bd",
+    "tech gadgets accessories bd",
     "unique gift items bd",
     "cash on delivery gifts bd",
   ],
@@ -42,15 +42,15 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://ardhimart.com",
-    title: "ArdhiMart — Gift Shop, Tech Gadgets & Custom Gifts in BD",
-    description: "Shop unique gifts, tech gadgets, customized presents & surprise items at ArdhiMart across Bangladesh.",
+    title: "ArdhiMart — Gift Shop, Gadgets & Accessories in BD",
+    description: "Shop unique gifts, trendy gadgets & premium accessories at ArdhiMart across Bangladesh.",
     siteName: "ArdhiMart",
     images: [
       {
         url: "/logo.png",
         width: 1200,
         height: 630,
-        alt: "ArdhiMart Gift & Gadget Shop Logo",
+        alt: "ArdhiMart Gift, Gadget & Accessories Shop Logo",
       },
     ],
   },
