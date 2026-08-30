@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useStore } from '@/context/StoreContext';
-import { Flame, Clock, ShoppingCart, ArrowRight } from 'lucide-react';
+import { Clock, ShoppingCart, ArrowRight } from 'lucide-react';
 import { ProductCard, ProductSkeletonCard } from '@/components/ProductCard';
 
 export const FlashSaleSection: React.FC = () => {
@@ -46,9 +47,13 @@ export const FlashSaleSection: React.FC = () => {
       {/* Header with Single Line Title, Timer & View All Link */}
       <div className="flex items-center justify-between gap-3 mb-3 pb-2.5 border-b border-gray-200/80 dark:border-slate-800">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="p-1.5 bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-400 rounded-lg shrink-0">
-            <Flame className="w-5 h-5 fill-red-500 animate-pulse" />
-          </div>
+          <Image
+            src="/flash-bolt.svg"
+            alt="Flash Sale Lightning Icon"
+            width={32}
+            height={32}
+            className="w-7 h-7 sm:w-8 sm:h-8 object-contain shrink-0 drop-shadow-xs"
+          />
           <h3 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white tracking-tight truncate whitespace-nowrap">
             Flash Deals
           </h3>
