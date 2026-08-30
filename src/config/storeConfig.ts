@@ -9,13 +9,13 @@ export const defaultStoreConfig: StoreConfig = {
 };
 
 export const defaultHeroBanner: HeroBanner = {
-  badge: "স্মার্ট গ্যাজেট কালেকশন ⚡",
-  title: "স্মার্ট এলইডি ডিজিটাল পেন হোল্ডার",
-  subtitle: "ডিজিটাল ঘড়ি, আলার্ম ও নাইট লাইটসহ প্রিমিয়াম ডেক্স অর্গানাইজার। আপনার ডেক্সকে দিন আধুনিক লুক!",
+  badge: "Smart Tech Collection ⚡",
+  title: "Smart LED Digital Pen Holder",
+  subtitle: "Premium desk organizer with digital clock, alarm & ambient LED light. Elevate your workspace with a modern touch!",
   imageUrl: "/images/ardhimart-smart-pen-holder.webp",
-  ctaPrimaryText: "এখনই অর্ডার করুন",
+  ctaPrimaryText: "Order Now",
   ctaPrimaryLink: "/products",
-  ctaSecondaryText: "গ্যাজেটসমূহ দেখুন",
+  ctaSecondaryText: "Explore Gadgets",
   ctaSecondaryLink: "/products",
 };
 
