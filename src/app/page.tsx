@@ -11,6 +11,7 @@ import FeaturedProducts from '@/components/FeaturedProducts';
 import TestimonialsSection from '@/components/TestimonialsSection';
 import Footer from '@/components/Footer';
 import BottomNavBar from '@/components/BottomNavBar';
+import PromotionalEntryModal from '@/components/PromotionalEntryModal';
 import { useStore } from '@/context/StoreContext';
 
 export default function Home() {
@@ -54,6 +55,9 @@ export default function Home() {
 
       {/* Sticky Mobile Bottom Navigation Bar */}
       <BottomNavBar />
+
+      {/* Promotional Entry Modal (Masks background loading & delivers special offer) */}
+      <PromotionalEntryModal />
     </div>
   );
 }
