@@ -157,7 +157,7 @@ export default function RegisterPage() {
           </form>
 
           {/* Social Sign-In Divider */}
-          <div className="relative my-4">
+          <div className="relative my-2">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-200 dark:border-slate-800" />
             </div>
@@ -184,7 +184,7 @@ export default function RegisterPage() {
           </button>
 
           {/* Bottom Switch Link */}
-          <div className="text-center text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-slate-800">
+          <div className="text-center text-xs text-gray-500 dark:text-gray-400 pt-1.5 border-t border-gray-200 dark:border-slate-800">
             Already have an account?{" "}
             <Link href="/login" className="text-[#FF6B00] font-extrabold hover:underline inline-flex items-center gap-1">
               <span>Sign In</span>
