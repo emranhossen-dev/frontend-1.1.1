@@ -147,7 +147,7 @@ export const PromotionalEntryModal: React.FC<PromotionalEntryModalProps> = ({
                   যেকোনো পণ্য কিনলেই ৳১০০ ভাউচার কার্ড!
                 </span>
                 <span className="block text-[10px] text-gray-500 dark:text-gray-400 font-semibold mt-0.5">
-                  প্রোডাক্টের সাথেই পেয়ে যাবেন ৳১০০ এর ভাউচার কার্ড
+                  কার্ডের কুপন কোড দিয়ে পরবর্তী অর্ডারে পাবেন ৳১০০ ছাড়
                 </span>
               </div>
             </div>
