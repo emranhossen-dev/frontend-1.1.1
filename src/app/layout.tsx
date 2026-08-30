@@ -21,15 +21,15 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ardhimart.com"),
-  title: "ArdhiMart — Premium Tech & Everyday Gadgets in BD", // Exactly 51 characters (Optimal SERP Title)
-  description: "Shop premium tech gadgets, power banks & smartwatch accessories at ArdhiMart. Enjoy fast 24h delivery across Bangladesh with Cash on Delivery!", // Exactly 153 characters (Optimal SERP Description)
+  title: "ArdhiMart — Premium Gift Shop & Personalized Gifts in BD",
+  description: "Shop unique gifts, personalized presents & surprise items at ArdhiMart. Enjoy fast 24h delivery across Bangladesh with Cash on Delivery!",
   keywords: [
     "ArdhiMart",
-    "online shopping bangladesh",
-    "tech gadgets bd",
-    "power bank price in bd",
-    "smartwatch bangladesh",
-    "cash on delivery gadgets bd",
+    "online gift shop bangladesh",
+    "personalized gifts bd",
+    "birthday gift shop bd",
+    "unique gift items bd",
+    "cash on delivery gifts bd",
   ],
   authors: [{ name: "ArdhiMart Team" }],
   robots: {
@@ -40,15 +40,15 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://ardhimart.com",
-    title: "ArdhiMart — Premium Tech & Everyday Gadgets in BD",
-    description: "Shop premium tech gadgets, power banks & smartwatch accessories at ArdhiMart across Bangladesh.",
+    title: "ArdhiMart — Premium Gift Shop & Personalized Gifts in BD",
+    description: "Shop unique gifts, personalized presents & surprise items at ArdhiMart across Bangladesh.",
     siteName: "ArdhiMart",
     images: [
       {
         url: "/logo.png",
         width: 1200,
         height: 630,
-        alt: "ArdhiMart E-Commerce Storefront Logo",
+        alt: "ArdhiMart Gift Shop Logo",
       },
     ],
   },
