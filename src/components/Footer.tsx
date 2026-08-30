@@ -28,8 +28,8 @@ export const Footer: React.FC = () => {
   return (
     <footer className="bg-white dark:bg-slate-950 text-gray-900 dark:text-gray-100 pt-12 pb-20 sm:pb-8 border-t border-gray-200/80 dark:border-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 space-y-12">
-        {/* Newsletter Banner */}
-        <div className="bg-gray-100 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+        {/* Newsletter Banner (Hidden on Mobile) */}
+        <div className="hidden md:flex bg-gray-100 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
           <div className="space-y-1 text-center md:text-left">
             <h3 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
               Join Our VIP Newsletter
@@ -58,8 +58,8 @@ export const Footer: React.FC = () => {
           </form>
         </div>
 
-        {/* Main Footer Links Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+        {/* Main Footer Links Grid (Hidden on Mobile) */}
+        <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {/* Col 1: Brand Info */}
           <div className="space-y-4">
             <Link href="/" className="inline-block">
@@ -196,8 +196,8 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        {/* Bottom Copyright & Agency Credit Bar */}
-        <div className="pt-8 border-t border-gray-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 dark:text-slate-500 gap-4">
+        {/* Bottom Copyright & Agency Credit Bar (Visible on All Devices) */}
+        <div className="pt-4 md:pt-8 border-t border-gray-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 dark:text-slate-500 gap-2 sm:gap-4">
           <p>© {new Date().getFullYear()} {storeConfig.name}. All Rights Reserved.</p>
           <div className="flex items-center gap-1.5 font-medium">
             <span>Developed with</span>
