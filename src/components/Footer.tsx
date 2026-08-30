@@ -26,8 +26,8 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-white dark:bg-slate-950 text-gray-900 dark:text-gray-100 pt-4 pb-20 md:pt-12 md:pb-8 border-t border-gray-200/80 dark:border-slate-800 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 space-y-2 md:space-y-12">
+    <footer className="bg-white dark:bg-slate-950 text-gray-900 dark:text-gray-100 pt-0 pb-20 md:pt-12 md:pb-8 border-t border-gray-200/80 dark:border-slate-800 transition-colors">
+      <div className="max-w-7xl mx-auto px-4 space-y-0 md:space-y-12">
         {/* Newsletter Banner (Hidden on Mobile) */}
         <div className="hidden md:flex bg-gray-100 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
           <div className="space-y-1 text-center md:text-left">
@@ -197,7 +197,7 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Copyright & Agency Credit Bar (Single Divider Line) */}
-        <div className="pt-1.5 md:pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 dark:text-slate-500 gap-2 sm:gap-4">
+        <div className="pt-1 md:pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 dark:text-slate-500 gap-2 sm:gap-4">
           <p>© {new Date().getFullYear()} {storeConfig.name}. All Rights Reserved.</p>
           <div className="flex items-center gap-1.5 font-medium">
             <span>Developed with</span>
