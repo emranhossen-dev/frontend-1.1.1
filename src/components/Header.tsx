@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingBag, Search, User, UserPlus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Search, User } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { useAuth } from '@/context/AuthContext';
 
@@ -22,34 +23,61 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenCart: customOpenCart,
   onOpenSearch: customOpenSearch,
 }) => {
+  const router = useRouter();
   const {
-    storeConfig,
+    products,
     cartItems,
     setIsCartOpen,
-    setIsSearchOpen,
     setIsMenuOpen,
   } = useStore();
   const { user } = useAuth();
+
   const [searchQuery, setSearchQuery] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
 
   const computedCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const cartCount = customCartCount !== undefined ? customCartCount : computedCartCount;
+
+  // Close live search dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleMenuClick = () => {
     setIsMenuOpen(true);
     if (customOpenMenu) customOpenMenu();
   };
 
-  const handleSearchSubmit = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setIsSearchOpen(true);
-    if (customOpenSearch) customOpenSearch();
-  };
-
   const handleCartClick = () => {
     setIsCartOpen(true);
     if (customOpenCart) customOpenCart();
   };
+
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!searchQuery.trim()) return;
+    setIsDropdownOpen(false);
+    router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+  };
+
+  // Live matching suggestions while typing
+  const suggestions = searchQuery.trim()
+    ? products
+        .filter(
+          (p) =>
+            p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (p.brand && p.brand.toLowerCase().includes(searchQuery.toLowerCase()))
+        )
+        .slice(0, 5)
+    : [];
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-gray-200/80 dark:border-slate-800 text-gray-900 dark:text-white shadow-xs">
@@ -89,16 +117,17 @@ export const Header: React.FC<HeaderProps> = ({
           </Link>
         </div>
 
-        {/* Center: Full Interactive Search Bar Input with Search Icon on Right (No Cross Button) */}
-        <form
-          onSubmit={handleSearchSubmit}
-          className="flex-1 max-w-md mx-0.5 sm:mx-2 min-w-0"
-        >
-          <div className="relative flex items-center w-full">
+        {/* Center: Full Interactive Search Bar Input with Live Suggestions */}
+        <div ref={searchRef} className="flex-1 max-w-md mx-0.5 sm:mx-2 min-w-0 relative">
+          <form onSubmit={handleSearchSubmit} className="relative flex items-center w-full">
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setIsDropdownOpen(true);
+              }}
+              onFocus={() => setIsDropdownOpen(true)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
@@ -117,10 +146,64 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Search className="w-4 h-4" />
             </button>
-          </div>
-        </form>
+          </form>
 
-        {/* Right Actions: Cart & Register Button (Text ALWAYS visible) */}
+          {/* Live Autocomplete Suggestions Dropdown Panel */}
+          {isDropdownOpen && searchQuery.trim() !== '' && (
+            <div className="absolute left-0 right-0 top-full mt-1.5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden z-50 animate-fade-in">
+              <div className="p-2 space-y-1 max-h-72 overflow-y-auto">
+                <div className="px-2 py-1 flex items-center justify-between text-[10px] font-extrabold uppercase tracking-wider text-gray-400 border-b border-gray-100 dark:border-slate-800 mb-1">
+                  <span>Possible Results</span>
+                  <span>{suggestions.length} items</span>
+                </div>
+
+                {suggestions.length === 0 ? (
+                  <div className="p-3 text-center text-xs text-gray-500 dark:text-gray-400 font-medium">
+                    No matching products found. Press Enter to view search page.
+                  </div>
+                ) : (
+                  suggestions.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        router.push(`/products/${item.id}`);
+                      }}
+                      className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="w-9 h-9 object-cover rounded-md bg-gray-100 dark:bg-slate-700 shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                          {item.title}
+                        </h5>
+                        <p className="text-[10px] text-gray-400 font-semibold truncate">
+                          {item.category}
+                        </p>
+                      </div>
+                      <span className="text-xs font-extrabold text-[#FF6B00] shrink-0">
+                        ৳{item.price.toLocaleString()}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <button
+                onClick={handleSearchSubmit}
+                className="w-full py-2.5 bg-gray-50 dark:bg-slate-800/80 hover:bg-[#FF6B00] hover:text-white text-[#FF6B00] dark:text-orange-400 dark:hover:text-white font-extrabold text-xs text-center border-t border-gray-100 dark:border-slate-800 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <span>View all product cards for &quot;{searchQuery}&quot;</span>
+                <Search className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Right Actions: Cart & Register/Account Button */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <button
             onClick={handleCartClick}
@@ -143,7 +226,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </button>
 
-          {/* Register or Account Button (Register text visible on ALL screens) */}
+          {/* Register or Account Button */}
           {user ? (
             <Link
               href="/account"
