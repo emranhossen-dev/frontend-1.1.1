@@ -9,13 +9,13 @@ export const defaultStoreConfig: StoreConfig = {
 };
 
 export const defaultHeroBanner: HeroBanner = {
-  badge: "New Collection 2026",
-  title: "Find something you'll love",
-  subtitle: "Curated minimalist essentials, premium electronics & handcrafted luxury lifestyle products.",
-  imageUrl: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1600&auto=format&fit=crop",
-  ctaPrimaryText: "Shop Collection",
+  badge: "স্মার্ট গ্যাজেট কালেকশন ⚡",
+  title: "স্মার্ট এলইডি ডিজিটাল পেন হোল্ডার",
+  subtitle: "ডিজিটাল ঘড়ি, আলার্ম ও নাইট লাইটসহ প্রিমিয়াম ডেক্স অর্গানাইজার। আপনার ডেক্সকে দিন আধুনিক লুক!",
+  imageUrl: "/images/ardhimart-smart-pen-holder.webp",
+  ctaPrimaryText: "এখনই অর্ডার করুন",
   ctaPrimaryLink: "/products",
-  ctaSecondaryText: "Explore Categories",
+  ctaSecondaryText: "গ্যাজেটসমূহ দেখুন",
   ctaSecondaryLink: "/products",
 };
 
