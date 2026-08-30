@@ -685,32 +685,21 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
         </div>
       </main>
 
-      {/* Mobile-Only Fixed Bottom Bar (3 CTA Buttons) */}
-      <div className="sm:hidden fixed bottom-16 left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-gray-200/80 dark:border-slate-800 px-2 py-2 flex gap-1.5 z-30 shadow-2xl">
+      {/* Mobile-Only Fixed Bottom Bar (2 CTA Buttons: Add to Cart & Buy Now) */}
+      <div className="sm:hidden fixed bottom-16 left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-gray-200/80 dark:border-slate-800 px-3 py-2.5 flex gap-2 z-30 shadow-2xl">
         <button
           onClick={handleAddToCart}
-          className="btn-shimmer flex-1 border border-[#0F396F] text-[#0F396F] py-2 rounded font-bold text-[11px] uppercase text-center bg-white dark:bg-slate-900 active:scale-95 cursor-pointer truncate"
+          className="btn-shimmer flex-1 border border-[#0F396F] dark:border-blue-400 text-[#0F396F] dark:text-blue-400 py-2.5 rounded-xl font-extrabold text-xs uppercase text-center bg-white dark:bg-slate-900 active:scale-95 cursor-pointer truncate shadow-xs"
         >
           Add to Cart
         </button>
 
         <button
           onClick={handleBuyNow}
-          className="btn-shimmer flex-1 bg-[#FF6B00] text-white py-2 rounded font-bold text-[11px] uppercase text-center active:scale-95 cursor-pointer truncate"
+          className="btn-shimmer flex-1 bg-[#FF6B00] hover:bg-[#e05e00] text-white py-2.5 rounded-xl font-extrabold text-xs uppercase text-center active:scale-95 cursor-pointer truncate shadow-md shadow-orange-500/20"
         >
           Buy Now
         </button>
-
-        <a
-          href={`https://wa.me/8801700000000?text=${encodeURIComponent(
-            `Hello, I would like to order "${product.title}".\nPrice: ৳${product.price}`
-          )}`}
-          target="_blank"
-          rel="noreferrer"
-          className="btn-shimmer flex-1 bg-emerald-600 text-white py-2 rounded font-bold text-[11px] text-center active:scale-95 cursor-pointer truncate"
-        >
-          WhatsApp
-        </a>
       </div>
 
       {/* Full-Screen Image Lightbox Modal */}
