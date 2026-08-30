@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { Home, LayoutGrid, Search, ShoppingBag, User, LucideIcon } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
@@ -100,7 +101,17 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
               }`}
             >
               <div className="relative">
-                <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                {tab.id === 'cart' ? (
+                  <Image
+                    src="/ardhimart-bag.svg"
+                    alt="Cart"
+                    width={22}
+                    height={22}
+                    className="w-5.5 h-5.5 object-contain"
+                  />
+                ) : (
+                  <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                )}
                 {tab.badge !== undefined && (
                   <span className="absolute -top-1.5 -right-2.5 bg-black dark:bg-white text-white dark:text-black font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
                     {tab.badge}
@@ -125,7 +136,17 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
             }`}
           >
             <div className="relative">
-              <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+              {tab.id === 'cart' ? (
+                <Image
+                  src="/ardhimart-bag.svg"
+                  alt="Cart"
+                  width={22}
+                  height={22}
+                  className="w-5.5 h-5.5 object-contain"
+                />
+              ) : (
+                <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+              )}
               {tab.badge !== undefined && (
                 <span className="absolute -top-1.5 -right-2.5 bg-black dark:bg-white text-white dark:text-black font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
                   {tab.badge}

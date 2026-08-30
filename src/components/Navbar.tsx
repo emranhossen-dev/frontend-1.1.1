@@ -124,18 +124,23 @@ export const Navbar: React.FC = () => {
           
           <Link
             href="/cart"
-            className="relative p-2 sm:p-2.5 rounded-lg bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer"
+            className="relative p-1.5 sm:p-2 transition-transform active:scale-95 flex items-center justify-center cursor-pointer"
             aria-label="Shopping Cart Page"
           >
-            <div className="relative">
-              <HiOutlineShoppingBag className="w-5 h-5 text-[#FF6B00]" />
+            <div className="relative flex items-center justify-center">
+              <Image 
+                src="/ardhimart-bag.svg" 
+                alt="Cart Bag" 
+                width={28} 
+                height={28} 
+                className="w-7 h-7 object-contain transition-transform hover:scale-110"
+              />
               {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-[#FF6B00] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-xs animate-pulse">
+                <span className="absolute -top-1.5 -right-2 bg-[#FF6B00] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-xs animate-pulse">
                   {totalItems}
                 </span>
               )}
             </div>
-            <span className="hidden md:inline text-xs font-bold text-gray-800 dark:text-gray-200">Cart</span>
           </Link>
 
           <Link

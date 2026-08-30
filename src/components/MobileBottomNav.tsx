@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   HiOutlineHome,
   HiOutlineSquares2X2,
@@ -137,7 +138,13 @@ export const MobileBottomNav: React.FC = () => {
           }`}
         >
           <div className="relative">
-            <HiOutlineShoppingBag className="w-5 h-5 text-blue-400" />
+            <Image 
+              src="/ardhimart-bag.svg" 
+              alt="Cart Bag" 
+              width={20} 
+              height={20} 
+              className="w-5 h-5 object-contain"
+            />
             {totalItems > 0 && (
               <span className="absolute -top-1.5 -right-2 bg-blue-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-md shadow-blue-500/40 animate-pulse">
                 {totalItems}
