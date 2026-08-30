@@ -64,10 +64,11 @@ export const Footer: React.FC = () => {
           <div className="space-y-4">
             <Link href="/" className="inline-block">
               <Image
-                src="/logo.png"
+                src="/logo.png?v=2"
                 alt="ArdhiMart Logo"
                 width={180}
                 height={45}
+                unoptimized
                 className="h-10 w-auto object-contain"
               />
             </Link>

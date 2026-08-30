@@ -72,12 +72,13 @@ export const Header: React.FC<HeaderProps> = ({
           >
             {/* Clean Logo Image without dark cover box */}
             <Image
-              src="/logo.png"
+              src="/logo.png?v=2"
               alt="ArdhiMart Logo"
-              width={140}
-              height={36}
+              width={160}
+              height={40}
               priority
-              className="h-7 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105"
+              unoptimized
+              className="h-8 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105"
             />
             {/* Brand Name with Ardhi (#FF6B00) and Mart (#0F396F) Colors */}
             <span className="font-extrabold text-lg sm:text-xl tracking-tight leading-none">
