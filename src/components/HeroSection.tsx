@@ -63,7 +63,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ banner }) => {
   };
 
   return (
-    <section className="relative w-full h-[calc(100dvh-64px)] sm:h-[calc(100vh-72px)] min-h-[540px] bg-slate-950 overflow-hidden group select-none">
+    <section className="relative w-full h-[calc(100dvh-128px)] sm:h-[calc(100vh-80px)] min-h-[440px] bg-slate-950 overflow-hidden group select-none">
       {/* Slide Images */}
       {slides.map((slide, idx) => (
         <div
@@ -83,7 +83,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ banner }) => {
       ))}
 
       {/* Slide Content Overlay */}
-      <div className="relative z-20 h-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col items-center justify-end text-center pb-12 sm:pb-16">
+      <div className="relative z-20 h-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col items-center justify-end text-center pb-8 sm:pb-14">
         <div className="max-w-2xl mx-auto space-y-3.5 flex flex-col items-center text-center">
           {/* Headline (Center Aligned) */}
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight drop-shadow-md text-center">
