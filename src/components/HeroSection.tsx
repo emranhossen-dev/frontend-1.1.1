@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { HeroBanner } from '@/types/store';
 
 interface HeroSectionProps {
@@ -53,14 +52,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ banner }) => {
     }, 4500);
     return () => clearInterval(interval);
   }, [slides.length]);
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev > 0 ? prev - 1 : slides.length - 1));
-  };
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
 
   return (
     <section className="relative w-full h-[calc(100dvh-128px)] sm:h-[calc(100vh-80px)] min-h-[440px] bg-slate-950 overflow-hidden group select-none">
@@ -114,22 +105,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ banner }) => {
         </div>
       </div>
 
-      {/* Prev / Next Navigation Chevron Buttons */}
-      <button
-        onClick={prevSlide}
-        aria-label="Previous Slide"
-        className="absolute left-3 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/40 hover:bg-black/80 text-white backdrop-blur-md transition-all opacity-80 hover:opacity-100 active:scale-90 cursor-pointer hidden sm:flex"
-      >
-        <ChevronLeft className="w-6 h-6" />
-      </button>
 
-      <button
-        onClick={nextSlide}
-        aria-label="Next Slide"
-        className="absolute right-3 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/40 hover:bg-black/80 text-white backdrop-blur-md transition-all opacity-80 hover:opacity-100 active:scale-90 cursor-pointer hidden sm:flex"
-      >
-        <ChevronRight className="w-6 h-6" />
-      </button>
 
       {/* Slide Navigation Pagination Dots */}
       <div className="absolute bottom-4 left-0 w-full z-30 flex justify-center gap-2">
