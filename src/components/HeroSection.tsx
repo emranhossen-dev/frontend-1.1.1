@@ -63,7 +63,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ banner }) => {
   };
 
   return (
-    <section className="relative w-full h-[520px] sm:h-[600px] bg-slate-950 overflow-hidden group select-none">
+    <section className="relative w-full h-[calc(100dvh-64px)] sm:h-[calc(100vh-72px)] min-h-[540px] bg-slate-950 overflow-hidden group select-none">
       {/* Slide Images */}
       {slides.map((slide, idx) => (
         <div

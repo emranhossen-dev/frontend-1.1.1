@@ -21,9 +21,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 font-sans text-gray-900 dark:text-gray-100 flex flex-col">
-      {/* Top Announcement Bar */}
-      <AnnouncementBar text={storeConfig.announcementText} />
-
       {/* Top Navigation Header */}
       <Header siteName={storeConfig.name} />
 
