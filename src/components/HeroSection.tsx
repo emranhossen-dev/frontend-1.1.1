@@ -83,25 +83,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ banner }) => {
       ))}
 
       {/* Slide Content Overlay */}
-      <div className="relative z-20 h-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col justify-end pb-12 sm:pb-16">
-        <div className="max-w-xl space-y-4">
-          {/* Badge Pill */}
-          <div className="inline-flex items-center bg-[#FF6B00] text-white px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-md">
-            {slides[currentSlide].badge}
-          </div>
-
-          {/* Headline */}
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight drop-shadow-md">
+      <div className="relative z-20 h-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col items-center justify-end text-center pb-12 sm:pb-16">
+        <div className="max-w-2xl mx-auto space-y-3.5 flex flex-col items-center text-center">
+          {/* Headline (Center Aligned) */}
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight drop-shadow-md text-center">
             {slides[currentSlide].title}
           </h2>
 
-          {/* Subtitle */}
-          <p className="text-gray-200 text-sm sm:text-base font-medium line-clamp-2 max-w-md">
+          {/* Subtitle (Center Aligned) */}
+          <p className="text-gray-200 text-sm sm:text-base font-medium line-clamp-2 max-w-lg mx-auto text-center">
             {slides[currentSlide].subtitle}
           </p>
 
-          {/* Action Buttons styled with Logo Brand Colors (#FF6B00 & #0F396F) */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-2 w-full sm:w-auto">
+          {/* Action Buttons (Center Aligned) */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 w-full sm:w-auto">
             <Link
               href={slides[currentSlide].ctaPrimaryLink}
               className="btn-shimmer w-full sm:w-auto px-8 h-12 bg-[#FF6B00] hover:bg-[#E56000] text-white font-extrabold text-sm rounded-xl flex items-center justify-center transition-all shadow-lg active:scale-95 cursor-pointer"
