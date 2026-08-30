@@ -6,6 +6,9 @@ export const defaultStoreConfig: StoreConfig = {
   currency: "৳",
   logoUrl: "/logo.png",
   announcementText: "Free Delivery on orders over ৳5000 | Use Code: FIRST50",
+  phone: "01895627138",
+  email: "martardhi@gmail.com",
+  address: "Mohammadpur, Dhaka-1207",
 };
 
 export const defaultHeroBanner: HeroBanner = {

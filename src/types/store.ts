@@ -4,6 +4,9 @@ export interface StoreConfig {
   currency: string;
   logoUrl?: string;
   announcementText?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
 }
 
 export interface Category {

@@ -78,15 +78,19 @@ export const Footer: React.FC = () => {
             <div className="space-y-2 text-xs text-gray-700 dark:text-slate-300">
               <div className="flex items-center gap-2.5">
                 <PhoneCall className="w-4 h-4 text-[#FF6B00] shrink-0" />
-                <span>+880 1700-000000 (10 AM - 10 PM)</span>
+                <a href={`tel:${storeConfig.phone || '01895627138'}`} className="hover:text-[#FF6B00] transition-colors">
+                  {storeConfig.phone || '01895627138'} (10 AM - 10 PM)
+                </a>
               </div>
               <div className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-[#FF6B00] shrink-0" />
-                <span>support@domain.com</span>
+                <a href={`mailto:${storeConfig.email || 'martardhi@gmail.com'}`} className="hover:text-[#FF6B00] transition-colors">
+                  {storeConfig.email || 'martardhi@gmail.com'}
+                </a>
               </div>
               <div className="flex items-center gap-2.5">
                 <MapPin className="w-4 h-4 text-[#FF6B00] shrink-0" />
-                <span>Gulshan-2, Dhaka-1212, Bangladesh</span>
+                <span>{storeConfig.address || 'Mohammadpur, Dhaka-1207'}</span>
               </div>
             </div>
           </div>
