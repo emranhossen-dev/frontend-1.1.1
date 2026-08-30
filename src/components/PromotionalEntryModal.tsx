@@ -14,8 +14,22 @@ export const PromotionalEntryModal: React.FC<PromotionalEntryModalProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Simulated countdown timer (12 hours, 45 mins, 30 secs)
-  const [timeLeft, setTimeLeft] = useState({ hours: 12, minutes: 45, seconds: 30 });
+  // Calculate dynamic remaining time until 5:00 PM today (or tomorrow 5:00 PM if past 5 PM)
+  const getRemainingTimeUntil5PM = () => {
+    const now = new Date();
+    let target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 17, 0, 0);
+
+    if (now.getTime() >= target.getTime()) {
+      target = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 17, 0, 0);
+    }
+
+    const diff = target.getTime() - now.getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    return { hours, minutes, seconds };
+  };
 
   useEffect(() => {
     if (forceOpen) {
@@ -35,22 +49,16 @@ export const PromotionalEntryModal: React.FC<PromotionalEntryModalProps> = ({
     }
   }, [forceOpen]);
 
-  // Countdown timer tick effect
+  // Dynamic 5:00 PM Daily Countdown timer tick effect
   useEffect(() => {
     if (!isOpen) return;
 
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        } else if (prev.hours > 0) {
-          return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        }
-        return prev;
-      });
-    }, 1000);
+    const updateTimer = () => {
+      setTimeLeft(getRemainingTimeUntil5PM());
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
 
     return () => clearInterval(interval);
   }, [isOpen]);
