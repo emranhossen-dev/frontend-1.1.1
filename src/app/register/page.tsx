@@ -9,13 +9,12 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BottomNavBar from "@/components/BottomNavBar";
 import { notifySuccess } from "@/lib/sweetalert";
-import { User, Mail, Lock, UserPlus, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { User, Mail, Lock, UserPlus, ArrowRight } from "lucide-react";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { registerWithEmail, loginWithGoogle } = useAuth();
@@ -57,14 +56,14 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 text-gray-900 dark:text-white flex flex-col justify-between font-sans">
+    <div className="min-h-screen bg-white dark:bg-slate-950 text-gray-900 dark:text-white flex flex-col justify-between">
       <Header />
 
-      <main className="flex-1 max-w-md w-full mx-auto px-4 py-4 sm:py-8 flex flex-col justify-center">
-        <div className="space-y-3">
-          
+      <main className="flex-1 max-w-md w-full mx-auto px-6 sm:px-10 py-6 sm:py-10 flex flex-col justify-center">
+        <div className="space-y-6">
+
           {/* Header Logo & Title */}
-          <div className="text-center space-y-1">
+          <div className="text-center space-y-2">
             <Link href="/" className="inline-flex items-center gap-1.5 justify-center">
               <Image
                 src="/logo.png?v=2"
@@ -80,7 +79,7 @@ export default function RegisterPage() {
                 <span className="text-[#0F396F] dark:text-blue-400">Mart</span>
               </span>
             </Link>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight pt-1">
+            <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
               Create Your Account
             </h1>
             <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
@@ -89,15 +88,15 @@ export default function RegisterPage() {
           </div>
 
           {errorMessage && (
-            <div className="p-2.5 bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-800 rounded-xl text-xs font-semibold text-red-600 dark:text-red-300">
+            <div className="p-3 bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-800 rounded-xl text-xs font-semibold text-red-600 dark:text-red-300">
               {errorMessage}
             </div>
           )}
 
           {/* Registration Form */}
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+              <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1.5">
                 Full Name
               </label>
               <div className="relative">
@@ -107,14 +106,14 @@ export default function RegisterPage() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Ardhi Islam"
+                  placeholder="Shamshed Rahman"
                   className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#FF6B00] dark:focus:border-[#FF6B00] transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+              <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1.5">
                 Email Address
               </label>
               <div className="relative">
@@ -124,41 +123,33 @@ export default function RegisterPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="ardhi@example.com"
+                  placeholder="you@example.com"
                   className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#FF6B00] dark:focus:border-[#FF6B00] transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+              <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1.5">
                 Password
               </label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="At least 6 characters"
-                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl pl-10 pr-10 py-2.5 text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#FF6B00] dark:focus:border-[#FF6B00] transition-colors"
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#FF6B00] dark:focus:border-[#FF6B00] transition-colors"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-3 top-2.5 p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer transition-colors"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
               </div>
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-2.5 sm:py-3 rounded-xl bg-[#FF6B00] hover:bg-[#e05e00] text-white font-extrabold text-xs shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full py-3 rounded-xl bg-[#FF6B00] hover:bg-[#e05e00] text-white font-extrabold text-xs shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               <UserPlus className="w-4 h-4" />
               <span>{isSubmitting ? "Creating Account..." : "Create Account"}</span>
@@ -166,12 +157,12 @@ export default function RegisterPage() {
           </form>
 
           {/* Social Sign-In Divider */}
-          <div className="relative my-1">
+          <div className="relative my-2">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-200 dark:border-slate-800" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white dark:bg-slate-950 px-3 text-gray-400 font-bold text-[10px]">
+              <span className="bg-white dark:bg-slate-900 px-3 text-gray-400 font-bold text-[10px]">
                 Or Sign Up With
               </span>
             </div>
@@ -181,7 +172,7 @@ export default function RegisterPage() {
             type="button"
             onClick={handleGoogleSignup}
             disabled={isSubmitting}
-            className="w-full py-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-white text-xs font-bold hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2.5 cursor-pointer shadow-xs"
+            className="w-full py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-white text-xs font-bold hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2.5 cursor-pointer shadow-xs"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -193,7 +184,7 @@ export default function RegisterPage() {
           </button>
 
           {/* Bottom Switch Link */}
-          <div className="text-center text-xs text-gray-500 dark:text-gray-400 !mt-1.5 pt-1 border-t border-gray-200 dark:border-slate-800 pb-0 mb-0">
+          <div className="text-center text-xs text-gray-500 dark:text-gray-400 !mt-2 pt-1 border-t border-gray-200 dark:border-slate-800">
             Already have an account?{" "}
             <Link href="/login" className="text-[#FF6B00] font-extrabold hover:underline inline-flex items-center gap-1">
               <span>Sign In</span>
