@@ -37,8 +37,7 @@ export default function AccountPage() {
     name: 'Alex Sterling',
     status: 'Premium Member',
     email: 'alex.sterling@example.com',
-    avatar:
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop',
+    avatar: '/logo.png',
     totalOrders: 128,
     pendingOrders: 3,
     deliveredOrders: 125,
@@ -50,14 +49,14 @@ export default function AccountPage() {
       productName: 'Minimalist Product',
       status: 'In Transit',
       price: 2450,
-      image: products[0]?.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600',
+      image: products[0]?.image || '/images/ardhimart-smart-pen-holder.webp',
     },
     {
       id: '8874',
       productName: 'Tech Lifestyle Accessory',
       status: 'Delivered',
       price: 1800,
-      image: products[1]?.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600',
+      image: products[1]?.image || '/images/ardhimart-giftbox-valentine-set.webp',
     },
   ];
 
