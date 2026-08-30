@@ -34,6 +34,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
   const computedCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -64,6 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
     if (e) e.preventDefault();
     if (!searchQuery.trim()) return;
     setIsDropdownOpen(false);
+    setIsMobileSearchOpen(false);
     router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
   };
 
@@ -83,8 +85,8 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-gray-200/80 dark:border-slate-800 text-gray-900 dark:text-white shadow-xs">
       <div className="max-w-7xl mx-auto px-1.5 sm:px-4 lg:px-6 h-16 flex items-center justify-between gap-1.5 sm:gap-3">
         
-        {/* Left Group: Hamburger Menu + Logo (Text hidden on mobile) */}
-        <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
+        {/* Left Group: Hamburger Menu + Logo + Brand Name Text */}
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <button
             onClick={handleMenuClick}
             aria-label="Open Mobile Menu"
@@ -97,7 +99,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <Link
             href="/"
-            className="flex items-center gap-1 group shrink-0"
+            className="flex items-center gap-1 sm:gap-1.5 group shrink-0"
             title="ArdhiMart"
           >
             <Image
@@ -109,16 +111,16 @@ export const Header: React.FC<HeaderProps> = ({
               unoptimized
               className="h-5 sm:h-7 w-auto object-contain transition-transform group-hover:scale-105"
             />
-            {/* Brand Name Text: HIDDEN ON MOBILE (hidden sm:inline-block) */}
-            <span className="hidden sm:inline-block font-extrabold text-lg sm:text-xl tracking-tight leading-none">
+            {/* Brand Name Text: VISIBLE ON ALL SCREENS */}
+            <span className="font-extrabold text-base sm:text-xl tracking-tight leading-none">
               <span className="text-[#FF6B00]">Ardhi</span>
               <span className="text-[#0F396F] dark:text-blue-400">Mart</span>
             </span>
           </Link>
         </div>
 
-        {/* Center: Full Interactive Search Bar Input with Live Suggestions */}
-        <div ref={searchRef} className="flex-1 max-w-md mx-0.5 sm:mx-2 min-w-0 relative">
+        {/* Center: Full Interactive Search Bar Input (Desktop View) */}
+        <div ref={searchRef} className="hidden md:block flex-1 max-w-md mx-2 min-w-0 relative">
           <form onSubmit={handleSearchSubmit} className="relative flex items-center w-full">
             <input
               type="text"
@@ -203,8 +205,18 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Right Actions: Cart & Register/Account Button */}
+        {/* Right Actions: Mobile Search Toggle, Cart & Register/Account Button */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+          {/* Mobile Search Icon Toggle Button */}
+          <button
+            onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+            aria-label="Toggle Search Bar"
+            className="md:hidden p-1.5 text-gray-700 dark:text-gray-200 hover:text-[#FF6B00] dark:hover:text-[#FF6B00] transition-colors cursor-pointer"
+          >
+            <Search className="w-5 h-5" />
+          </button>
+
+          {/* Cart Icon Button */}
           <button
             onClick={handleCartClick}
             aria-label="Open Cart"
@@ -251,6 +263,98 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
       </div>
+
+      {/* Mobile Expandable Search Bar Panel (Opens Right Under Navbar on Mobile) */}
+      {isMobileSearchOpen && (
+        <div className="md:hidden border-t border-gray-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-2.5 px-3 shadow-md animate-fade-in relative">
+          <form onSubmit={handleSearchSubmit} className="relative flex items-center w-full">
+            <input
+              type="text"
+              autoFocus
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setIsDropdownOpen(true);
+              }}
+              onFocus={() => setIsDropdownOpen(true)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleSearchSubmit();
+                }
+              }}
+              placeholder="Search gifts, gadgets..."
+              className="w-full h-9 bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md pl-3 pr-9 text-xs font-medium text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#FF6B00] dark:focus:border-[#FF6B00] transition-colors"
+            />
+            <button
+              type="submit"
+              onClick={handleSearchSubmit}
+              aria-label="Search"
+              className="absolute right-0 top-0 bottom-0 px-3 text-gray-500 hover:text-[#FF6B00] dark:text-gray-400 flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+          </form>
+
+          {/* Live Suggestions Dropdown inside Mobile Search Bar */}
+          {isDropdownOpen && searchQuery.trim() !== '' && (
+            <div className="mt-1.5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden z-50">
+              <div className="p-2 space-y-1 max-h-60 overflow-y-auto">
+                <div className="px-2 py-1 flex items-center justify-between text-[10px] font-extrabold uppercase tracking-wider text-gray-400 border-b border-gray-100 dark:border-slate-800 mb-1">
+                  <span>Possible Results</span>
+                  <span>{suggestions.length} items</span>
+                </div>
+
+                {suggestions.length === 0 ? (
+                  <div className="p-2.5 text-center text-xs text-gray-500 dark:text-gray-400 font-medium">
+                    No matching products found.
+                  </div>
+                ) : (
+                  suggestions.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        setIsMobileSearchOpen(false);
+                        router.push(`/products/${item.id}`);
+                      }}
+                      className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="w-8 h-8 object-cover rounded-md bg-gray-100 dark:bg-slate-700 shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                          {item.title}
+                        </h5>
+                        <p className="text-[10px] text-gray-400 font-semibold truncate">
+                          {item.category}
+                        </p>
+                      </div>
+                      <span className="text-xs font-extrabold text-[#FF6B00] shrink-0">
+                        ৳{item.price.toLocaleString()}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <button
+                onClick={(e) => {
+                  setIsMobileSearchOpen(false);
+                  handleSearchSubmit(e);
+                }}
+                className="w-full py-2 bg-gray-50 dark:bg-slate-800/80 hover:bg-[#FF6B00] hover:text-white text-[#FF6B00] font-extrabold text-xs text-center border-t border-gray-100 dark:border-slate-800 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <span>View all product cards for &quot;{searchQuery}&quot;</span>
+                <Search className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </header>
   );
 };
