@@ -96,7 +96,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
               }}
               className={`flex flex-col items-center justify-center w-14 py-1 relative transition-all active:scale-90 ${
                 active
-                  ? 'text-black dark:text-white font-bold'
+                  ? 'text-[#FF6B00] dark:text-[#FF6B00] font-bold'
                   : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-medium'
               }`}
             >
@@ -107,13 +107,15 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
                     alt="Cart"
                     width={26}
                     height={26}
-                    className="w-6.5 h-6.5 object-contain dark:brightness-0 dark:invert"
+                    className={`w-6.5 h-6.5 object-contain transition-all ${
+                      active ? 'brightness-100' : 'opacity-60 dark:brightness-0 dark:invert'
+                    }`}
                   />
                 ) : (
-                  <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                  <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px] text-[#FF6B00]' : 'stroke-2'}`} />
                 )}
                 {tab.badge !== undefined && (
-                  <span className="absolute -top-1.5 -right-2.5 bg-black dark:bg-white text-white dark:text-black font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                  <span className="absolute -top-1.5 -right-2.5 bg-[#FF6B00] text-white font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
                     {tab.badge}
                   </span>
                 )}
@@ -131,7 +133,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
             href={tab.href!}
             className={`flex flex-col items-center justify-center w-14 py-1 relative transition-all active:scale-90 ${
               active
-                ? 'text-black dark:text-white font-bold'
+                ? 'text-[#FF6B00] dark:text-[#FF6B00] font-bold'
                 : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-medium'
             }`}
           >
@@ -142,13 +144,15 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
                   alt="Cart"
                   width={26}
                   height={26}
-                  className="w-6.5 h-6.5 object-contain dark:brightness-0 dark:invert"
+                  className={`w-6.5 h-6.5 object-contain transition-all ${
+                    active ? 'brightness-100' : 'opacity-60 dark:brightness-0 dark:invert'
+                  }`}
                 />
               ) : (
-                <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                <IconComponent className={`w-5 h-5 ${active ? 'stroke-[2.5px] text-[#FF6B00]' : 'stroke-2'}`} />
               )}
               {tab.badge !== undefined && (
-                <span className="absolute -top-1.5 -right-2.5 bg-black dark:bg-white text-white dark:text-black font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                <span className="absolute -top-1.5 -right-2.5 bg-[#FF6B00] text-white font-extrabold text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
                   {tab.badge}
                 </span>
               )}
