@@ -31,6 +31,8 @@ export const PromotionalEntryModal: React.FC<PromotionalEntryModalProps> = ({
     return { hours, minutes, seconds };
   };
 
+  const [timeLeft, setTimeLeft] = useState(getRemainingTimeUntil5PM);
+
   useEffect(() => {
     if (forceOpen) {
       setIsOpen(true);
