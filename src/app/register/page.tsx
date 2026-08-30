@@ -64,15 +64,20 @@ export default function RegisterPage() {
           
           {/* Header Logo & Title */}
           <div className="text-center space-y-2">
-            <Link href="/" className="inline-block">
+            <Link href="/" className="inline-flex items-center gap-1.5 justify-center">
               <Image
-                src="/logo.png"
+                src="/logo.png?v=2"
                 alt="ArdhiMart Logo"
-                width={150}
-                height={38}
+                width={120}
+                height={30}
                 priority
-                className="h-9 w-auto mx-auto object-contain"
+                unoptimized
+                className="h-6 sm:h-7 w-auto object-contain"
               />
+              <span className="font-extrabold text-xl tracking-tight leading-none">
+                <span className="text-[#FF6B00]">Ardhi</span>
+                <span className="text-[#0F396F] dark:text-blue-400">Mart</span>
+              </span>
             </Link>
             <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
               Create Your Account

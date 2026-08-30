@@ -52,7 +52,7 @@ export const FlashSaleSection: React.FC = () => {
             alt="Flash Sale Lightning Icon"
             width={32}
             height={32}
-            className="w-7 h-7 sm:w-8 sm:h-8 object-contain shrink-0 animate-flash-fire cursor-pointer"
+            className="w-7 h-7 sm:w-8 sm:h-8 object-contain shrink-0 drop-shadow-xs"
           />
           <h3 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white tracking-tight truncate whitespace-nowrap">
             Flash Deals
