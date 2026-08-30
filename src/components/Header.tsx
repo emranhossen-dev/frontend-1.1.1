@@ -73,11 +73,11 @@ export const Header: React.FC<HeaderProps> = ({
             <Image
               src="/logo.png?v=2"
               alt="ArdhiMart Logo"
-              width={160}
-              height={40}
+              width={120}
+              height={30}
               priority
               unoptimized
-              className="h-8 sm:h-10 w-auto object-contain transition-transform group-hover:scale-105"
+              className="h-5 sm:h-7 w-auto object-contain transition-transform group-hover:scale-105"
             />
             {/* Brand Name Text: HIDDEN ON MOBILE (hidden sm:inline-block) */}
             <span className="hidden sm:inline-block font-extrabold text-lg sm:text-xl tracking-tight leading-none">
