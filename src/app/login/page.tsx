@@ -51,11 +51,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-white dark:bg-slate-950 text-gray-900 dark:text-white flex flex-col justify-between">
       <Header />
 
-      <main className="flex-1 max-w-md w-full mx-auto px-4 py-12 flex flex-col justify-center">
-        <div className="bg-white dark:bg-slate-900 border border-gray-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
+      <main className="flex-1 max-w-md w-full mx-auto px-4 py-8 sm:py-12 flex flex-col justify-center">
+        <div className="space-y-6">
           
           {/* Header Logo & Title */}
           <div className="text-center space-y-2">
