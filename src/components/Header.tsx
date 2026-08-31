@@ -272,10 +272,23 @@ export const Header: React.FC<HeaderProps> = ({
                   <img
                     src={user.photoURL}
                     alt={user.displayName || 'Profile photo'}
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = 'none';
+                      const parent = (e.target as HTMLElement).parentElement;
+                      if (parent) {
+                        const fallback = parent.querySelector('.avatar-fallback');
+                        if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                      }
+                    }}
                     className="w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-full object-cover border-2 border-[#FF6B00] shrink-0"
                   />
-                ) : (
-                  <div className="w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-full bg-[#FF6B00]/10 dark:bg-[#FF6B00]/20 text-[#FF6B00] font-extrabold text-xs flex items-center justify-center border border-[#FF6B00]/30 shrink-0">
+                ) : null}
+                {(!user.photoURL || true) && (
+                  <div
+                    className="avatar-fallback w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-full bg-[#FF6B00]/10 dark:bg-[#FF6B00]/20 text-[#FF6B00] font-extrabold text-xs flex items-center justify-center border border-[#FF6B00]/30 shrink-0"
+                    style={{ display: user.photoURL ? 'none' : 'flex' }}
+                  >
                     {user.displayName ? user.displayName.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
                   </div>
                 )}
@@ -294,13 +307,24 @@ export const Header: React.FC<HeaderProps> = ({
                       <img
                         src={user.photoURL}
                         alt="Google Profile Avatar"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = 'none';
+                          const parent = (e.target as HTMLElement).parentElement;
+                          if (parent) {
+                            const fallback = parent.querySelector('.dropdown-avatar-fallback');
+                            if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                          }
+                        }}
                         className="w-10 h-10 rounded-full object-cover border-2 border-[#FF6B00] shrink-0"
                       />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-[#FF6B00]/10 text-[#FF6B00] font-black text-sm flex items-center justify-center border border-[#FF6B00]/30 shrink-0">
-                        {user.displayName ? user.displayName.charAt(0).toUpperCase() : <User className="w-5 h-5" />}
-                      </div>
-                    )}
+                    ) : null}
+                    <div
+                      className="dropdown-avatar-fallback w-10 h-10 rounded-full bg-[#FF6B00]/10 text-[#FF6B00] font-black text-sm flex items-center justify-center border border-[#FF6B00]/30 shrink-0"
+                      style={{ display: user.photoURL ? 'none' : 'flex' }}
+                    >
+                      {user.displayName ? user.displayName.charAt(0).toUpperCase() : <User className="w-5 h-5" />}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-xs font-extrabold text-gray-900 dark:text-white truncate">
                         {user.displayName || 'ArdhiMart Member'}

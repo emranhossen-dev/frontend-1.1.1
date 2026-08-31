@@ -89,6 +89,7 @@ function AccountContent() {
                 <img
                   src={user.photoURL}
                   alt={user.displayName || 'Google Profile Avatar'}
+                  referrerPolicy="no-referrer"
                   className="w-full h-full object-cover rounded-full"
                 />
               ) : (

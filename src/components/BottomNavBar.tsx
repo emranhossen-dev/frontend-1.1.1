@@ -107,6 +107,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
                   <img
                     src={user.photoURL}
                     alt="Account Avatar"
+                    referrerPolicy="no-referrer"
                     className={`w-5.5 h-5.5 rounded-full object-cover border ${
                       active ? 'border-white ring-2 ring-white/60' : 'border-orange-200'
                     }`}
