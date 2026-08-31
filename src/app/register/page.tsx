@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BottomNavBar from "@/components/BottomNavBar";
-import { notifySuccess } from "@/lib/sweetalert";
+import { notifySuccess, showErrorModal } from "@/lib/sweetalert";
 import { User, Mail, Lock, UserPlus, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
@@ -48,7 +48,9 @@ export default function RegisterPage() {
     e.preventDefault();
     setErrorMessage("");
     if (password.length < 6) {
-      setErrorMessage("Password must be at least 6 characters long.");
+      const msg = "Password must be at least 6 characters long.";
+      setErrorMessage(msg);
+      showErrorModal("Weak Password", msg);
       return;
     }
     setIsSubmitting(true);
@@ -58,7 +60,9 @@ export default function RegisterPage() {
       router.push("/");
     } catch (err: any) {
       console.error(err);
-      setErrorMessage(getFirebaseErrorMessage(err));
+      const msg = getFirebaseErrorMessage(err);
+      setErrorMessage(msg);
+      showErrorModal("Registration Failed", msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -73,7 +77,9 @@ export default function RegisterPage() {
       router.push("/");
     } catch (err: any) {
       console.error(err);
-      setErrorMessage(getFirebaseErrorMessage(err));
+      const msg = getFirebaseErrorMessage(err);
+      setErrorMessage(msg);
+      showErrorModal("Google Sign-Up Failed", msg);
     } finally {
       setIsSubmitting(false);
     }

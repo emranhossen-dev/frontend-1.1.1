@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BottomNavBar from "@/components/BottomNavBar";
-import { notifySuccess } from "@/lib/sweetalert";
+import { notifySuccess, showErrorModal } from "@/lib/sweetalert";
 import { Mail, Lock, LogIn, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
@@ -55,7 +55,9 @@ export default function LoginPage() {
       router.push("/");
     } catch (err: any) {
       console.error(err);
-      setErrorMessage(getFirebaseErrorMessage(err));
+      const msg = getFirebaseErrorMessage(err);
+      setErrorMessage(msg);
+      showErrorModal("Login Failed", msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -70,7 +72,9 @@ export default function LoginPage() {
       router.push("/");
     } catch (err: any) {
       console.error(err);
-      setErrorMessage(getFirebaseErrorMessage(err));
+      const msg = getFirebaseErrorMessage(err);
+      setErrorMessage(msg);
+      showErrorModal("Google Sign-In Failed", msg);
     } finally {
       setIsSubmitting(false);
     }
