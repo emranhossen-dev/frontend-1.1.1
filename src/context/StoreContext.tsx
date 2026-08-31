@@ -105,13 +105,21 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               reviewsCount: typeof item.reviewsCount === 'number' ? item.reviewsCount : 0,
               badge: item.badge || 'New',
               image: item.image || '/images/ardhimart-smart-pen-holder.webp',
-              galleryImages: item.galleryImages && Array.isArray(item.galleryImages) ? item.galleryImages : [],
+              galleryImages: Array.isArray(item.galleryImages)
+                ? item.galleryImages
+                : typeof item.galleryImages === 'string' && item.galleryImages.trim()
+                ? item.galleryImages.split(',').map((s: string) => s.trim()).filter(Boolean)
+                : [],
               category: item.category || 'Electronics',
               color: item.color || item.variantOptions || '',
               shortDescription: item.shortDescription || '',
               description: item.description || '',
               usability: item.usability || '',
-              features: item.features && Array.isArray(item.features) ? item.features : [],
+              features: Array.isArray(item.features)
+                ? item.features
+                : typeof item.features === 'string' && item.features.trim()
+                ? item.features.split('\n').map((s: string) => s.trim()).filter(Boolean)
+                : [],
               material: item.material || '',
               warranty: item.warranty || '',
               deliveryInsideDhaka: item.deliveryInsideDhaka ? Number(item.deliveryInsideDhaka) : 80,

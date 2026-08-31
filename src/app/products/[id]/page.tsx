@@ -127,10 +127,18 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
     );
   }
 
-  const galleryImages = [
-    product.image,
-    ...(product.galleryImages && Array.isArray(product.galleryImages) ? product.galleryImages : []),
-  ].filter(Boolean);
+  const rawGallery = product.galleryImages;
+  let parsedGallery: string[] = [];
+
+  if (Array.isArray(rawGallery)) {
+    parsedGallery = rawGallery;
+  } else if (typeof rawGallery === 'string' && (rawGallery as string).trim()) {
+    parsedGallery = (rawGallery as string).split(',').map((s) => s.trim()).filter(Boolean);
+  }
+
+  const galleryImages = Array.from(
+    new Set([product.image, ...parsedGallery].filter(Boolean))
+  );
 
   const variantOptions = product.color
     ? product.color.split(',').map((s) => s.trim()).filter(Boolean)
