@@ -472,7 +472,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsPageProps) 
             {/* THIRD CTA BUTTON: ORDER ON WHATSAPP WITH SLIDING SHIMMER ANIMATION */}
             <div className="pt-0.5">
               <a
-                href={`https://wa.me/8801700000000?text=${encodeURIComponent(
+                href={`https://wa.me/${(storeConfig?.phone || '01895627138').replace(/^0/, '880').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
                   `Hello, I would like to order "${product.title}".\nPrice: ৳${product.price}`
                 )}`}
                 target="_blank"

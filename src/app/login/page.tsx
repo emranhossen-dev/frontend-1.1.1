@@ -20,6 +20,31 @@ export default function LoginPage() {
   const { loginWithEmail, loginWithGoogle } = useAuth();
   const router = useRouter();
 
+  const getFirebaseErrorMessage = (err: any): string => {
+    if (!err) return "An unexpected error occurred.";
+    const code = err.code || "";
+    switch (code) {
+      case "auth/invalid-credential":
+      case "auth/wrong-password":
+      case "auth/user-not-found":
+        return "Invalid email or password. Please check your credentials.";
+      case "auth/user-disabled":
+        return "This account has been disabled. Please contact support.";
+      case "auth/too-many-requests":
+        return "Too many failed login attempts. Please try again later or reset your password.";
+      case "auth/popup-closed-by-user":
+        return "Google Sign-In popup was closed before completing.";
+      case "auth/popup-blocked":
+        return "Sign-In popup was blocked by your browser. Please allow popups for this site.";
+      case "auth/unauthorized-domain":
+        return "This domain is not authorized in Firebase Console. Please add it to Authorized Domains.";
+      case "auth/network-request-failed":
+        return "Network connection failed. Please check your internet connection.";
+      default:
+        return err.message?.replace(/^Firebase:\s*/, "") || "Failed to log in. Please check your credentials.";
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage("");
@@ -30,7 +55,7 @@ export default function LoginPage() {
       router.push("/");
     } catch (err: any) {
       console.error(err);
-      setErrorMessage(err.message || "Failed to log in. Please check your credentials.");
+      setErrorMessage(getFirebaseErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -45,7 +70,7 @@ export default function LoginPage() {
       router.push("/");
     } catch (err: any) {
       console.error(err);
-      setErrorMessage("Google Sign-In was cancelled or failed.");
+      setErrorMessage(getFirebaseErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -175,7 +200,7 @@ export default function LoginPage() {
         </div>
       </main>
 
-      <Footer />
+      <Footer className="hidden md:block" />
       <BottomNavBar />
     </div>
   );

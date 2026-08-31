@@ -13,7 +13,11 @@ import {
   Heart,
 } from 'lucide-react';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  className?: string;
+}
+
+export const Footer: React.FC<FooterProps> = ({ className = '' }) => {
   const { storeConfig } = useStore();
   const [email, setEmail] = useState('');
 
@@ -26,10 +30,10 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-white dark:bg-slate-950 text-gray-900 dark:text-gray-100 pt-0 pb-20 md:pt-12 md:pb-8 border-t border-gray-200/80 dark:border-slate-800 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 space-y-0 md:space-y-12">
-        {/* Newsletter Banner (Hidden on Mobile) */}
-        <div className="hidden md:flex bg-gray-100 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+    <footer className={`bg-white dark:bg-slate-950 text-gray-900 dark:text-gray-100 pt-8 pb-24 md:pt-12 md:pb-8 border-t border-gray-200/80 dark:border-slate-800 transition-colors ${className}`}>
+      <div className="max-w-7xl mx-auto px-4 space-y-8 md:space-y-12">
+        {/* Newsletter Banner */}
+        <div className="flex bg-gray-100 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
           <div className="space-y-1 text-center md:text-left">
             <h3 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
               Join Our VIP Newsletter
@@ -58,8 +62,8 @@ export const Footer: React.FC = () => {
           </form>
         </div>
 
-        {/* Main Footer Links Grid (Hidden on Mobile) */}
-        <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+        {/* Main Footer Links Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {/* Col 1: Brand Info */}
           <div className="space-y-4">
             <Link href="/" className="inline-block">

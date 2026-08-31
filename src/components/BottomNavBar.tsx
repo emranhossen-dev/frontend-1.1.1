@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { Home, LayoutGrid, Search, ShoppingBag, User, LucideIcon } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface BottomNavBarProps {
   activeTab?: string;
@@ -34,6 +35,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
   const pathname = usePathname();
   const router = useRouter();
   const { cartItems, wishlistIds, setIsSearchOpen } = useStore();
+  const { user } = useAuth();
 
   const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const effectiveWishlistCount = wishlistCount !== undefined ? wishlistCount : wishlistIds.length;
@@ -101,7 +103,15 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
               }`}
             >
               <div className="relative">
-                {tab.id === 'cart' ? (
+                {tab.id === 'account' && user?.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt="Account Avatar"
+                    className={`w-5.5 h-5.5 rounded-full object-cover border ${
+                      active ? 'border-white ring-2 ring-white/60' : 'border-orange-200'
+                    }`}
+                  />
+                ) : tab.id === 'cart' ? (
                   <Image
                     src="/ardhimart-bag.svg"
                     alt="Cart"

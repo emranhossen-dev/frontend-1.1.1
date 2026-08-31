@@ -21,6 +21,29 @@ export default function RegisterPage() {
   const { registerWithEmail, loginWithGoogle } = useAuth();
   const router = useRouter();
 
+  const getFirebaseErrorMessage = (err: any): string => {
+    if (!err) return "An unexpected error occurred.";
+    const code = err.code || "";
+    switch (code) {
+      case "auth/email-already-in-use":
+        return "An account with this email address already exists. Please sign in instead.";
+      case "auth/invalid-email":
+        return "Please enter a valid email address.";
+      case "auth/weak-password":
+        return "Password is too weak. Please use at least 6 characters.";
+      case "auth/popup-closed-by-user":
+        return "Google Sign-In popup was closed before completing.";
+      case "auth/popup-blocked":
+        return "Sign-Up popup was blocked by your browser. Please allow popups for this site.";
+      case "auth/unauthorized-domain":
+        return "This domain is not authorized in Firebase Console. Please add it to Authorized Domains.";
+      case "auth/network-request-failed":
+        return "Network connection failed. Please check your internet connection.";
+      default:
+        return err.message?.replace(/^Firebase:\s*/, "") || "Failed to create account. Please try again.";
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage("");
@@ -35,7 +58,7 @@ export default function RegisterPage() {
       router.push("/");
     } catch (err: any) {
       console.error(err);
-      setErrorMessage(err.message || "Failed to create account. Please try again.");
+      setErrorMessage(getFirebaseErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -50,7 +73,7 @@ export default function RegisterPage() {
       router.push("/");
     } catch (err: any) {
       console.error(err);
-      setErrorMessage("Google Sign-Up was cancelled or failed.");
+      setErrorMessage(getFirebaseErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -189,7 +212,7 @@ export default function RegisterPage() {
         </div>
       </main>
 
-      <Footer />
+      <Footer className="hidden md:block" />
       <BottomNavBar />
     </div>
   );
