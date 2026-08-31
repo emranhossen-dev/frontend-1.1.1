@@ -9,6 +9,7 @@ import {
   defaultHeroBanner,
 } from '@/config/storeConfig';
 import { notifySuccess, notifyInfo, showAddToCartModal } from '@/lib/sweetalert';
+import { useAuth } from '@/context/AuthContext';
 
 interface StoreContextType {
   theme: 'light' | 'dark';
@@ -149,6 +150,32 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [wishlistIds, setWishlistIds] = useState<string[]>([]);
+  const { user } = useAuth();
+
+  // Auto-sync active cart items to backend for admin tracking
+  React.useEffect(() => {
+    if (user) {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ardhimart-backend.onrender.com/api/v1';
+      fetch(`${baseUrl}/customers/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: user.uid,
+          name: user.displayName || 'Customer',
+          email: user.email || '',
+          avatar: user.photoURL || '',
+          provider: user.providerData[0]?.providerId || 'password',
+          cartItems: cartItems.map((i) => ({
+            id: i.product.id,
+            title: i.product.title,
+            price: i.product.price,
+            quantity: i.quantity,
+            image: i.product.image,
+          })),
+        }),
+      }).catch((e) => console.warn('Cart sync error:', e));
+    }
+  }, [user, cartItems]);
 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
