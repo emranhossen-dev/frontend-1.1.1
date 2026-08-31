@@ -7,6 +7,8 @@ import { useStore } from '@/context/StoreContext';
 import { Clock, ShoppingCart, ArrowRight } from 'lucide-react';
 import { ProductCard, ProductSkeletonCard } from '@/components/ProductCard';
 
+import ProductGridCarousel from '@/components/ProductGridCarousel';
+
 export const FlashSaleSection: React.FC = () => {
   const { products, isLoading } = useStore();
 
@@ -40,7 +42,7 @@ export const FlashSaleSection: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const flashProducts = products.slice(0, 6);
+  const flashProducts = products.filter((p) => p.isFlashSale === true);
 
   return (
     <section className="py-5 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto select-none">
@@ -79,7 +81,7 @@ export const FlashSaleSection: React.FC = () => {
         </Link>
       </div>
 
-      {/* 6 PRODUCTS PER ROW SHOWCASE ON DESKTOP */}
+      {/* 2-ROW HORIZONTAL CONTINUOUS AUTO-CAROUSEL WITHOUT ARROW BUTTONS */}
       {!mounted || isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
           {[1, 2, 3, 4, 5, 6].map((n) => (
@@ -94,17 +96,7 @@ export const FlashSaleSection: React.FC = () => {
           <h4 className="text-xs font-bold text-gray-900 dark:text-white">No Flash Sale Products</h4>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-          {flashProducts.map((prod, idx) => (
-            <ProductCard
-              key={prod.id}
-              product={prod}
-              showStockBar={true}
-              stockSoldPercent={85 - idx * 10}
-              stockLeftCount={idx + 2}
-            />
-          ))}
-        </div>
+        <ProductGridCarousel products={flashProducts} showStockBar={true} />
       )}
     </section>
   );

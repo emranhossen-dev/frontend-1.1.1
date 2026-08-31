@@ -31,6 +31,7 @@ export interface Product {
   category: string;
   isNew?: boolean;
   isFeatured?: boolean;
+  isFlashSale?: boolean;
   color?: string;
   variantName?: string;
   shortDescription?: string;
