@@ -72,12 +72,40 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "ArdhiMart",
+    "url": "https://ardhimart.com",
+    "logo": "https://ardhimart.com/logo.png",
+    "image": "https://ardhimart.com/logo.png",
+    "description": "Shop unique gifts, trendy gadgets & premium accessories at ArdhiMart across Bangladesh.",
+    "sameAs": [
+      "https://facebook.com/ardhimart",
+      "https://instagram.com/ardhimart"
+    ]
+  };
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        {/* Explicit Google Favicon & Apple Icon HTML Links */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.png" type="image/png" sizes="48x48" />
+        <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+
+        {/* Google Organization JSON-LD Schema for Google Search & Search Console Brand Logo */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <StoreShell>{children}</StoreShell>
       </body>
