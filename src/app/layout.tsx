@@ -72,19 +72,32 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "ArdhiMart",
-    "url": "https://ardhimart.com",
-    "logo": "https://ardhimart.com/logo.png",
-    "image": "https://ardhimart.com/logo.png",
-    "description": "Shop unique gifts, trendy gadgets & premium accessories at ArdhiMart across Bangladesh.",
-    "sameAs": [
-      "https://facebook.com/ardhimart",
-      "https://instagram.com/ardhimart"
-    ]
-  };
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "ArdhiMart",
+      "url": "https://ardhimart.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://ardhimart.com/products?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "OnlineStore",
+      "name": "ArdhiMart",
+      "url": "https://ardhimart.com",
+      "logo": "https://ardhimart.com/logo.png",
+      "image": "https://ardhimart.com/logo.png",
+      "description": "Shop unique gifts, trendy gadgets & premium accessories at ArdhiMart across Bangladesh.",
+      "sameAs": [
+        "https://facebook.com/ardhimart",
+        "https://instagram.com/ardhimart"
+      ]
+    }
+  ];
 
   return (
     <html
