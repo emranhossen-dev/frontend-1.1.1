@@ -17,35 +17,39 @@ export const ProductGridCarousel: React.FC<ProductGridCarouselProps> = ({
   const [isInteracting, setIsInteracting] = useState(false);
 
   // Group products into 2-row column pairs: [[P0, P1], [P2, P3], [P4, P5], ...]
-  const columns: Product[][] = [];
+  const baseColumns: Product[][] = [];
   for (let i = 0; i < products.length; i += 2) {
-    columns.push(products.slice(i, i + 2));
+    baseColumns.push(products.slice(i, i + 2));
   }
 
-  // Time delay step slide (slides 1 column of 2 products together every 3 seconds)
+  // Triple columns for 100% seamless forward-only endless looping
+  const displayColumns = baseColumns.length > 1 ? [...baseColumns, ...baseColumns, ...baseColumns] : baseColumns;
+
+  // Time delay step slide (always slides FORWARD to the right, NEVER rewinds backward!)
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || columns.length <= 1) return;
+    if (!container || baseColumns.length <= 1) return;
 
     const timer = setInterval(() => {
       if (isInteracting) return;
 
       const firstCol = container.firstElementChild as HTMLElement;
-      const colWidth = firstCol ? firstCol.offsetWidth + 16 : 180; // Column width + gap
+      const colWidth = firstCol ? firstCol.offsetWidth + 16 : 180;
+      const oneSetWidth = container.scrollWidth / 3;
 
-      if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 15) {
-        // Endless loop: rewind smoothly to start
-        container.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        // Slide 1 column (2 products stacked together) forward
-        container.scrollBy({ left: colWidth, behavior: 'smooth' });
+      // If we reach the end of the 2nd set, jump silently back to 1st set without backwards animation
+      if (container.scrollLeft >= oneSetWidth * 2) {
+        container.scrollLeft = container.scrollLeft - oneSetWidth;
       }
+
+      // Always slide FORWARD to the right
+      container.scrollBy({ left: colWidth, behavior: 'smooth' });
     }, 3000);
 
     return () => clearInterval(timer);
-  }, [isInteracting, columns.length]);
+  }, [isInteracting, baseColumns.length]);
 
-  if (columns.length === 0) return null;
+  if (baseColumns.length === 0) return null;
 
   return (
     <div
@@ -56,7 +60,7 @@ export const ProductGridCarousel: React.FC<ProductGridCarouselProps> = ({
       onTouchEnd={() => setIsInteracting(false)}
       className="flex flex-row overflow-x-auto no-scrollbar scroll-smooth gap-3 sm:gap-4 py-1 select-none cursor-grab active:cursor-grabbing w-full"
     >
-      {columns.map((colPair, cIdx) => (
+      {displayColumns.map((colPair, cIdx) => (
         <div key={cIdx} className="w-[160px] sm:w-[190px] md:w-[210px] shrink-0 flex flex-col gap-3 sm:gap-4">
           {colPair.map((product, pIdx) => (
             <div key={product.id} className="w-full">
